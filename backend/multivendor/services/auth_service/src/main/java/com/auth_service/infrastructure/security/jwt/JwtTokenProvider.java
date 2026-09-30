@@ -1,0 +1,45 @@
+package com.auth_service.infrastructure.security.jwt;
+
+import com.auth_service.application.port.out.TokenProvider;
+import com.auth_service.domain.model.aggregate.User;
+import org.springframework.security.oauth2.jwt.JwtClaimsSet;
+import org.springframework.security.oauth2.jwt.JwtEncoder;
+import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
+import org.springframework.stereotype.Component;
+
+import java.time.Instant;
+import java.util.List;
+
+@Component
+public class JwtTokenProvider implements TokenProvider {
+
+    private final JwtEncoder jwtEncoder;
+
+    public JwtTokenProvider(JwtEncoder jwtEncoder) {
+        this.jwtEncoder = jwtEncoder;
+    }
+
+    @Override
+    public String generateAccessToken(User user) {
+
+        Instant now = Instant.now();
+
+        List<String> roles = user.getRoles()
+                .stream()
+                .map(Enum::name)
+                .toList();
+
+        JwtClaimsSet claims = JwtClaimsSet.builder()
+                .issuer("auth-service")
+                .subject(user.getUserId().toString())
+                .issuedAt(now)
+                .expiresAt(now.plusSeconds(900))
+                .claim("email", user.getEmail().getValue())
+                .claim("roles", roles)
+                .build();
+
+        return jwtEncoder
+                .encode(JwtEncoderParameters.from(claims))
+                .getTokenValue();
+    }
+}

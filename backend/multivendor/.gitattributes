@@ -1,2 +1,37 @@
-/mvnw text eol=lf
-*.cmd text eol=crlf
+# ═══ Maven Wrapper (đã có sẵn) ═══
+/mvnw     text eol=lf
+*.cmd     text eol=crlf
+
+# ═══ Mặc định: Git tự quản lý ═══
+* text=auto
+
+# ═══ Source code & config → LF ═══
+*.java       text eol=lf
+*.kt         text eol=lf
+*.xml        text eol=lf
+*.yml        text eol=lf
+*.yaml       text eol=lf
+*.properties text eol=lf
+*.gradle     text eol=lf
+*.md         text eol=lf
+*.json       text eol=lf
+*.sql        text eol=lf
+*.html       text eol=lf
+*.css        text eol=lf
+*.js         text eol=lf
+*.ts         text eol=lf
+
+# ═══ Script & Container → LF ═══
+*.sh       text eol=lf
+Dockerfile text eol=lf
+
+# ═══ Binary ═══
+*.png   binary
+*.jpg   binary
+*.jpeg  binary
+*.gif   binary
+*.ico   binary
+*.pdf   binary
+*.jar   binary
+*.zip   binary
+*.class binary

@@ -32,7 +32,13 @@ spring:
           connectiontimeout: 5000
           timeout: 5000
           writetimeout: 5000
-
+  data:
+    redis:
+      host: localhost
+      port: 6379
+auth:
+  refresh-token:
+    expiration: 604800
 server:
   port: 8081
 logging:

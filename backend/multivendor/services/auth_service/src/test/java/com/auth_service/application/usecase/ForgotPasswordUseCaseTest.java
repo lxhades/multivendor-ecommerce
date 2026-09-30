@@ -36,12 +36,12 @@ public class ForgotPasswordUseCaseTest {
     @InjectMocks
     private ForgotPasswordUseCase useCase;
 
-    private Email email;
+    private String email;
     private User user;
 
     @BeforeEach
     void setUp() {
-        email= Email.of("ducanh957z@gmail.com");
+        email= "ducanh957z@gmail.com";
         user = mock(User.class);
     }
     @Test
@@ -51,14 +51,14 @@ public class ForgotPasswordUseCaseTest {
         ForgotPasswordCommand command = new ForgotPasswordCommand(email);
         PasswordHash hashed = new PasswordHash("$2a$10$hashedvalue");
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(Email.of(email))).thenReturn(Optional.of(user));
         when(passwordHasher.hash(anyString())).thenReturn(hashed);
 
         // When
         useCase.execute(command);
 
         // Then
-        verify(userRepository).findByEmail(email);
+        verify(userRepository).findByEmail(Email.of(email));
         verify(user).changePassword(hashed);
         verify(userRepository).save(user);
         verify(notificationSender).send(eq("ducanh957z@gmail.com"), anyString());
@@ -69,7 +69,7 @@ public class ForgotPasswordUseCaseTest {
         ForgotPasswordCommand command = new ForgotPasswordCommand(email);
         PasswordHash hashed = new PasswordHash("$2a$10$hashedvalue");
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(Email.of(email))).thenReturn(Optional.of(user));
         when(passwordHasher.hash(anyString())).thenReturn(hashed);
 
         useCase.execute(command);
@@ -88,7 +88,7 @@ public class ForgotPasswordUseCaseTest {
         ForgotPasswordCommand command = new ForgotPasswordCommand(email);
         PasswordHash hashed = new PasswordHash("$2a$10$hashedvalue");
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.of(user));
+        when(userRepository.findByEmail(Email.of(email))).thenReturn(Optional.of(user));
         when(passwordHasher.hash(anyString())).thenReturn(hashed);
 
         useCase.execute(command);
@@ -105,7 +105,7 @@ public class ForgotPasswordUseCaseTest {
     void execute_whenUserNotFound_shouldThrowEmailNotFoundException() {
         ForgotPasswordCommand command = new ForgotPasswordCommand(email);
 
-        when(userRepository.findByEmail(email)).thenReturn(Optional.empty());
+        when(userRepository.findByEmail(Email.of(email))).thenReturn(Optional.empty());
 
         assertThatThrownBy(() -> useCase.execute(command))
                 .isInstanceOf(EmailNotFoundException.class)
