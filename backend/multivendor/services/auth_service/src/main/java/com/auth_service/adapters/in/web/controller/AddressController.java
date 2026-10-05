@@ -16,6 +16,9 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 
 import java.util.List;
 
@@ -42,8 +45,11 @@ public class AddressController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<AddressResult>> add(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable String userId,
             @Valid @RequestBody AddAddressRequest request) {
+
+        assertCurrentUser(jwt, userId);
 
         AddressResult result = addAddressUseCase.execute(new AddAddressCommand(
                 userId,
@@ -61,9 +67,12 @@ public class AddressController {
 
     @PutMapping("/{addressId}")
     public ResponseEntity<ApiResponse<AddressResult>> update(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable String userId,
             @PathVariable String addressId,
             @Valid @RequestBody UpdateAddressRequest request) {
+
+        assertCurrentUser(jwt, userId);
 
         AddressResult result = updateAddressUseCase.execute(new UpdateAddressCommand(
                 userId,
@@ -80,8 +89,11 @@ public class AddressController {
 
     @DeleteMapping("/{addressId}")
     public ResponseEntity<ApiResponse<Void>> delete(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable String userId,
             @PathVariable String addressId) {
+
+        assertCurrentUser(jwt, userId);
 
         deleteAddressUseCase.execute(new DeleteAddressCommand(userId, addressId));
 
@@ -90,12 +102,21 @@ public class AddressController {
 
     @GetMapping
     public ResponseEntity<ApiResponse<List<AddressResult>>> getAllAddresses(
+            @AuthenticationPrincipal Jwt jwt,
             @PathVariable String userId) {
+
+        assertCurrentUser(jwt, userId);
 
         List<AddressResult> results = getAllAddressesUseCase.execute(
                 new GetAllAdressesQuery(userId)
         );
 
         return ResponseEntity.ok(ApiResponse.success(results));
+    }
+
+    private void assertCurrentUser(Jwt jwt, String userId) {
+        if (jwt == null || !jwt.getSubject().equals(userId)) {
+            throw new AccessDeniedException("Không có quyền truy cập tài nguyên của người dùng khác");
+        }
     }
 }

@@ -1,16 +1,20 @@
 package com.auth_service.adapters.in.web.controller;
 
 import com.auth_service.adapters.in.web.dto.request.*;
+
 import com.auth_service.adapters.in.web.dto.response.ApiResponse;
 import com.auth_service.application.command.*;
+import com.auth_service.application.port.in.CurrentUserResult;
 import com.auth_service.application.port.in.LoginUserResult;
+import com.auth_service.application.port.in.RefreshTokenResult;
 import com.auth_service.application.port.in.RegisterUserResult;
 import com.auth_service.application.usecase.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -19,15 +23,24 @@ public class AuthController {
     private final LoginUserUseCase loginUserUseCase;
     private final ForgotPasswordUseCase forgotPasswordUseCase;
     private final ChangePasswordUseCase changePasswordUseCase;
+    private final RefreshTokenUseCase refreshTokenUseCase;
+    private final LogoutUseCase logoutUseCase;
+    private final GetCurrentUserUseCase getCurrentUserUseCase;
 
     public AuthController(RegisterUserUseCase registerUserUseCase,
                           LoginUserUseCase loginUserUseCase,
                           ForgotPasswordUseCase forgotPasswordUseCase,
-                          ChangePasswordUseCase changePasswordUseCase) {
+                          ChangePasswordUseCase changePasswordUseCase,
+                          RefreshTokenUseCase refreshTokenUseCase,
+                          LogoutUseCase logoutUseCase,
+                          GetCurrentUserUseCase getCurrentUserUseCase) {
         this.registerUserUseCase = registerUserUseCase;
         this.loginUserUseCase = loginUserUseCase;
         this.forgotPasswordUseCase = forgotPasswordUseCase;
         this.changePasswordUseCase = changePasswordUseCase;
+        this.refreshTokenUseCase = refreshTokenUseCase;
+        this.logoutUseCase = logoutUseCase;
+        this.getCurrentUserUseCase = getCurrentUserUseCase;
     }
 
     @PostMapping("/register")
@@ -61,6 +74,15 @@ public class AuthController {
         return ResponseEntity.ok(ApiResponse.success("Đăng nhập thành công", result));
     }
 
+
+    @GetMapping("/me")
+    public ResponseEntity<ApiResponse<CurrentUserResult>> me(
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        CurrentUserResult result = getCurrentUserUseCase.execute(jwt.getSubject());
+        return ResponseEntity.ok(ApiResponse.success(result));
+    }
+
     @PutMapping("/forgotpassword")
     public ResponseEntity<ApiResponse<Void>> forgotPassword(
             @Valid @RequestBody ForgotpasswordRequest forgotpasswordRequest) {
@@ -78,10 +100,11 @@ public class AuthController {
 
     @PutMapping("/changepassword")
     public ResponseEntity<ApiResponse<Void>> changePassword(
+            @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
 
         ChangePasswordCommand command = new ChangePasswordCommand(
-                changePasswordRequest.getUserId(),
+                jwt.getSubject(),
                 changePasswordRequest.getOldPassword(),
                 changePasswordRequest.getNewPassword()
         );
@@ -90,6 +113,35 @@ public class AuthController {
 
         return ResponseEntity.ok(
                 ApiResponse.success("Đổi mật khẩu thành công", null)
+        );
+    }
+    @PostMapping("/refresh")
+    public ApiResponse<RefreshTokenResult> refresh(
+            @Valid @RequestBody RefreshTokenRequest refreshTokenRequest
+    ) {
+        RefreshTokenCommand command =
+                new RefreshTokenCommand(refreshTokenRequest.refreshToken());
+
+        RefreshTokenResult result =
+                refreshTokenUseCase.execute(command);
+
+        return ApiResponse.success(
+                "Làm mới access token thành công",
+                result
+        );
+    }
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(
+            @Valid @RequestBody RefreshTokenRequest request
+    ) {
+        LogoutCommand command =
+                new LogoutCommand(request.refreshToken());
+
+        logoutUseCase.execute(command);
+
+        return ApiResponse.success(
+                "Đăng xuất thành công",
+                null
         );
     }
 }

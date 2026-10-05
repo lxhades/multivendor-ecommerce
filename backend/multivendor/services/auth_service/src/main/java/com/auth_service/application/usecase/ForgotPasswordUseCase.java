@@ -27,7 +27,7 @@ public class ForgotPasswordUseCase {
         User user = userRepository.findByEmail(Email.of(command.email()))
                 .orElseThrow(() -> new EmailNotFoundException(command.email()));
 
-        String newPassword= String.format("%08d",new SecureRandom().nextInt(100000000));
+        String newPassword = String.format("%06d", new SecureRandom().nextInt(1_000_000));
         PasswordHash newPasswordHash=passwordHasher.hash(newPassword);
         user.changePassword(newPasswordHash);
         userRepository.save(user);

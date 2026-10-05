@@ -7,7 +7,8 @@ import java.util.UUID;
 
 public record LoginUserResult(
         String userId,
-        String email
+        String accessToken,
+        String refreshToken
 
 ) {
 }

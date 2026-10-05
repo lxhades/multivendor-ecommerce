@@ -11,14 +11,13 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-public class ChangePasswordRequest{
+public class ChangePasswordRequest {
 
-    @NotBlank(message = "UserId không được để trống")
-    private String userId;
-    @NotBlank(message = "Mật khẩu không được để trống")
+    @NotBlank(message = "Mật khẩu cũ không được để trống")
     @Size(min = 8, max = 20, message = "Mật khẩu phải từ 8 đến 20 ký tự")
     private String oldPassword;
-    @NotBlank(message = "Mật khẩu không được để trống")
+
+    @NotBlank(message = "Mật khẩu mới không được để trống")
     @Size(min = 8, max = 20, message = "Mật khẩu phải từ 8 đến 20 ký tự")
     private String newPassword;
 }

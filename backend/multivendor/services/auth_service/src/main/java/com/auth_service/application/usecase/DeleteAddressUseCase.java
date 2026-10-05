@@ -21,7 +21,7 @@ public class DeleteAddressUseCase {
         UserId userId= UserId.of(UUID.fromString(command.userId()));
         Long addressId=Long.parseLong(command.addressId());
         User user=userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(null));
+                .orElseThrow(() -> new UserNotFoundException(userId));
         user.deleteAddress(addressId);
         userRepository.save(user);
     }

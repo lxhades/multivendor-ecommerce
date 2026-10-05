@@ -33,6 +33,7 @@ public class User {
         this.status = UserStatus.ACTIVE;
         this.roles = new HashSet<>();
         this.roles.add(Role.BUYER);
+
         this.addresses = new ArrayList<>();
         this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
@@ -108,6 +109,7 @@ public class User {
                 .findFirst()
                 .orElseThrow(() -> new AddressNotFoundException(addressId));
         this.addresses.remove(address);
+        this.updatedAt = Instant.now();
     }
 
     public void assignRole(Role role) {
