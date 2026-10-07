@@ -8,7 +8,7 @@ import com.catalog_service.domain.model.aggregate.Product;
 import com.catalog_service.domain.model.vo.Money;
 import com.catalog_service.domain.model.vo.ProductId;
 import com.catalog_service.domain.model.vo.ProductName;
-import com.catalog_service.domain.model.vo.ProductStatus;
+import com.catalog_service.domain.model.enumtype.ProductStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

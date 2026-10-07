@@ -3,7 +3,7 @@ package com.catalog_service.domain.model.aggregate;
 import com.catalog_service.domain.model.vo.Money;
 import com.catalog_service.domain.model.vo.ProductId;
 import com.catalog_service.domain.model.vo.ProductName;
-import com.catalog_service.domain.model.vo.ProductStatus;
+import com.catalog_service.domain.model.enumtype.ProductStatus;
 import com.catalog_service.domain.model.vo.SellerId;
 
 import java.time.Instant;

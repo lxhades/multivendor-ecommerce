@@ -32,8 +32,8 @@ public class GetProductUseCase {
 
     static ProductResult toResult(Product p) {
         return new ProductResult(
-                p.getProductId().toString(),
-                p.getSellerId().toString(),
+                p.getProductId().value().toString(),
+                p.getSellerId().value().toString(),
                 p.getName().value(),
                 p.getDescription(),
                 p.getPrice().amount().toPlainString(),
