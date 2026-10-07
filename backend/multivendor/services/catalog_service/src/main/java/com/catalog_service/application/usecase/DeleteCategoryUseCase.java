@@ -1,6 +1,7 @@
 package com.catalog_service.application.usecase;
 
 import com.catalog_service.application.port.out.CategoryRepository;
+import com.catalog_service.domain.exception.CategoryNotFoundException;
 import com.catalog_service.domain.model.vo.CategoryId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,7 +14,7 @@ public class DeleteCategoryUseCase {
     @Transactional
     public void execute(String categoryId) {
         CategoryId id = CategoryId.of(UUID.fromString(categoryId));
-        if (!repository.existsById(id)) throw new IllegalArgumentException("Category not found");
+        if (!repository.existsById(id)) throw new CategoryNotFoundException(categoryId);
         repository.deleteById(id);
     }
 }

@@ -3,6 +3,8 @@ package com.catalog_service.application.usecase;
 import com.catalog_service.application.command.CreateCategoryCommand;
 import com.catalog_service.application.port.in.CategoryResult;
 import com.catalog_service.application.port.out.CategoryRepository;
+import com.catalog_service.domain.exception.CategorySlugAlreadyExistsException;
+import com.catalog_service.domain.exception.ParentCategoryNotFoundException;
 import com.catalog_service.domain.model.aggregate.Category;
 import com.catalog_service.domain.model.vo.CategoryId;
 import com.catalog_service.domain.model.vo.CategoryName;
@@ -17,11 +19,11 @@ public class CreateCategoryUseCase {
 
     @Transactional
     public CategoryResult execute(CreateCategoryCommand command) {
-        if (repository.existsBySlug(command.slug())) throw new IllegalArgumentException("Category slug already exists");
+        if (repository.existsBySlug(command.slug())) throw new CategorySlugAlreadyExistsException(command.slug());
         CategoryId parentId = null;
         if (command.parentId() != null && !command.parentId().isBlank()) {
             parentId = CategoryId.of(UUID.fromString(command.parentId()));
-            if (!repository.existsById(parentId)) throw new IllegalArgumentException("Parent category not found");
+            if (!repository.existsById(parentId)) throw new ParentCategoryNotFoundException(command.parentId());
         }
         return toResult(repository.save(Category.create(parentId, new CategoryName(command.name()), command.slug())));
     }
