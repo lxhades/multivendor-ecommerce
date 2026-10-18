@@ -20,10 +20,12 @@ public class ChangeCategoryStatusUseCase {
     }
 
     @Transactional
-    public CreateCategoryResult change(UUID id, CategoryStatus status) {
+    public CreateCategoryResult change(UUID id, String status) {
+        CategoryStatus categoryStatus = CategoryStatus.valueOf(status);
         var category = repository.findById(new CategoryId(id))
                 .orElseThrow(() -> new CategoryNotFoundException(id));
-        category.changeStatus(status, clock.instant());
+
+        category.changeStatus(categoryStatus, clock.instant());
         return CategoryMapper.toResult(repository.save(category));
     }
 }
