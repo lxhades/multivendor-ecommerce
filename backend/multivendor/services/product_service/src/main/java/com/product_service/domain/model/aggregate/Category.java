@@ -22,6 +22,34 @@ public final class Category {
         validateSlug(slug); this.slug = slug;
         createdAt = updatedAt = required(now, "now");
     }
+    public static Category restore(
+            CategoryId id,
+            CategoryId parentId,
+            String name,
+            Slug slug,
+            String description,
+            String imageUrl,
+            CategoryStatus status,
+            int displayOrder,
+            Instant createdAt,
+            Instant updatedAt
+    ) {
+        Category category = new Category(
+                id,
+                parentId,
+                name,
+                slug,
+                createdAt
+        );
+
+        category.description = description;
+        category.imageUrl = imageUrl;
+        category.status = required(status, "status");
+        category.displayOrder = displayOrder;
+        category.updatedAt = required(updatedAt, "updatedAt");
+
+        return category;
+    }
     private void validateParent(CategoryId parent)
     {
         rule(!id.equals(parent), "Category cannot be its own parent");
