@@ -18,10 +18,7 @@ public final class Shop {
     private final Instant createdAt;
     private Instant updatedAt;
 
-    /**
-     * Khởi tạo Shop mới ở trạng thái ACTIVE.
-     * Validate các trường bắt buộc: id, sellerId, name, slug, now.
-     */
+
     public Shop(ShopId id, SellerId sellerId, String name, Slug slug, Instant now) {
         this.id = required(id, "id");
         this.sellerId = required(sellerId, "sellerId");
@@ -31,26 +28,19 @@ public final class Shop {
         status = ShopStatus.ACTIVE;
     }
 
-    /**
-     * Kiểm tra actor có phải chủ sở hữu shop hay không.
-     * Throw nếu sellerId không khớp.
-     */
+
     public void assertOwner(SellerId actor) {
+
         rule(sellerId.equals(actor), "Seller does not own shop");
     }
 
-    /**
-     * Kiểm tra shop có đang được phép bán hàng hay không.
-     * Chỉ cho phép khi status = ACTIVE.
-     */
+
     public void assertCanSell() {
+
         rule(status == ShopStatus.ACTIVE, "Shop is not active");
     }
 
-    /**
-     * Cập nhật hồ sơ shop: tên, slug, logo, banner, mô tả, địa chỉ, thông tin ngân hàng.
-     * Validate tên, slug, now và độ dài bankDetails (tối đa 200 ký tự).
-     */
+
     public void updateProfile(String name, Slug slug, String logoUrl, String bannerUrl,
                               String description, String address, String bankDetails, Instant now) {
         String checked = text(name, "shop name", 200);
@@ -68,9 +58,7 @@ public final class Shop {
         updatedAt = now;
     }
 
-    /**
-     * Thay đổi trạng thái shop (ACTIVE, INACTIVE, SUSPENDED, ...).
-     */
+
     public void changeStatus(ShopStatus status, Instant now) {
         required(status, "status");
         required(now, "now");
@@ -78,10 +66,7 @@ public final class Shop {
         updatedAt = now;
     }
 
-    /**
-     * Thay thế thống kê tổng hợp của shop: rating và số lượng sản phẩm.
-     * Chặn productCount âm.
-     */
+
     public void replaceStatistics(RatingSummary rating, long productCount, Instant now) {
         required(rating, "rating");
         required(now, "now");
@@ -146,5 +131,19 @@ public final class Shop {
 
     public Instant getUpdatedAt() {
         return updatedAt;
+    }
+
+
+    public static Shop restore(ShopId id, SellerId sellerId, String name, Slug slug,
+                               String logoUrl, String bannerUrl, String description, String address,
+                               String bankDetails, ShopStatus status, RatingSummary rating,
+                               long productCount, Instant createdAt, Instant updatedAt) {
+        Shop shop = new Shop(id, sellerId, name, slug, createdAt);
+        shop.updateProfile(name, slug, logoUrl, bannerUrl, description, address, bankDetails, updatedAt);
+        shop.status = required(status, "status");
+        shop.rating = required(rating, "rating");
+        rule(productCount >= 0, "Negative product count");
+        shop.productCount = productCount;
+        return shop;
     }
 }
