@@ -17,6 +17,7 @@
     <description>Multi-vendor E-commerce Microservices</description>
     <modules>
         <module>services/auth_service</module>
+        <module>services/product_service</module>
     </modules>
     <properties>
         <java.version>17</java.version>
