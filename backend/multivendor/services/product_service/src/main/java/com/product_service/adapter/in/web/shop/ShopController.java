@@ -92,9 +92,10 @@ public class ShopController {
     @PatchMapping("/{shopId}/status")
     public ResponseEntity<ApiResponse<ShopResult>> changeStatus(
             @PathVariable UUID shopId,
+            @RequestParam UUID actorSellerId,
             @RequestParam ShopStatus shopStatus) {
 
-        ShopResult updatedShopResult = changeShopStatusUseCase.change(shopId, shopStatus);
+        ShopResult updatedShopResult = changeShopStatusUseCase.change(shopId, actorSellerId, shopStatus);
         return ResponseEntity.ok(ApiResponse.success("Cập nhật trạng thái cửa hàng thành công", updatedShopResult));
     }
 }

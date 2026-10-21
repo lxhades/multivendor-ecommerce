@@ -34,6 +34,8 @@ public class UpdateShopUseCase {
         var shop = repository.findById(new ShopId(id))
                 .orElseThrow(() -> new ShopNotFoundException(id));
 
+        if (!actorSellerId.equals(shop.getSellerId().value()))
+            throw new RuntimeException("Không có quyền truy cập vào shop của người khác");
         shop.assertOwner(new SellerId(actorSellerId));
 
         Slug slug = new Slug(command.slug());

@@ -23,8 +23,10 @@ public class ChangeShopStatusUseCase {
     }
 
     @Transactional
-    public ShopResult change(UUID id, ShopStatus status) {
-        var shop = repository.findById(new ShopId(id)).orElseThrow(() -> new ShopNotFoundException(id));
+    public ShopResult change(UUID shopId, UUID actorSellerId, ShopStatus status) {
+        var shop = repository.findById(new ShopId(shopId)).orElseThrow(() -> new ShopNotFoundException(shopId));
+        if (!actorSellerId.equals(shop.getSellerId().value()))
+            throw new RuntimeException("Không có quyền truy cập vào shop của người khác");
         shop.changeStatus(status, clock.instant());
         return ShopMapper.toResult(repository.save(shop));
     }
