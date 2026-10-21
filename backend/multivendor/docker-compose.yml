@@ -1,4 +1,29 @@
 services:
+  #Kong
+  kong:
+    image: kong:3.9
+    container_name: ecommerce-kong
+    restart: unless-stopped
+    environment:
+      KONG_DATABASE: "off"
+      KONG_DECLARATIVE_CONFIG: /etc/kong/kong.yml
+      KONG_PROXY_LISTEN: 0.0.0.0:8000
+      KONG_ADMIN_LISTEN: 127.0.0.1:8001
+      KONG_LOG_LEVEL: info
+      KONG_ROUTER_FLAVOR: traditional
+    ports:
+      - "${KONG_PROXY_PORT:-8000}:8000"
+      - "8001:8001"
+    volumes:
+      - ./kong-gateway/config/kong.yml:/etc/kong/kong.yml:ro
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD", "kong", "health" ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+
   # Auth DB
   postgres-auth:
     image: postgres:16
@@ -14,7 +39,7 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d auth_db"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d auth_db" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -34,7 +59,7 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d product_db"]
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d product_db" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -57,17 +82,15 @@ services:
     networks:
       - backend
     healthcheck:
-      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-changeme}", "ping"]
+      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-changeme}", "ping" ]
       interval: 10s
       timeout: 3s
       retries: 5
-
 
 volumes:
   postgres_auth_data:
   postgres_product_data:
   redis_data:
-
 
 networks:
   backend:

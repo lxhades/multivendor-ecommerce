@@ -1,0 +1,68 @@
+_format_version: "3.0"
+
+# CẤU HÌNH ĐỊNH TUYẾN (ROUTING)
+services:
+  # 1. Service cho Auth
+  - name: auth-service
+    # Vì bạn chạy Java trên IntelliJ (ngoài Docker), dùng host.docker.internal để Kong gọi ra ngoài
+    url: http://host.docker.internal:8081
+    routes:
+      - name: auth-route
+        paths:
+          - /auth
+        strip_path: false # Giữ nguyên tiền tố /auth khi gửi xuống service
+
+  # 2. Service cho Product
+  - name: product-service
+    url: http://host.docker.internal:8082
+    routes:
+      - name: product-routes
+        paths:
+          - /shops
+          - /categories
+        strip_path: false # Giữ nguyên tiền tố /shops, /categories
+
+# ==========================================
+# CẤU HÌNH XÁC THỰC JWT (NÂNG CAO - BỎ COMMENT ĐỂ DÙNG)
+# ==========================================
+# Lưu ý: Để Kong xác thực JWT, Kong cần biết Public Key để verify chữ ký.
+# Vì bạn đang chạy Kong ở chế độ DB-less (KONG_DATABASE: "off"),
+# bạn phải khai báo Public Key tĩnh hoặc dùng plugin phức tạp hơn.
+# Dưới đây là cấu hình mẫu để Kong bắt buộc phải có JWT hợp lệ khi gọi API.
+
+# plugins:
+#   - name: jwt
+#     route: product-routes
+#     config:
+#       claims_to_verify:
+#         - exp
+#       # Bạn cần cấu hình thêm consumer và key ở đây để Kong biết verify với key nào.
+#       # Tuy nhiên, cách đơn giản nhất để test trong giai đoạn này là để Spring Boot tự verify.
+#       # Kong chỉ làm nhiệm vụ Routing.
+plugins:
+  - name: cors
+    config:
+      origins:
+        - "http://localhost:3000"
+      methods:
+        - GET
+        - POST
+        - PUT
+        - PATCH
+        - DELETE
+        - OPTIONS
+      headers:
+        - Accept
+        - Authorization
+        - Content-Type
+      exposed_headers:
+        - X-User-Id
+        - X-User-Roles
+      credentials: true
+      max_age: 3600
+  - name: rate-limiting
+    route: auth-route # Chỉ áp dụng cho API auth
+    config:
+      minute: 5 # Tối đa 5 request / 1 phút
+      policy: local
+      fault_tolerant: true
