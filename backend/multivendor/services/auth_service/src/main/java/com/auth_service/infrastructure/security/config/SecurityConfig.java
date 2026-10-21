@@ -75,7 +75,7 @@ public class SecurityConfig {
                         .requestMatchers("/buyer/**")
                         .hasRole("BUYER")
 
-                        .anyRequest().authenticated()
+                        .anyRequest().permitAll()
                 )
 
                 .oauth2ResourceServer(oauth2 ->

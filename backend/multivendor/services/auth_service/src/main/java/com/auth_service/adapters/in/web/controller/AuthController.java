@@ -15,6 +15,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -26,6 +28,7 @@ public class AuthController {
     private final RefreshTokenUseCase refreshTokenUseCase;
     private final LogoutUseCase logoutUseCase;
     private final GetCurrentUserUseCase getCurrentUserUseCase;
+    private final RegisterSellerUseCase registerSellerUseCase;
 
     public AuthController(RegisterUserUseCase registerUserUseCase,
                           LoginUserUseCase loginUserUseCase,
@@ -33,7 +36,8 @@ public class AuthController {
                           ChangePasswordUseCase changePasswordUseCase,
                           RefreshTokenUseCase refreshTokenUseCase,
                           LogoutUseCase logoutUseCase,
-                          GetCurrentUserUseCase getCurrentUserUseCase) {
+                          GetCurrentUserUseCase getCurrentUserUseCase,
+                          RegisterSellerUseCase registerSellerUseCase) {
         this.registerUserUseCase = registerUserUseCase;
         this.loginUserUseCase = loginUserUseCase;
         this.forgotPasswordUseCase = forgotPasswordUseCase;
@@ -41,6 +45,7 @@ public class AuthController {
         this.refreshTokenUseCase = refreshTokenUseCase;
         this.logoutUseCase = logoutUseCase;
         this.getCurrentUserUseCase = getCurrentUserUseCase;
+        this.registerSellerUseCase = registerSellerUseCase;
     }
 
     @PostMapping("/register")
@@ -145,5 +150,17 @@ public class AuthController {
                 "Đăng xuất thành công",
                 null
         );
+    }
+
+    @PostMapping("/me/register-seller")
+    public ResponseEntity<ApiResponse<Void>> registerSeller(@AuthenticationPrincipal Jwt jwt) {
+
+        UUID userId = UUID.fromString(jwt.getSubject());
+
+
+        registerSellerUseCase.RegisterSeller(userId);
+
+  
+        return ResponseEntity.ok(ApiResponse.success("Đăng ký Seller thành công", null));
     }
 }
