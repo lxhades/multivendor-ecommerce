@@ -1,6 +1,5 @@
 package com.product_service.adapter.in.web.security.handler;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.product_service.adapter.in.web.response.ApiResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -9,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.stereotype.Component;
+import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
 
