@@ -6,10 +6,11 @@ public record Phone(String value) {
         if (value == null || value.isBlank()) {
             throw new IllegalArgumentException("Phone must not be blank");
         }
-        if(value.length() < 8) {
+        if (value.length() < 8) {
             throw new IllegalArgumentException("Phone must have at least 8 characters");
         }
     }
+
     public static Phone of(String value) {
         return new Phone(value);
     }

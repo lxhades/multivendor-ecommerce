@@ -2,6 +2,7 @@ package com.auth_service.adapters.in.web.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
 import java.time.Instant;
 
 @Getter

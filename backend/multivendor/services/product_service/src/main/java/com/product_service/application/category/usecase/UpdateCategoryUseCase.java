@@ -1,22 +1,29 @@
 package com.product_service.application.category.usecase;
-import java.time.Clock;
-import java.util.UUID;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+
 import com.product_service.application.category.command.UpdateCategoryCommand;
-import com.product_service.application.category.exception.*;
+import com.product_service.application.category.exception.CategoryNotFoundException;
+import com.product_service.application.category.exception.CategorySlugAlreadyExistsException;
 import com.product_service.application.category.mapper.CategoryMapper;
 import com.product_service.application.category.result.CreateCategoryResult;
 import com.product_service.domain.model.aggregate.Category;
-import com.product_service.domain.model.vo.*;
+import com.product_service.domain.model.vo.CategoryId;
+import com.product_service.domain.model.vo.Slug;
 import com.product_service.domain.repository.CategoryRepository;
 import com.product_service.domain.shared.Checks;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Clock;
+import java.util.UUID;
+
 @Service
 public class UpdateCategoryUseCase {
     private final CategoryRepository repository;
     private final Clock clock;
+
     public UpdateCategoryUseCase(CategoryRepository repository, Clock clock) {
-        this.repository = repository; this.clock = clock;
+        this.repository = repository;
+        this.clock = clock;
     }
 
     @Transactional

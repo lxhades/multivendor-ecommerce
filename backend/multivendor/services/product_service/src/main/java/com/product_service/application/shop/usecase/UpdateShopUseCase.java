@@ -1,18 +1,20 @@
 package com.product_service.application.shop.usecase;
 
-import java.time.Clock;
-import java.util.UUID;
-import java.util.Objects;
-
+import com.product_service.application.shop.command.UpdateShopCommand;
+import com.product_service.application.shop.exception.ShopNotFoundException;
+import com.product_service.application.shop.exception.ShopSlugAlreadyExistsException;
+import com.product_service.application.shop.mapper.ShopMapper;
+import com.product_service.application.shop.result.ShopResult;
+import com.product_service.domain.model.vo.SellerId;
+import com.product_service.domain.model.vo.ShopId;
+import com.product_service.domain.model.vo.Slug;
+import com.product_service.domain.repository.ShopRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.product_service.application.shop.command.UpdateShopCommand;
-import com.product_service.application.shop.exception.*;
-import com.product_service.application.shop.mapper.ShopMapper;
-import com.product_service.application.shop.result.ShopResult;
-import com.product_service.domain.model.vo.*;
-import com.product_service.domain.repository.ShopRepository;
+import java.time.Clock;
+import java.util.Objects;
+import java.util.UUID;
 
 @Service
 public class UpdateShopUseCase {

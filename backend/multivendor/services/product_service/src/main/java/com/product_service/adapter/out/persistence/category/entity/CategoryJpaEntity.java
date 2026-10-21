@@ -1,21 +1,14 @@
 package com.product_service.adapter.out.persistence.category.entity;
 
-import java.time.Instant;
-import java.util.UUID;
-
 import com.product_service.domain.model.enumtype.CategoryStatus;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+
+import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @Getter

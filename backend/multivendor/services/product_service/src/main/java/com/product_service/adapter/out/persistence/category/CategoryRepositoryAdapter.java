@@ -1,16 +1,16 @@
 package com.product_service.adapter.out.persistence.category;
 
-import java.util.List;
-import java.util.Optional;
-
-import org.springframework.stereotype.Repository;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.product_service.adapter.out.persistence.category.mapper.CategoryPersistenceMapper;
 import com.product_service.adapter.out.persistence.category.repository.CategoryJpaRepository;
 import com.product_service.domain.model.aggregate.Category;
-import com.product_service.domain.model.vo.*;
+import com.product_service.domain.model.vo.CategoryId;
+import com.product_service.domain.model.vo.Slug;
 import com.product_service.domain.repository.CategoryRepository;
+import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+import java.util.Optional;
 
 @Repository
 @Transactional(readOnly = true)

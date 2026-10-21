@@ -1,4 +1,5 @@
 package com.product_service.adapter.in.web.exception;
+
 import com.product_service.adapter.in.web.response.ErrorResponse;
 import com.product_service.application.category.exception.CategoryNotFoundException;
 import com.product_service.application.category.exception.CategorySlugAlreadyExistsException;
@@ -37,7 +38,6 @@ public class GlobalExceptionHandler {
     }
 
 
-
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ErrorResponse> handleMissingParams(MissingServletRequestParameterException ex, HttpServletRequest request) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
@@ -52,13 +52,33 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, message, request);
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
+
+
+        ex.printStackTrace();
+
+
+        String message = ex.getMessage() != null ? ex.getMessage() : "No message available";
+
+
+        ErrorResponse errorResponse = new ErrorResponse(
+                Instant.now(),
+                HttpStatus.BAD_REQUEST.value(),
+                "Bad Request / Runtime Error",
+                message,
+                request.getRequestURI()
+        );
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllUncaughtException(Exception ex, HttpServletRequest request) {
         log.error("Unknown error occurred at path: {}", request.getRequestURI(), ex);
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error", request);
     }
-
 
 
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request) {

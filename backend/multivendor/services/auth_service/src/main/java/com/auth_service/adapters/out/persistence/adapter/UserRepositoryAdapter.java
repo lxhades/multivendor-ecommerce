@@ -20,7 +20,7 @@ public class UserRepositoryAdapter implements UserRepository {
     private final UserMapper userMapper;
 
     public UserRepositoryAdapter(UserJpaRepository userJpaRepository,
-                                  UserMapper userMapper) {
+                                 UserMapper userMapper) {
         this.userJpaRepository = userJpaRepository;
         this.userMapper = userMapper;
     }
@@ -66,6 +66,7 @@ public class UserRepositoryAdapter implements UserRepository {
     public boolean existsById(UserId userId) {
         return userJpaRepository.existsById(userId.value());
     }
+
     @Override
     @Transactional
     public void deleteById(UserId userId) {

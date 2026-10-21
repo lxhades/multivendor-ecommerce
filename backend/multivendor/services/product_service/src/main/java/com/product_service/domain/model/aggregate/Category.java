@@ -1,9 +1,13 @@
 package com.product_service.domain.model.aggregate;
 
-import java.time.Instant;
-import com.product_service.domain.model.vo.*;
 import com.product_service.domain.model.enumtype.CategoryStatus;
+import com.product_service.domain.model.vo.CategoryId;
+import com.product_service.domain.model.vo.Slug;
+
+import java.time.Instant;
+
 import static com.product_service.domain.shared.Checks.*;
+
 public final class Category {
 
     private final CategoryId id;
@@ -17,11 +21,14 @@ public final class Category {
 
     public Category(CategoryId id, CategoryId parentId, String name, Slug slug, Instant now) {
         this.id = required(id, "id");
-        validateParent(parentId); this.parentId = parentId;
+        validateParent(parentId);
+        this.parentId = parentId;
         this.name = text(name, "category name", 150);
-        validateSlug(slug); this.slug = slug;
+        validateSlug(slug);
+        this.slug = slug;
         createdAt = updatedAt = required(now, "now");
     }
+
     public static Category restore(
             CategoryId id,
             CategoryId parentId,
@@ -50,10 +57,11 @@ public final class Category {
 
         return category;
     }
-    private void validateParent(CategoryId parent)
-    {
+
+    private void validateParent(CategoryId parent) {
         rule(!id.equals(parent), "Category cannot be its own parent");
     }
+
     private void validateSlug(Slug slug) {
         required(slug, "slug");
         rule(slug.value().length() <= 180, "Category slug too long");
@@ -65,28 +73,64 @@ public final class Category {
         parentId = parent;
         updatedAt = now;
     }
+
     public void update(String name, Slug slug, String description, String imageUrl, int displayOrder, Instant now) {
         String checked = text(name, "category name", 150);
-        validateSlug(slug); required(now, "now");
-        this.name = checked; this.slug = slug; this.description = description;
+        validateSlug(slug);
+        required(now, "now");
+        this.name = checked;
+        this.slug = slug;
+        this.description = description;
         this.imageUrl = imageUrl;
-        this.displayOrder = displayOrder; updatedAt = now;
+        this.displayOrder = displayOrder;
+        updatedAt = now;
     }
 
 
     public void changeStatus(CategoryStatus status, Instant now) {
         required(status, "status");
         required(now, "now");
-        this.status = status; updatedAt = now;
+        this.status = status;
+        updatedAt = now;
     }
-    public CategoryId getId() { return id; }
-    public CategoryId getParentId() { return parentId; }
-    public String getName() { return name; }
-    public Slug getSlug() { return slug; }
-    public String getDescription() { return description; }
-    public String getImageUrl() { return imageUrl; }
-    public int getDisplayOrder() { return displayOrder; }
-    public CategoryStatus getStatus() { return status; }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
+
+    public CategoryId getId() {
+        return id;
+    }
+
+    public CategoryId getParentId() {
+        return parentId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Slug getSlug() {
+        return slug;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public int getDisplayOrder() {
+        return displayOrder;
+    }
+
+    public CategoryStatus getStatus() {
+        return status;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
 }

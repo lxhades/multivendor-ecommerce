@@ -9,7 +9,6 @@ import com.product_service.domain.model.aggregate.Category;
 import com.product_service.domain.model.vo.CategoryId;
 import com.product_service.domain.model.vo.Slug;
 import com.product_service.domain.repository.CategoryRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

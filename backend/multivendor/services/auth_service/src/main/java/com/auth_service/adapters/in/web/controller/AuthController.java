@@ -1,7 +1,6 @@
 package com.auth_service.adapters.in.web.controller;
 
 import com.auth_service.adapters.in.web.dto.request.*;
-
 import com.auth_service.adapters.in.web.dto.response.ApiResponse;
 import com.auth_service.application.command.*;
 import com.auth_service.application.port.in.CurrentUserResult;
@@ -12,9 +11,10 @@ import com.auth_service.application.usecase.*;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.web.bind.annotation.*;
+
 @RestController
 @RequestMapping("/auth")
 public class AuthController {
@@ -115,6 +115,7 @@ public class AuthController {
                 ApiResponse.success("Đổi mật khẩu thành công", null)
         );
     }
+
     @PostMapping("/refresh")
     public ApiResponse<RefreshTokenResult> refresh(
             @Valid @RequestBody RefreshTokenRequest refreshTokenRequest
@@ -130,6 +131,7 @@ public class AuthController {
                 result
         );
     }
+
     @PostMapping("/logout")
     public ApiResponse<Void> logout(
             @Valid @RequestBody RefreshTokenRequest request

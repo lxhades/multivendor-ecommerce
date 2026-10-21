@@ -13,14 +13,16 @@ import java.util.UUID;
 @Service
 public class DeleteAddressUseCase {
     private final UserRepository userRepository;
+
     public DeleteAddressUseCase(UserRepository userRepository) {
         this.userRepository = userRepository;
     }
+
     @Transactional
     public void execute(DeleteAddressCommand command) {
-        UserId userId= UserId.of(UUID.fromString(command.userId()));
-        Long addressId=Long.parseLong(command.addressId());
-        User user=userRepository.findById(userId)
+        UserId userId = UserId.of(UUID.fromString(command.userId()));
+        Long addressId = Long.parseLong(command.addressId());
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserNotFoundException(userId));
         user.deleteAddress(addressId);
         userRepository.save(user);

@@ -1,21 +1,15 @@
 package com.auth_service.adapters.in.web.exception;
 
 import com.auth_service.adapters.in.web.dto.response.ErrorResponse;
-import com.auth_service.domain.exception.AccountLockedException;
-import com.auth_service.domain.exception.AddressNotFoundException;
-import com.auth_service.domain.exception.EmailAlreadyExistsException;
-import com.auth_service.domain.exception.EmailNotFoundException;
-import com.auth_service.domain.exception.InvalidPasswordException;
-import com.auth_service.domain.exception.InvalidRefreshTokenException;
-import com.auth_service.domain.exception.UserNotFoundException;
+import com.auth_service.domain.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.security.access.AccessDeniedException;
 import jakarta.validation.ConstraintViolationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -103,7 +97,6 @@ public class GlobalExceptionHandler {
     }
 
 
-
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(
             AccessDeniedException ex, HttpServletRequest request) {
@@ -116,7 +109,6 @@ public class GlobalExceptionHandler {
             AccountLockedException ex, HttpServletRequest request) {
         return build(HttpStatus.FORBIDDEN, "FORBIDDEN", ex.getMessage(), request);
     }
-
 
 
     @ExceptionHandler(UserNotFoundException.class)
@@ -132,13 +124,11 @@ public class GlobalExceptionHandler {
     }
 
 
-
     @ExceptionHandler(EmailAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleEmailExists(
             EmailAlreadyExistsException ex, HttpServletRequest request) {
         return build(HttpStatus.CONFLICT, "CONFLICT", ex.getMessage(), request);
     }
-
 
 
     @ExceptionHandler(Exception.class)

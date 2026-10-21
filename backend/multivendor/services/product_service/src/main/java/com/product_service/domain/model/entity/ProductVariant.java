@@ -1,8 +1,13 @@
 package com.product_service.domain.model.entity;
 
+import com.product_service.domain.model.vo.Money;
+import com.product_service.domain.model.vo.Sku;
+import com.product_service.domain.model.vo.VariantId;
+
 import java.util.Map;
-import com.product_service.domain.model.vo.*;
-import static com.product_service.domain.shared.Checks.*;
+
+import static com.product_service.domain.shared.Checks.required;
+import static com.product_service.domain.shared.Checks.text;
 
 
 public record ProductVariant(

@@ -26,6 +26,7 @@ public class SecurityConfig {
         this.authenticationEntryPoint = authenticationEntryPoint;
         this.accessDeniedHandler = accessDeniedHandler;
     }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
@@ -79,8 +80,9 @@ public class SecurityConfig {
 
                 .oauth2ResourceServer(oauth2 ->
                         oauth2.jwt(jwt ->
-                        {jwt.jwtAuthenticationConverter(
-                                jwtAuthenticationConverter);
+                        {
+                            jwt.jwtAuthenticationConverter(
+                                    jwtAuthenticationConverter);
                         })
                 );
 

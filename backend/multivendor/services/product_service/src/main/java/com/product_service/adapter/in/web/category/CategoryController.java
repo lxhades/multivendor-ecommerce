@@ -1,18 +1,17 @@
 package com.product_service.adapter.in.web.category;
 
-import java.net.URI;
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.http.HttpStatus;
+import com.product_service.adapter.in.web.response.ApiResponse;
+import com.product_service.application.category.command.ChangeStatusCategoryCommand;
+import com.product_service.application.category.command.CreateCategoryCommand;
+import com.product_service.application.category.command.UpdateCategoryCommand;
+import com.product_service.application.category.result.CreateCategoryResult;
+import com.product_service.application.category.usecase.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import com.product_service.adapter.in.web.response.ApiResponse;
-import com.product_service.application.category.command.*;
-import com.product_service.application.category.result.CreateCategoryResult;
-import com.product_service.application.category.usecase.*;
-import com.product_service.domain.model.enumtype.CategoryStatus;
+import java.net.URI;
+import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/categories")

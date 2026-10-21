@@ -2,6 +2,7 @@ package com.product_service.adapter.in.web.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+
 import java.time.Instant;
 
 @Getter

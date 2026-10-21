@@ -11,9 +11,17 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 public class UpdateAddressRequest {
-    @NotBlank @Size(max = 100) private String receiverName;
-    @NotBlank @Pattern(regexp = "^0[0-9]{9}$") private String phone;
-    @NotBlank @Size(max = 255) private String location;
-    @NotBlank @Size(max = 500) private String detail;
+    @NotBlank
+    @Size(max = 100)
+    private String receiverName;
+    @NotBlank
+    @Pattern(regexp = "^0[0-9]{9}$")
+    private String phone;
+    @NotBlank
+    @Size(max = 255)
+    private String location;
+    @NotBlank
+    @Size(max = 500)
+    private String detail;
     private boolean isDefault;
 }

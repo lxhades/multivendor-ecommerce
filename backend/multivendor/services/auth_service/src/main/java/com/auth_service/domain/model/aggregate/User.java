@@ -1,16 +1,14 @@
 package com.auth_service.domain.model.aggregate;
 
-import com.auth_service.domain.model.enumtype.Role;
+import com.auth_service.domain.exception.AddressNotFoundException;
 import com.auth_service.domain.model.entity.Address;
+import com.auth_service.domain.model.enumtype.Role;
 import com.auth_service.domain.model.enumtype.UserStatus;
 import com.auth_service.domain.model.vo.Email;
 import com.auth_service.domain.model.vo.PasswordHash;
 import com.auth_service.domain.model.vo.Phone;
 import com.auth_service.domain.model.vo.UserId;
-import com.auth_service.domain.exception.AddressNotFoundException;
 
-
-import java.security.AuthProvider;
 import java.time.Instant;
 import java.util.*;
 
@@ -72,6 +70,7 @@ public class User {
 
         return user;
     }
+
     public void changePassword(PasswordHash newPasswordHash) {
         this.passwordHash = Objects.requireNonNull(newPasswordHash, "Password hash must not be null");
         this.updatedAt = Instant.now();
@@ -102,7 +101,8 @@ public class User {
         address.setDefault(isDefault);
         this.updatedAt = Instant.now();
     }
-    public void deleteAddress(Long addressId){
+
+    public void deleteAddress(Long addressId) {
         Objects.requireNonNull(addressId, "Address id must not be null");
         Address address = this.addresses.stream()
                 .filter(item -> addressId.equals(item.getAddressId()))
@@ -142,15 +142,41 @@ public class User {
         this.updatedAt = Instant.now();
     }
 
-    public UserId getUserId() { return userId; }
-    public Email getEmail() { return email; }
-    public Phone getPhone() { return phone; }
-    public PasswordHash getPasswordHash() { return passwordHash; }
-    public UserStatus getStatus() { return status; }
-    public Set<Role> getRoles() { return Collections.unmodifiableSet(roles); }
-    public List<Address> getAddresses() { return Collections.unmodifiableList(addresses); }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
+    public UserId getUserId() {
+        return userId;
+    }
+
+    public Email getEmail() {
+        return email;
+    }
+
+    public Phone getPhone() {
+        return phone;
+    }
+
+    public PasswordHash getPasswordHash() {
+        return passwordHash;
+    }
+
+    public UserStatus getStatus() {
+        return status;
+    }
+
+    public Set<Role> getRoles() {
+        return Collections.unmodifiableSet(roles);
+    }
+
+    public List<Address> getAddresses() {
+        return Collections.unmodifiableList(addresses);
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
 
 
     @Override

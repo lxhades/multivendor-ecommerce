@@ -1,98 +1,100 @@
 package com.product_service.adapter.in.web.shop;
 
-import java.net.URI;
-import java.util.List;
-import java.util.UUID;
-
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-
 import com.product_service.adapter.in.web.response.ApiResponse;
-import com.product_service.application.shop.command.*;
+import com.product_service.application.shop.command.CreateShopCommand;
+import com.product_service.application.shop.command.UpdateShopCommand;
 import com.product_service.application.shop.result.ShopResult;
 import com.product_service.application.shop.usecase.*;
 import com.product_service.domain.model.enumtype.ShopStatus;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.net.URI;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/shops")
 public class ShopController {
 
-    private final CreateShopUseCase create;
-    private final GetShopUseCase get;
-    private final ListShopsUseCase list;
-    private final UpdateShopUseCase update;
-    private final CloseShopUseCase close;
-    private final ChangeShopStatusUseCase changeStatus;
+
+    private final CreateShopUseCase createShopUseCase;
+    private final GetShopUseCase getShopUseCase;
+    private final ListShopsUseCase listShopsUseCase;
+    private final UpdateShopUseCase updateShopUseCase;
+    private final CloseShopUseCase closeShopUseCase;
+    private final ChangeShopStatusUseCase changeShopStatusUseCase;
 
     public ShopController(
-            CreateShopUseCase create,
-            GetShopUseCase get,
-            ListShopsUseCase list,
-            UpdateShopUseCase update,
-            CloseShopUseCase close,
-            ChangeShopStatusUseCase changeStatus) {
-        this.create = create;
-        this.get = get;
-        this.list = list;
-        this.update = update;
-        this.close = close;
-        this.changeStatus = changeStatus;
+            CreateShopUseCase createShopUseCase,
+            GetShopUseCase getShopUseCase,
+            ListShopsUseCase listShopsUseCase,
+            UpdateShopUseCase updateShopUseCase,
+            CloseShopUseCase closeShopUseCase,
+            ChangeShopStatusUseCase changeShopStatusUseCase) {
+        this.createShopUseCase = createShopUseCase;
+        this.getShopUseCase = getShopUseCase;
+        this.listShopsUseCase = listShopsUseCase;
+        this.updateShopUseCase = updateShopUseCase;
+        this.closeShopUseCase = closeShopUseCase;
+        this.changeShopStatusUseCase = changeShopStatusUseCase;
     }
 
+    // User tạo cửa hàng
     @PostMapping
-    public ResponseEntity<ApiResponse<ShopResult>> create(@RequestBody CreateShopCommand command) {
-        ShopResult result = create.create(command);
+    public ResponseEntity<ApiResponse<ShopResult>> create(@RequestParam UUID userId, @RequestBody CreateShopCommand createShopCommand) {
+        ShopResult createdShopResult = createShopUseCase.create(userId, createShopCommand);
 
         return ResponseEntity
-                .created(URI.create("/shops/" + result.id()))
-                .body(ApiResponse.success("Tạo cửa hàng thành công", result));
+                .created(URI.create("/shops/" + createdShopResult.id()))
+                .body(ApiResponse.success("Tạo cửa hàng thành công", createdShopResult));
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ShopResult>> get(@PathVariable UUID id) {
-        ShopResult result = get.get(id);
+    @GetMapping("/{shopId}")
+    public ResponseEntity<ApiResponse<ShopResult>> findById(@PathVariable UUID shopId) {
+        ShopResult result = getShopUseCase.get(shopId);
 
         return ResponseEntity.ok(ApiResponse.success(result));
+
     }
 
     @GetMapping
-    public ResponseEntity<ApiResponse<List<ShopResult>>> list(@RequestParam(required = false) UUID sellerId) {
-        List<ShopResult> results = list.list(sellerId);
+    public ResponseEntity<ApiResponse<Page<ShopResult>>> list(
+            @RequestParam(required = false) UUID sellerId,
+            Pageable pageable) {
 
-        return ResponseEntity.ok(ApiResponse.success(results));
+        Page<ShopResult> shopResultPage = listShopsUseCase.list(sellerId, pageable);
+        return ResponseEntity.ok(ApiResponse.success(shopResultPage));
     }
 
-    // actorSellerId is TEMPORARY for development only; replace with authenticated JWT principal.
-    @PutMapping("/{id}")
+    @PutMapping("/{shopId}")
     public ResponseEntity<ApiResponse<ShopResult>> update(
-            @PathVariable UUID id,
+            @PathVariable UUID shopId,
             @RequestParam UUID actorSellerId,
-            @RequestBody UpdateShopCommand command) {
+            @RequestBody UpdateShopCommand updateShopCommand) {
 
-        ShopResult result = update.update(id, actorSellerId, command);
+        ShopResult updatedShopResult = updateShopUseCase.update(shopId, actorSellerId, updateShopCommand);
 
-        return ResponseEntity.ok(ApiResponse.success("Cập nhật cửa hàng thành công", result));
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật cửa hàng thành công", updatedShopResult));
     }
 
-    @DeleteMapping("/{id}")
+    @DeleteMapping("/{shopId}")
     public ResponseEntity<ApiResponse<Void>> close(
-            @PathVariable UUID id,
+            @PathVariable UUID shopId,
             @RequestParam UUID actorSellerId) {
 
-        close.close(id, actorSellerId);
-
+        closeShopUseCase.close(shopId, actorSellerId);
 
         return ResponseEntity.ok(ApiResponse.success("Đóng cửa hàng thành công", null));
     }
 
-
-    @PatchMapping("/{id}/status")
+    @PatchMapping("/{shopId}/status")
     public ResponseEntity<ApiResponse<ShopResult>> changeStatus(
-            @PathVariable UUID id,
-            @RequestParam ShopStatus status) {
+            @PathVariable UUID shopId,
+            @RequestParam ShopStatus shopStatus) {
 
-        ShopResult result = changeStatus.change(id, status);
-
-        return ResponseEntity.ok(ApiResponse.success("Cập nhật trạng thái cửa hàng thành công", result));
+        ShopResult updatedShopResult = changeShopStatusUseCase.change(shopId, shopStatus);
+        return ResponseEntity.ok(ApiResponse.success("Cập nhật trạng thái cửa hàng thành công", updatedShopResult));
     }
 }

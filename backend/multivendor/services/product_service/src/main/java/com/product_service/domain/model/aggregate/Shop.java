@@ -1,8 +1,13 @@
 package com.product_service.domain.model.aggregate;
 
-import java.time.Instant;
-import com.product_service.domain.model.vo.*;
 import com.product_service.domain.model.enumtype.ShopStatus;
+import com.product_service.domain.model.vo.RatingSummary;
+import com.product_service.domain.model.vo.SellerId;
+import com.product_service.domain.model.vo.ShopId;
+import com.product_service.domain.model.vo.Slug;
+
+import java.time.Instant;
+
 import static com.product_service.domain.shared.Checks.*;
 
 public final class Shop {

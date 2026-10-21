@@ -38,8 +38,9 @@ public class ListUsersUseCase {
         int totalPages = filtered.isEmpty() ? 0 : (int) Math.ceil((double) filtered.size() / query.size());
         return new AdminUserListResult(page, query.page(), query.size(), filtered.size(), totalPages);
     }
+
     private AdminUserResult toResult(User user) {
-        if(user == null) {
+        if (user == null) {
             return null;
         }
         AdminUserResult adminUserResult = new AdminUserResult(

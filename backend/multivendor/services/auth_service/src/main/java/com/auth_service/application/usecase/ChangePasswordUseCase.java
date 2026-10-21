@@ -17,6 +17,7 @@ import java.util.UUID;
 public class ChangePasswordUseCase {
     private UserRepository userRepository;
     private PasswordHasher passwordHasher;
+
     public ChangePasswordUseCase(UserRepository userRepository, PasswordHasher passwordHasher) {
         this.userRepository = userRepository;
         this.passwordHasher = passwordHasher;
@@ -24,15 +25,15 @@ public class ChangePasswordUseCase {
 
     @Transactional
     public void execute(ChangePasswordCommand changePasswordCommand) {
-        UserId userId =UserId.of(UUID.fromString( changePasswordCommand.userId()));
+        UserId userId = UserId.of(UUID.fromString(changePasswordCommand.userId()));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(()->new UserNotFoundException(userId));
-        if (passwordHasher.matches(changePasswordCommand.oldPassword(),user.getPasswordHash())){
-            PasswordHash newPassword=passwordHasher.hash(changePasswordCommand.newPassword());
+                .orElseThrow(() -> new UserNotFoundException(userId));
+        if (passwordHasher.matches(changePasswordCommand.oldPassword(), user.getPasswordHash())) {
+            PasswordHash newPassword = passwordHasher.hash(changePasswordCommand.newPassword());
             user.changePassword(newPassword);
             userRepository.save(user);
-        }else{
+        } else {
             throw new InvalidPasswordException("Mật khẩu không đúng");
         }
     }

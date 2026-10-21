@@ -2,11 +2,11 @@ package com.auth_service.infrastructure.security.jwt;
 
 import com.auth_service.application.port.out.TokenProvider;
 import com.auth_service.domain.model.aggregate.User;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.oauth2.jwt.JwtClaimsSet;
 import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
-import org.springframework.beans.factory.annotation.Value;
 
 import java.time.Instant;
 import java.util.List;

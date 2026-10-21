@@ -1,12 +1,11 @@
 package com.product_service.adapter.out.persistence.category.repository;
 
-import java.util.UUID;
-
+import com.product_service.adapter.out.persistence.category.entity.CategoryJpaEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import com.product_service.adapter.out.persistence.category.entity.CategoryJpaEntity;
+import java.util.UUID;
 
 public interface CategoryJpaRepository
         extends JpaRepository<CategoryJpaEntity, UUID> {
@@ -23,9 +22,9 @@ public interface CategoryJpaRepository
                         SELECT parent_id
                         FROM categories
                         WHERE id = :candidateId
-
+                    
                         UNION
-
+                    
                         SELECT c.parent_id
                         FROM categories c
                         JOIN ancestors a ON c.id = a.parent_id

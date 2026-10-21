@@ -8,15 +8,11 @@ import com.auth_service.application.port.out.UserRepository;
 import com.auth_service.domain.exception.InvalidRefreshTokenException;
 import com.auth_service.domain.model.aggregate.User;
 import com.auth_service.domain.model.entity.RefreshToken;
-import com.auth_service.domain.model.vo.Email;
-import com.auth_service.domain.model.vo.PasswordHash;
-import com.auth_service.domain.model.vo.Phone;
 import com.auth_service.domain.model.vo.UserId;
 import com.auth_service.infrastructure.security.RefreshTokenGenerator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
@@ -24,7 +20,8 @@ import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 

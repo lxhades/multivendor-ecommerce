@@ -1,10 +1,16 @@
 package com.product_service.domain.model.aggregate;
 
+import com.product_service.domain.model.entity.ProductApprovalHistory;
+import com.product_service.domain.model.entity.ProductVariant;
+import com.product_service.domain.model.enumtype.ApprovalStatus;
+import com.product_service.domain.model.enumtype.CategoryStatus;
+import com.product_service.domain.model.enumtype.ProductStatus;
+import com.product_service.domain.model.enumtype.ShopStatus;
+import com.product_service.domain.model.vo.*;
+
 import java.time.Instant;
 import java.util.*;
-import com.product_service.domain.model.vo.*;
-import com.product_service.domain.model.entity.*;
-import com.product_service.domain.model.enumtype.*;
+
 import static com.product_service.domain.shared.Checks.*;
 
 public final class Product {
@@ -214,6 +220,28 @@ public final class Product {
                 .filter(ProductVariant::active)
                 .map(ProductVariant::price)
                 .max(Money::compareTo);
+    }
+
+    /**
+     * Reconstitute persisted state without triggering business transitions. Persistence only.
+     */
+    public static Product rehydrate(ProductId id, ShopId shopId, CategoryId categoryId,
+                                    String name, Slug slug, String description, ProductStatus status,
+                                    ApprovalStatus approvalStatus, List<ProductVariant> variants, List<ProductMedia> media,
+                                    List<ProductApprovalHistory> histories, RatingSummary rating, Instant createdAt, Instant updatedAt) {
+        Product p = new Product(id, shopId, categoryId, name, slug, description, createdAt);
+        p.status = required(status, "status");
+        p.approvalStatus = required(approvalStatus, "approvalStatus");
+        for (ProductVariant v : variants) {
+            rule(!p.variants.containsKey(v.id()), "Duplicate variant id");
+            p.assertUniqueSku(v);
+            p.variants.put(v.id(), v);
+        }
+        p.media = List.copyOf(media);
+        p.approvalHistories.addAll(histories);
+        p.rating = required(rating, "rating");
+        p.updatedAt = required(updatedAt, "updatedAt");
+        return p;
     }
 
     public ProductId getId() {

@@ -26,8 +26,9 @@ public class GetUserUseCase {
                 .map(this::toResult)
                 .orElseThrow(() -> new UserNotFoundException(userId));
     }
+
     private AdminUserResult toResult(User user) {
-        if(user == null) {
+        if (user == null) {
             return null;
         }
         AdminUserResult adminUserResult = new AdminUserResult(

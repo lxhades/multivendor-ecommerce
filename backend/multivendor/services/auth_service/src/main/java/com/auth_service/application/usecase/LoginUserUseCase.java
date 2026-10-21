@@ -33,7 +33,7 @@ public class LoginUserUseCase {
     private long refreshTokenExpiration;
 
     public LoginUserUseCase(UserRepository userRepository,
-                             PasswordHasher passwordHasher,
+                            PasswordHasher passwordHasher,
                             TokenProvider tokenProvider,
                             RefreshTokenRepository refreshTokenRepository,
                             RefreshTokenGenerator refreshTokenGenerator) {
