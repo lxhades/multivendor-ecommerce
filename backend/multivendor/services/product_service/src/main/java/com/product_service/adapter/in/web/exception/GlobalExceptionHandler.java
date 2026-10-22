@@ -1,6 +1,6 @@
 package com.product_service.adapter.in.web.exception;
 
-import com.product_service.adapter.in.web.response.response.ErrorResponse;
+import com.product_service.adapter.in.web.dto.response.ErrorResponse;
 import com.product_service.application.category.exception.CategoryNotFoundException;
 import com.product_service.application.category.exception.CategorySlugAlreadyExistsException;
 import com.product_service.domain.exception.DomainException;
@@ -12,6 +12,8 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.servlet.NoHandlerFoundException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.Instant;
 import java.util.stream.Collectors;
@@ -19,6 +21,11 @@ import java.util.stream.Collectors;
 @Slf4j
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+    @ExceptionHandler({NoResourceFoundException.class, NoHandlerFoundException.class})
+    public ResponseEntity<ErrorResponse> handleRouteNotFound(Exception ex, HttpServletRequest request) {
+        String message = "Đường dẫn không tồn tại: " + request.getRequestURI();
+        return buildErrorResponse(HttpStatus.NOT_FOUND, message, request);
+    }
 
     @ExceptionHandler(CategoryNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(CategoryNotFoundException ex, HttpServletRequest request) {
