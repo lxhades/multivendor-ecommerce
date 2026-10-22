@@ -1,4 +1,4 @@
-package com.product_service.adapter.in.web.response.response;
+package com.product_service.adapter.in.web.dto.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
