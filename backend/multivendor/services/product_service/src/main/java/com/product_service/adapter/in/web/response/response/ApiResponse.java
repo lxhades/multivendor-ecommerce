@@ -1,4 +1,4 @@
-package com.product_service.adapter.in.web.response;
+package com.product_service.adapter.in.web.response.response;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 

@@ -1,10 +1,13 @@
 package com.product_service.adapter.in.web.shop;
 
-import com.product_service.adapter.in.web.response.ApiResponse;
+import com.product_service.adapter.in.web.response.request.CreateShopRequest;
+import com.product_service.adapter.in.web.response.request.UpdateShopRequest;
+import com.product_service.adapter.in.web.response.response.ApiResponse;
 import com.product_service.application.shop.command.CreateShopCommand;
 import com.product_service.application.shop.command.UpdateShopCommand;
 import com.product_service.application.shop.result.ShopResult;
 import com.product_service.application.shop.usecase.*;
+import jakarta.validation.Valid; // <-- Thêm import này
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -55,9 +58,21 @@ public class ShopController {
     @PreAuthorize("hasAnyRole('USER', 'SELLER')")
     public ResponseEntity<ApiResponse<ShopResult>> create(
             @AuthenticationPrincipal Jwt jwt,
-            @RequestBody CreateShopCommand createShopCommand) {
+            @Valid @RequestBody CreateShopRequest createShopRequest) {
 
         UUID userId = currentUserId(jwt);
+
+
+        CreateShopCommand createShopCommand = new CreateShopCommand(
+                createShopRequest.name(),
+                createShopRequest.slug(),
+                createShopRequest.logoUrl(),
+                createShopRequest.bannerUrl(),
+                createShopRequest.description(),
+                createShopRequest.address(),
+                createShopRequest.bankDetails()
+        );
+
         ShopResult createdShopResult = createShopUseCase.create(userId, createShopCommand);
 
         return ResponseEntity
@@ -81,7 +96,6 @@ public class ShopController {
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
-
     @GetMapping
     public ResponseEntity<ApiResponse<Page<ShopResult>>> list(Pageable pageable) {
         Page<ShopResult> shopResultPage = listShopsUseCase.list(pageable);
@@ -94,9 +108,20 @@ public class ShopController {
     public ResponseEntity<ApiResponse<ShopResult>> update(
             @PathVariable UUID shopId,
             @AuthenticationPrincipal Jwt jwt,
-            @RequestBody UpdateShopCommand updateShopCommand) {
-
+            @Valid @RequestBody UpdateShopRequest updateShopRequest) {
         UUID actorSellerId = currentUserId(jwt);
+
+
+        UpdateShopCommand updateShopCommand = new UpdateShopCommand(
+                updateShopRequest.name(),
+                updateShopRequest.slug(),
+                updateShopRequest.logoUrl(),
+                updateShopRequest.bannerUrl(),
+                updateShopRequest.description(),
+                updateShopRequest.address(),
+                updateShopRequest.bankDetails()
+        );
+
         ShopResult updatedShopResult = updateShopUseCase.update(shopId, actorSellerId, updateShopCommand);
 
         return ResponseEntity.ok(ApiResponse.success("Cập nhật cửa hàng thành công", updatedShopResult));
@@ -114,6 +139,4 @@ public class ShopController {
 
         return ResponseEntity.ok(ApiResponse.success("Đóng cửa hàng thành công", null));
     }
-
-
 }

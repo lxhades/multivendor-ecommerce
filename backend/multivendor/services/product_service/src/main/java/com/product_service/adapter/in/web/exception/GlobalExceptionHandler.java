@@ -1,6 +1,6 @@
 package com.product_service.adapter.in.web.exception;
 
-import com.product_service.adapter.in.web.response.ErrorResponse;
+import com.product_service.adapter.in.web.response.response.ErrorResponse;
 import com.product_service.application.category.exception.CategoryNotFoundException;
 import com.product_service.application.category.exception.CategorySlugAlreadyExistsException;
 import com.product_service.domain.exception.DomainException;
@@ -20,7 +20,6 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-
     @ExceptionHandler(CategoryNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(CategoryNotFoundException ex, HttpServletRequest request) {
         return buildErrorResponse(HttpStatus.NOT_FOUND, ex.getMessage(), request);
@@ -37,42 +36,25 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, message, request);
     }
 
-
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ErrorResponse> handleMissingParams(MissingServletRequestParameterException ex, HttpServletRequest request) {
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), request);
     }
 
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResponse> handleValidationExceptions(MethodArgumentNotValidException ex, HttpServletRequest request) {
         String message = ex.getBindingResult().getFieldErrors().stream()
                 .map(error -> error.getField() + ": " + error.getDefaultMessage())
-                .collect(Collectors.joining("; "));
-        return buildErrorResponse(HttpStatus.BAD_REQUEST, message, request);
+                .collect(Collectors.joining(" | "));
+        return buildErrorResponse(HttpStatus.BAD_REQUEST, "Dữ liệu không hợp lệ: " + message, request);
     }
 
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(RuntimeException ex, HttpServletRequest request) {
-
-
-        ex.printStackTrace();
-
-
+        log.error("Runtime Exception at path: {}", request.getRequestURI(), ex);
         String message = ex.getMessage() != null ? ex.getMessage() : "No message available";
-
-
-        ErrorResponse errorResponse = new ErrorResponse(
-                Instant.now(),
-                HttpStatus.BAD_REQUEST.value(),
-                "Bad Request / Runtime Error",
-                message,
-                request.getRequestURI()
-        );
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, message, request);
     }
-
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllUncaughtException(Exception ex, HttpServletRequest request) {
@@ -80,9 +62,7 @@ public class GlobalExceptionHandler {
         return buildErrorResponse(HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error", request);
     }
 
-
     private ResponseEntity<ErrorResponse> buildErrorResponse(HttpStatus status, String message, HttpServletRequest request) {
-
         ErrorResponse errorResponse = new ErrorResponse(
                 Instant.now(),
                 status.value(),
@@ -90,7 +70,6 @@ public class GlobalExceptionHandler {
                 message,
                 request.getRequestURI()
         );
-
         return ResponseEntity.status(status).body(errorResponse);
     }
 }
