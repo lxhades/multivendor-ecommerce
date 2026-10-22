@@ -1,6 +1,6 @@
 package com.product_service.adapter.in.web.shop;
 
-import com.product_service.adapter.in.web.response.ApiResponse;
+import com.product_service.adapter.in.web.response.response.ApiResponse;
 import com.product_service.application.shop.result.ShopResult;
 import com.product_service.application.shop.usecase.ChangeShopStatusUseCase;
 import com.product_service.application.shop.usecase.CloseShopUseCase;
