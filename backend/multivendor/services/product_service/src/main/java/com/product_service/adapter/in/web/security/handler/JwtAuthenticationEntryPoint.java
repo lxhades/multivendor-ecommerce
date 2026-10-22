@@ -1,6 +1,6 @@
 package com.product_service.adapter.in.web.security.handler;
 
-import com.product_service.adapter.in.web.response.ApiResponse;
+import com.product_service.adapter.in.web.response.response.ApiResponse;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
