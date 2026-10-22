@@ -1,8 +1,8 @@
 package com.product_service.adapter.in.web.shop;
 
-import com.product_service.adapter.in.web.response.request.CreateShopRequest;
-import com.product_service.adapter.in.web.response.request.UpdateShopRequest;
-import com.product_service.adapter.in.web.response.response.ApiResponse;
+import com.product_service.adapter.in.web.dto.request.CreateShopRequest;
+import com.product_service.adapter.in.web.dto.request.UpdateShopRequest;
+import com.product_service.adapter.in.web.dto.response.ApiResponse;
 import com.product_service.application.shop.command.CreateShopCommand;
 import com.product_service.application.shop.command.UpdateShopCommand;
 import com.product_service.application.shop.result.ShopResult;
@@ -30,6 +30,7 @@ public class ShopController {
     private final CloseShopUseCase closeShopUseCase;
     private final ChangeShopStatusUseCase changeShopStatusUseCase;
 
+
     public ShopController(
             CreateShopUseCase createShopUseCase,
             GetShopUseCase getShopUseCase,
@@ -43,6 +44,7 @@ public class ShopController {
         this.updateShopUseCase = updateShopUseCase;
         this.closeShopUseCase = closeShopUseCase;
         this.changeShopStatusUseCase = changeShopStatusUseCase;
+
     }
 
     private UUID currentUserId(Jwt jwt) {
@@ -139,4 +141,6 @@ public class ShopController {
 
         return ResponseEntity.ok(ApiResponse.success("Đóng cửa hàng thành công", null));
     }
+
+
 }
