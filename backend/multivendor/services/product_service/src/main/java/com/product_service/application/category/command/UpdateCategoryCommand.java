@@ -8,5 +8,5 @@ public record UpdateCategoryCommand(
         String slug,
         String description,
         String imageUrl,
-        int displayOrder) {
+        Integer displayOrder) {
 }

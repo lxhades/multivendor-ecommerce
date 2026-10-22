@@ -1,5 +1,6 @@
 package com.product_service.domain.model.aggregate;
 
+import com.product_service.domain.exception.DomainException;
 import com.product_service.domain.model.enumtype.CategoryStatus;
 import com.product_service.domain.model.vo.CategoryId;
 import com.product_service.domain.model.vo.Slug;
@@ -74,7 +75,7 @@ public final class Category {
         updatedAt = now;
     }
 
-    public void update(String name, Slug slug, String description, String imageUrl, int displayOrder, Instant now) {
+    public void update(String name, Slug slug, String description, String imageUrl, Integer displayOrder, Instant now) {
         String checked = text(name, "category name", 150);
         validateSlug(slug);
         required(now, "now");
@@ -82,7 +83,13 @@ public final class Category {
         this.slug = slug;
         this.description = description;
         this.imageUrl = imageUrl;
-        this.displayOrder = displayOrder;
+        int finalOrder = displayOrder == null ? 0 : displayOrder;
+
+
+        if (finalOrder < 0) {
+            throw new DomainException("Thứ tự hiển thị không được là số âm");
+        }
+        this.displayOrder = finalOrder;
         updatedAt = now;
     }
 

@@ -9,6 +9,6 @@ public record CreateCategoryCommand(
         String slug,
         String description,
         String imageUrl,
-        int displayOrder
+        Integer displayOrder
 ) {
 }

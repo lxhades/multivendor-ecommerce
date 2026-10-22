@@ -23,6 +23,17 @@ public class CategoryRepositoryAdapter implements CategoryRepository {
     }
 
     @Override
+    public List<Category> findByParentId(CategoryId parentId) {
+        return jpaRepository.findByParentId(parentId.value())
+                .stream().map(CategoryPersistenceMapper::toDomain).toList();
+    }
+
+    @Override
+    public boolean existsById(CategoryId categoryId) {
+        return jpaRepository.existsById(categoryId.value());
+    }
+
+    @Override
     public Optional<Category> findById(CategoryId id) {
         return jpaRepository.findById(id.value())
                 .map(CategoryPersistenceMapper::toDomain);

@@ -17,4 +17,8 @@ public interface CategoryRepository {
     boolean existsBySlug(Slug slug, CategoryId excludingId);
 
     boolean isDescendant(CategoryId candidate, CategoryId ancestor);
+
+    List<Category> findByParentId(CategoryId parentId);
+
+    boolean existsById(CategoryId categoryId);
 }

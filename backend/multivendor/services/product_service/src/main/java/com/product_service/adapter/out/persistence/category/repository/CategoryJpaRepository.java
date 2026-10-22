@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface CategoryJpaRepository
@@ -16,6 +17,7 @@ public interface CategoryJpaRepository
 
     boolean existsBySlugAndIdNot(String slug, UUID id);
 
+    List<CategoryJpaEntity> findByParentId(UUID id);
     @Query(
             value = """
                     WITH RECURSIVE ancestors AS (
