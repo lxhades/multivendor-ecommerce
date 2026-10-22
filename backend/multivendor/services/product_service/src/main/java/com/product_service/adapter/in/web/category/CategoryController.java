@@ -113,7 +113,7 @@ public class CategoryController {
     }
 
     @GetMapping("/{parentId}/children")
-    public ResponseEntity<ApiResponse<List<CreateCategoryResult>>> getCategoriesByParentId(@PathVariable UUID parentId) {
+    public ResponseEntity<ApiResponse<List<CreateCategoryResult>>> GetCategoriesByParentIdUseCase(@PathVariable UUID parentId) {
         return ResponseEntity.ok(ApiResponse.success(getCategoroiesByParentIdUseCase.get(parentId)));
     }
 }
