@@ -7,8 +7,6 @@ import com.product_service.domain.model.vo.Slug;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
-
-import java.util.List;
 import java.util.Optional;
 
 public interface ShopRepository {
@@ -16,10 +14,11 @@ public interface ShopRepository {
 
     Page<Shop> findAll(Pageable pageable);
 
-    Shop findBySellerId(SellerId sellerId);
+    Optional<Shop> findBySellerId(SellerId sellerId);
 
     Shop save(Shop aggregate);
 
     boolean existsBySlug(Slug slug, ShopId excludingId);
+
     boolean existsShopBySellerId(SellerId sellerId);
 }

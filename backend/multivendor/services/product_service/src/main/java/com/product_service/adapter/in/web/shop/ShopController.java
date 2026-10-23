@@ -8,6 +8,7 @@ import com.product_service.application.shop.command.UpdateShopCommand;
 import com.product_service.application.shop.result.ShopResult;
 import com.product_service.application.shop.usecase.*;
 import jakarta.validation.Valid; // <-- Thêm import này
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -21,6 +22,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/shops")
+@RequiredArgsConstructor
 public class ShopController {
 
     private final CreateShopUseCase createShopUseCase;
@@ -29,23 +31,8 @@ public class ShopController {
     private final UpdateShopUseCase updateShopUseCase;
     private final CloseShopUseCase closeShopUseCase;
     private final ChangeShopStatusUseCase changeShopStatusUseCase;
+    private final FindShopBySellerUseCase findShopBySellerUseCase;
 
-
-    public ShopController(
-            CreateShopUseCase createShopUseCase,
-            GetShopUseCase getShopUseCase,
-            ListShopsUseCase listShopsUseCase,
-            UpdateShopUseCase updateShopUseCase,
-            CloseShopUseCase closeShopUseCase,
-            ChangeShopStatusUseCase changeShopStatusUseCase) {
-        this.createShopUseCase = createShopUseCase;
-        this.getShopUseCase = getShopUseCase;
-        this.listShopsUseCase = listShopsUseCase;
-        this.updateShopUseCase = updateShopUseCase;
-        this.closeShopUseCase = closeShopUseCase;
-        this.changeShopStatusUseCase = changeShopStatusUseCase;
-
-    }
 
     private UUID currentUserId(Jwt jwt) {
         String sub = jwt.getSubject();
@@ -94,7 +81,7 @@ public class ShopController {
     @PreAuthorize("hasRole('SELLER')")
     public ResponseEntity<ApiResponse<ShopResult>> myShopDetail(@AuthenticationPrincipal Jwt jwt) {
         UUID shopId = currentUserId(jwt);
-        ShopResult result = getShopUseCase.get(shopId);
+        ShopResult result = findShopBySellerUseCase.get(shopId);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 

@@ -26,6 +26,7 @@ public class ShopRepositoryAdapter implements ShopRepository {
 
     @Override
     public Optional<Shop> findById(ShopId id) {
+
         return jpa.findById(id.value()).map(ShopPersistenceMapper::toDomain);
     }
 
@@ -36,10 +37,11 @@ public class ShopRepositoryAdapter implements ShopRepository {
     }
 
     @Override
-    public Shop findBySellerId(SellerId sellerId) {
+    public Optional<Shop> findBySellerId(SellerId sellerId) {
         return jpa.findBySellerId(sellerId.value())
-                .map(ShopPersistenceMapper::toDomain)
-                .orElseThrow(() -> new RuntimeException("Không tìm thấy Shop cho seller này"));
+                .map(ShopPersistenceMapper::toDomain);
+
+
     }
 
     @Override
