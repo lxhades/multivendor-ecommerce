@@ -1,6 +1,9 @@
 package com.product_service.adapter.in.web.dto.request;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
 import org.hibernate.validator.constraints.URL;
 
 import java.util.UUID;
@@ -27,7 +30,6 @@ public record CreateCategoryRequest(
         String imageUrl,
 
 
-        @Null
         @Min(value = 0, message = "Thứ tự hiển thị không được là số âm")
         Integer displayOrder
 ) {
