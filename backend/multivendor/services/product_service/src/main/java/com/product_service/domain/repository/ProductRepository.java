@@ -1,19 +1,26 @@
 package com.product_service.domain.repository;
 
 import com.product_service.domain.model.aggregate.Product;
-import com.product_service.domain.model.vo.ProductId;
-import com.product_service.domain.model.vo.ShopId;
-import com.product_service.domain.model.vo.Slug;
 
+import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 public interface ProductRepository {
-    Optional<Product> findById(ProductId id);
+    Product save(Product product);
 
-    Product save(Product aggregate);
+    Optional<Product> findById(UUID id);
 
-    void deleteById(ProductId id);
+    Optional<Product> findByIdAndShopId(UUID id, UUID shopId);
 
-    boolean existsByShopIdAndSlug(ShopId shopId, Slug slug, ProductId excludingId);
+    Optional<Product> findVisibleById(UUID id);
 
+    List<Product> findVisible(UUID shopId, UUID categoryId, Collection<UUID> categoryIds);
+
+    List<Product> findByShop(UUID shopId);
+
+    List<Product> findPending();
+
+    boolean existsSlug(UUID shopId, String slug, UUID exceptId);
 }

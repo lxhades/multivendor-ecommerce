@@ -3,300 +3,214 @@ package com.product_service.domain.model.aggregate;
 import com.product_service.domain.model.entity.ProductApprovalHistory;
 import com.product_service.domain.model.entity.ProductVariant;
 import com.product_service.domain.model.enumtype.ApprovalStatus;
-import com.product_service.domain.model.enumtype.CategoryStatus;
 import com.product_service.domain.model.enumtype.ProductStatus;
-import com.product_service.domain.model.enumtype.ShopStatus;
-import com.product_service.domain.model.vo.*;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.*;
 
-import static com.product_service.domain.shared.Checks.*;
+public class Product {
+    private final UUID id, shopId;
+    private UUID categoryId;
+    private String name, slug, description, mediaJson;
+    private ProductStatus status;
+    private ApprovalStatus approvalStatus;
+    private final List<ProductVariant> variants = new ArrayList<>();
+    private final List<ProductApprovalHistory> histories = new ArrayList<>();
+    private BigDecimal minPrice;
+    private long soldCount;
+    private Instant createdAt, updatedAt, deletedAt;
 
-public final class Product {
-
-    private final ProductId id;
-    private final ShopId shopId;
-    private CategoryId categoryId;
-    private String name, description;
-    private Slug slug;
-    private ProductStatus status = ProductStatus.DRAFT;
-    private ApprovalStatus approvalStatus = ApprovalStatus.NOT_SUBMITTED;
-    private final Map<VariantId, ProductVariant> variants = new LinkedHashMap<>();
-    private List<ProductMedia> media = List.of();
-    private final List<ProductApprovalHistory> approvalHistories = new ArrayList<>();
-    private RatingSummary rating = RatingSummary.empty();
-    private final Instant createdAt;
-    private Instant updatedAt;
-
-
-    public Product(ProductId id, ShopId shopId, CategoryId categoryId, String name, Slug slug, String description, Instant now) {
-        this.id = required(id, "id");
-        this.shopId = required(shopId, "shopId");
-        this.categoryId = required(categoryId, "categoryId");
-        this.name = text(name, "product name", 200);
-        this.slug = required(slug, "slug");
-        this.description = description;
-        createdAt = updatedAt = required(now, "now");
+    public Product(
+            UUID id, UUID shopId, UUID categoryId,
+            String name, String slug, String description, String mediaJson, Instant now) {
+        this.id = Objects.requireNonNull(id);
+        this.shopId = Objects.requireNonNull(shopId);
+        this.createdAt = Objects.requireNonNull(now);
+        this.updatedAt = now;
+        this.status = ProductStatus.INACTIVE;
+        this.approvalStatus = ApprovalStatus.PENDING;
+        editFields(categoryId, name, slug, description, mediaJson);
     }
 
-
-    private void assertEditable() {
-        rule(status != ProductStatus.ARCHIVED, "Archived product cannot be edited");
-        rule(approvalStatus != ApprovalStatus.PENDING, "Pending product cannot be edited");
-    }
-
-
-    private void edited(Instant now) {
-        approvalStatus = ApprovalStatus.NOT_SUBMITTED;
-        if (status == ProductStatus.PUBLISHED) {
-            status = ProductStatus.HIDDEN;
-        }
-        updatedAt = now;
-    }
-
-
-    public void updateDetails(CategoryId categoryId, String name, Slug slug, String description, Instant now) {
-        assertEditable();
-        required(categoryId, "categoryId");
-        required(slug, "slug");
-        required(now, "now");
-        String checked = text(name, "product name", 200);
-        this.categoryId = categoryId;
-        this.name = checked;
-        this.slug = slug;
-        this.description = description;
-        edited(now);
-    }
-
-
-    public void addVariant(ProductVariant variant, Instant now) {
-        assertEditable();
-        required(variant, "variant");
-        required(now, "now");
-        rule(!variants.containsKey(variant.id()), "Duplicate variant id");
-        assertUniqueSku(variant);
-        variants.put(variant.id(), variant);
-        edited(now);
-    }
-
-
-    public void updateVariant(ProductVariant variant, Instant now) {
-        assertEditable();
-        required(variant, "variant");
-        required(now, "now");
-        rule(variants.containsKey(variant.id()), "Variant not found");
-        assertUniqueSku(variant);
-        variants.put(variant.id(), variant);
-        edited(now);
-    }
-
-
-    private void assertUniqueSku(ProductVariant candidate) {
-        rule(
-                variants.values().stream()
-                        .noneMatch(v -> !v.id().equals(candidate.id()) && v.sku().equals(candidate.sku())),
-                "SKU already exists in product"
-        );
-    }
-
-
-    public void removeVariant(VariantId variantId, Instant now) {
-        assertEditable();
-        required(now, "now");
-        rule(variants.containsKey(variantId), "Variant not found");
-        variants.remove(variantId);
-        edited(now);
-    }
-
-    public void replaceMedia(List<ProductMedia> media, Instant now) {
-        assertEditable();
-        List<ProductMedia> copy = List.copyOf(media);
-        required(now, "now");
-        this.media = copy;
-        edited(now);
-    }
-
-    public void submitForApproval(Instant now) {
-        assertEditable();
-        required(now, "now");
-        rule(
-                approvalStatus == ApprovalStatus.NOT_SUBMITTED || approvalStatus == ApprovalStatus.REJECTED,
-                "Cannot submit in current approval state"
-        );
-        rule(
-                variants.values().stream().anyMatch(ProductVariant::active),
-                "At least one active variant required"
-        );
-        approvalStatus = ApprovalStatus.PENDING;
-        updatedAt = now;
-    }
-
-
-    public void decide(ApprovalHistoryId historyId, UUID adminId, boolean approved, String reason, Instant now) {
-        rule(
-                status != ProductStatus.ARCHIVED && approvalStatus == ApprovalStatus.PENDING,
-                "Product is not pending approval"
-        );
-        ApprovalStatus decision = approved ? ApprovalStatus.APPROVED : ApprovalStatus.REJECTED;
-        rule(
-                approvalHistories.stream().noneMatch(h -> h.id().equals(historyId)),
-                "Duplicate history id"
-        );
-        ProductApprovalHistory history = new ProductApprovalHistory(historyId, id, adminId, decision, reason, now);
-        approvalHistories.add(history);
-        approvalStatus = decision;
-        updatedAt = now;
-    }
-
-
-    public void publish(Shop shop, Category category, Instant now) {
-        required(now, "now");
-        required(shop, "shop");
-        required(category, "category");
-        rule(status != ProductStatus.ARCHIVED, "Archived product");
-        rule(
-                shopId.equals(shop.getId()) && categoryId.equals(category.getId()),
-                "Wrong shop or category"
-        );
-        shop.assertCanSell();
-        rule(category.getStatus() == CategoryStatus.ACTIVE, "Inactive category");
-        rule(approvalStatus == ApprovalStatus.APPROVED, "Product not approved");
-        rule(
-                variants.values().stream().anyMatch(ProductVariant::active),
-                "No active variant"
-        );
-        status = ProductStatus.PUBLISHED;
-        updatedAt = now;
-    }
-
-
-    public boolean canDisplay(Shop shop, Category category) {
-        return shop != null
-                && category != null
-                && shopId.equals(shop.getId())
-                && categoryId.equals(category.getId())
-                && shop.getStatus() == ShopStatus.ACTIVE
-                && category.getStatus() == CategoryStatus.ACTIVE
-                && status == ProductStatus.PUBLISHED
-                && approvalStatus == ApprovalStatus.APPROVED
-                && variants.values().stream().anyMatch(ProductVariant::active);
-    }
-
-
-    public void hide(Instant now) {
-        required(now, "now");
-        rule(status == ProductStatus.PUBLISHED, "Product not published");
-        status = ProductStatus.HIDDEN;
-        updatedAt = now;
-    }
-
-
-    public void archive(Instant now) {
-        required(now, "now");
-        status = ProductStatus.ARCHIVED;
-        updatedAt = now;
-    }
-
-
-    public void replaceRating(RatingSummary rating, Instant now) {
-        required(rating, "rating");
-        required(now, "now");
-        this.rating = rating;
-        updatedAt = now;
-    }
-
-
-    public Optional<Money> getMinPrice() {
-        return variants.values().stream()
-                .filter(ProductVariant::active)
-                .map(ProductVariant::price)
-                .min(Money::compareTo);
-    }
-
-
-    public Optional<Money> getMaxPrice() {
-        return variants.values().stream()
-                .filter(ProductVariant::active)
-                .map(ProductVariant::price)
-                .max(Money::compareTo);
-    }
-
-    /**
-     * Reconstitute persisted state without triggering business transitions. Persistence only.
-     */
-    public static Product rehydrate(ProductId id, ShopId shopId, CategoryId categoryId,
-                                    String name, Slug slug, String description, ProductStatus status,
-                                    ApprovalStatus approvalStatus, List<ProductVariant> variants, List<ProductMedia> media,
-                                    List<ProductApprovalHistory> histories, RatingSummary rating, Instant createdAt, Instant updatedAt) {
-        Product p = new Product(id, shopId, categoryId, name, slug, description, createdAt);
-        p.status = required(status, "status");
-        p.approvalStatus = required(approvalStatus, "approvalStatus");
-        for (ProductVariant v : variants) {
-            rule(!p.variants.containsKey(v.id()), "Duplicate variant id");
-            p.assertUniqueSku(v);
-            p.variants.put(v.id(), v);
-        }
-        p.media = List.copyOf(media);
-        p.approvalHistories.addAll(histories);
-        p.rating = required(rating, "rating");
-        p.updatedAt = required(updatedAt, "updatedAt");
+    public static Product rehydrate(
+            UUID id, UUID shopId, UUID categoryId,
+            String name, String slug, String description,
+            String mediaJson, ProductStatus status, ApprovalStatus approval,
+            long soldCount,
+            Instant createdAt, Instant updatedAt, Instant deletedAt,
+            List<ProductVariant> variants,
+            List<ProductApprovalHistory> histories) {
+        Product p = new Product(id, shopId, categoryId, name, slug, description, mediaJson, createdAt);
+        p.status = status;
+        p.approvalStatus = approval;
+        p.soldCount = soldCount;
+        p.updatedAt = updatedAt;
+        p.deletedAt = deletedAt;
+        p.variants.addAll(variants);
+        p.histories.addAll(histories);
+        p.recalculateMinPrice();
         return p;
     }
 
-    public ProductId getId() {
+    private void editFields(
+            UUID categoryId, String name, String slug, String description, String mediaJson) {
+        if (categoryId == null || name == null || name.isBlank() || slug == null || slug.isBlank())
+            throw new IllegalArgumentException("Invalid product");
+        this.categoryId = categoryId;
+        this.name = name;
+        this.slug = slug;
+        this.description = description;
+        this.mediaJson = mediaJson;
+    }
+
+    private void checkLive() {
+        if (deletedAt != null) throw new IllegalStateException("Product deleted");
+    }
+
+    public void edit(
+            UUID categoryId, String name, String slug, String description, String mediaJson, Instant at) {
+        checkLive();
+        editFields(categoryId, name, slug, description, mediaJson);
+        approvalStatus = ApprovalStatus.PENDING;
+        updatedAt = at;
+    }
+
+    public void addVariant(ProductVariant v, Instant at) {
+        checkLive();
+        if (variants.stream()
+                .anyMatch(x -> x.id().equals(v.id()) || x.deletedAt() == null && x.sku().equals(v.sku())))
+            throw new IllegalArgumentException("Duplicate variant");
+        variants.add(v);
+        approvalStatus = ApprovalStatus.PENDING;
+        updatedAt = at;
+        recalculateMinPrice();
+    }
+
+    public void editVariant(UUID id, String sku, BigDecimal price, String attrs, boolean active, Instant at) {
+        checkLive();
+        ProductVariant v = variant(id);
+        if (variants.stream().anyMatch(x -> !x.id().equals(id) && x.deletedAt() == null && x.sku().equals(sku)))
+            throw new IllegalArgumentException("Duplicate SKU");
+        v.edit(sku, price, attrs, active);
+        approvalStatus = ApprovalStatus.PENDING;
+        updatedAt = at;
+        recalculateMinPrice();
+    }
+
+    public void deleteVariant(UUID id, Instant at) {
+        checkLive();
+        variant(id).softDelete(at);
+        approvalStatus = ApprovalStatus.PENDING;
+        updatedAt = at;
+        recalculateMinPrice();
+    }
+
+    public ProductVariant variant(UUID id) {
+        return variants.stream().filter(v -> v.id().equals(id) && v.deletedAt() == null).findFirst().orElseThrow(() -> new NoSuchElementException("Variant not found"));
+    }
+
+    public void changeStatus(ProductStatus s, Instant at) {
+        checkLive();
+        status = Objects.requireNonNull(s);
+        updatedAt = at;
+    }
+
+    public void decide(ApprovalStatus decision, UUID adminId, String reason, Instant at) {
+        checkLive();
+        if (decision == ApprovalStatus.PENDING) throw new IllegalArgumentException("Invalid decision");
+        if (approvalStatus != ApprovalStatus.PENDING) throw new IllegalStateException("Not pending");
+        approvalStatus = decision;
+        histories.add(new ProductApprovalHistory(UUID.randomUUID(), adminId, decision, reason, at));
+        updatedAt = at;
+    }
+
+    public void softDelete(Instant at) {
+        checkLive();
+        deletedAt = at;
+        status = ProductStatus.INACTIVE;
+        updatedAt = at;
+        for (ProductVariant v : variants) if (v.deletedAt() == null) v.softDelete(at);
+        recalculateMinPrice();
+    }
+
+    public void recordSale(UUID variantId, long qty) {
+        variant(variantId).recordSale(qty);
+        soldCount = Math.addExact(soldCount, qty);
+    }
+
+    public void recalculateMinPrice() {
+        minPrice = variants.stream()
+                .filter(v -> v.deletedAt() == null && v.active())
+                .map(ProductVariant::price)
+                .min(BigDecimal::compareTo).orElse(null);
+    }
+
+    public boolean canDisplay() {
+        return deletedAt == null && status == ProductStatus.ACTIVE && approvalStatus == ApprovalStatus.APPROVED;
+    }
+
+    public UUID id() {
         return id;
     }
 
-    public ShopId getShopId() {
+    public UUID shopId() {
         return shopId;
     }
 
-    public CategoryId getCategoryId() {
+    public UUID categoryId() {
         return categoryId;
     }
 
-    public String getName() {
+    public String name() {
         return name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public Slug getSlug() {
+    public String slug() {
         return slug;
     }
 
-    public ProductStatus getStatus() {
+    public String description() {
+        return description;
+    }
+
+    public String mediaJson() {
+        return mediaJson;
+    }
+
+    public ProductStatus status() {
         return status;
     }
 
-    public ApprovalStatus getApprovalStatus() {
+    public ApprovalStatus approvalStatus() {
         return approvalStatus;
     }
 
-    public List<ProductVariant> getVariants() {
-        return List.copyOf(variants.values());
+    public BigDecimal minPrice() {
+        return minPrice;
     }
 
-    public List<ProductMedia> getMedia() {
-        return media;
+    public long soldCount() {
+        return soldCount;
     }
 
-    public List<ProductApprovalHistory> getApprovalHistories() {
-        return List.copyOf(approvalHistories);
-    }
-
-    public RatingSummary getRating() {
-        return rating;
-    }
-
-    public Instant getCreatedAt() {
+    public Instant createdAt() {
         return createdAt;
     }
 
-    public Instant getUpdatedAt() {
+    public Instant updatedAt() {
         return updatedAt;
+    }
+
+    public Instant deletedAt() {
+        return deletedAt;
+    }
+
+    public List<ProductVariant> variants() {
+        return List.copyOf(variants);
+    }
+
+    public List<ProductApprovalHistory> histories() {
+        return List.copyOf(histories);
     }
 }

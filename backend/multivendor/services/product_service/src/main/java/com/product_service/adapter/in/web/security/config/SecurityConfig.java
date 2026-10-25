@@ -5,7 +5,6 @@ import com.product_service.adapter.in.web.security.handler.JwtAuthenticationEntr
 import com.product_service.adapter.in.web.security.jwt.JwtAuthenticationConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -42,13 +41,14 @@ public class SecurityConfig {
 
 
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll()
 
-                        .requestMatchers(HttpMethod.GET, "/shops/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/shops").hasAnyRole("SELLER", "ADMIN")
-                        .requestMatchers(HttpMethod.PUT, "/shops/**").hasAnyRole("SELLER", "ADMIN")
+                                .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
 
-                        .anyRequest().authenticated()
+//                        .requestMatchers(HttpMethod.GET, "/shops/**").permitAll()
+//                        .requestMatchers(HttpMethod.POST, "/shops").hasAnyRole("SELLER", "ADMIN")
+//                        .requestMatchers(HttpMethod.PUT, "/shops/**").hasAnyRole("SELLER", "ADMIN")
+
+                                .anyRequest().permitAll()
                 )
 
 
