@@ -1,4 +1,4 @@
-package com.product_service.adapter.out.persistence.product;
+package com.product_service.adapter.out.persistence.product.adapter;
 
 import com.product_service.application.product.port.CategoryTreePort;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -18,7 +18,7 @@ public class CategoryTreeAdapter implements CategoryTreePort {
         this.jdbc = jdbc;
     }
 
-    // Lấy danh sách ID của danh mục hiện tại và TẤT CẢ các danh mục con (cháu, chắt...) của nó
+    // Lấy danh sách ID của danh mục hiện tại và TẤT CẢ các danh mục con
     @Override
     public Set<UUID> descendantsIncluding(UUID id) {
         // Sử dụng Recursive CTE (Common Table Expression) của PostgreSQL để duyệt cây
@@ -35,10 +35,7 @@ public class CategoryTreeAdapter implements CategoryTreePort {
                 SELECT DISTINCT id FROM tree
                 """;
 
-        // Thực thi câu query và trả về danh sách UUID
         List<UUID> ids = jdbc.queryForList(sql, UUID.class, id);
-
-        // Dùng LinkedHashSet để giữ nguyên thứ tự và tự động loại bỏ trùng lặp (nếu có)
         return new LinkedHashSet<>(ids);
     }
 }

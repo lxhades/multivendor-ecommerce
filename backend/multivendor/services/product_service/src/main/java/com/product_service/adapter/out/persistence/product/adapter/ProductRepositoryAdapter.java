@@ -1,4 +1,4 @@
-package com.product_service.adapter.out.persistence.product;
+package com.product_service.adapter.out.persistence.product.adapter;
 
 import com.product_service.adapter.out.persistence.product.entity.ProductApprovalHistoryJpaEntity;
 import com.product_service.adapter.out.persistence.product.entity.ProductJpaEntity;
@@ -43,7 +43,6 @@ public class ProductRepositoryAdapter implements ProductRepository {
         );
     }
 
-    // Lưu sản phẩm (Thêm mới hoặc Cập nhật) và đồng bộ variants, histories
     @Override
     public Product save(Product p) {
         ProductJpaEntity e = jpa.findById(p.id()).orElse(null);

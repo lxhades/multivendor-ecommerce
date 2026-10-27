@@ -1,4 +1,4 @@
-package com.product_service.adapter.out.persistence.product;
+package com.product_service.adapter.out.persistence.product.adapter;
 
 import com.product_service.application.product.port.ShopOwnershipPort;
 import org.springframework.jdbc.core.JdbcTemplate;
