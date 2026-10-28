@@ -4,6 +4,7 @@ import com.product_service.application.shop.exception.ShopNotFoundException;
 import com.product_service.application.shop.mapper.ShopMapper;
 import com.product_service.application.shop.result.ShopResult;
 import com.product_service.domain.model.enumtype.ShopStatus;
+import com.product_service.domain.model.vo.SellerId;
 import com.product_service.domain.model.vo.ShopId;
 import com.product_service.domain.repository.ShopRepository;
 import org.springframework.stereotype.Service;
@@ -23,11 +24,17 @@ public class ChangeShopStatusUseCase {
     }
 
     @Transactional
-    public ShopResult change(UUID shopId, UUID actorSellerId, ShopStatus status) {
+    public ShopResult change(UUID shopId, UUID actorSellerId, ShopStatus status,boolean isAdmin) {
         var shop = repository.findById(new ShopId(shopId)).orElseThrow(() -> new ShopNotFoundException(shopId));
-        if (!actorSellerId.equals(shop.getSellerId().value()))
-            throw new RuntimeException("Không có quyền truy cập vào shop của người khác");
-        shop.changeStatus(status, clock.instant());
-        return ShopMapper.toResult(repository.save(shop));
+        if(isAdmin) {
+            shop.changeStatus(status, clock.instant());
+            return ShopMapper.toResult(repository.save(shop));
+        }
+        else {
+            shop.assertOwner(new SellerId(actorSellerId));
+            shop.changeStatus(status, clock.instant());
+            return ShopMapper.toResult(repository.save(shop));
+        }
+
     }
 }
