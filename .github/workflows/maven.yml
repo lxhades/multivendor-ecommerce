@@ -22,6 +22,7 @@ jobs:
           cache: 'maven'
 
       - name: Build with Maven
+        working-directory: ./backend/multivendor
         run: mvn -B -ntp clean package -Dmaven.test.skip=true
 
       - name: Upload JAR artifact
