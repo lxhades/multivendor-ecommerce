@@ -12,12 +12,12 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class GetCategoroiesByParentIdUseCase {
+public class GetCategoriesByParentIdUseCase {
 
 
     private final CategoryRepository repository;
 
-    public GetCategoroiesByParentIdUseCase(CategoryRepository repository) {
+    public GetCategoriesByParentIdUseCase(CategoryRepository repository) {
         this.repository = repository;
     }
 
