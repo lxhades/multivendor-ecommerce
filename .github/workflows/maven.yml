@@ -15,7 +15,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Setup JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
@@ -28,6 +28,7 @@ jobs:
       - name: Upload JAR artifact
         uses: actions/upload-artifact@v4
         with:
-          name: app-jar
-          path: target/*.jar
+          # Đổi tên thành app-jars vì sẽ có nhiều file jar được upload
+          name: app-jars
+          path: '**/target/*.jar' 
           if-no-files-found: error
