@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.Map;
 
-@RestControllerAdvice(assignableTypes = ShopController.class)
+@RestControllerAdvice
 public class ShopExceptionHandler {
     @ExceptionHandler(ShopNotFoundException.class)
     public ResponseEntity<Map<String, String>> notFound(ShopNotFoundException ex) {
