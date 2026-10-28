@@ -1,5 +1,6 @@
 package com.product_service.adapter.in.web.shop;
 
+import com.product_service.adapter.in.web.Helper;
 import com.product_service.adapter.in.web.dto.response.ApiResponse;
 import com.product_service.application.shop.result.ShopResult;
 import com.product_service.application.shop.usecase.ChangeShopStatusUseCase;
@@ -7,6 +8,7 @@ import com.product_service.application.shop.usecase.CloseShopUseCase;
 import com.product_service.application.shop.usecase.GetShopUseCase;
 import com.product_service.application.shop.usecase.ListShopsUseCase;
 import com.product_service.domain.model.enumtype.ShopStatus;
+import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +20,7 @@ import java.util.UUID;
 
 @RestController
 @RequestMapping("/admin/shops")
-
+@AllArgsConstructor
 public class AdminShopController {
 
     private final GetShopUseCase getShopUseCase;
@@ -26,20 +28,6 @@ public class AdminShopController {
     private final CloseShopUseCase closeShopUseCase;
     private final ChangeShopStatusUseCase changeShopStatusUseCase;
 
-    public AdminShopController(
-            GetShopUseCase getShopUseCase,
-            ListShopsUseCase listShopsUseCase,
-            CloseShopUseCase closeShopUseCase,
-            ChangeShopStatusUseCase changeShopStatusUseCase) {
-        this.getShopUseCase = getShopUseCase;
-        this.listShopsUseCase = listShopsUseCase;
-        this.closeShopUseCase = closeShopUseCase;
-        this.changeShopStatusUseCase = changeShopStatusUseCase;
-    }
-
-    private UUID currentUserId(Jwt jwt) {
-        return UUID.fromString(jwt.getSubject());
-    }
 
     // Admin xem danh sách toàn bộ shop
     @GetMapping
@@ -51,7 +39,7 @@ public class AdminShopController {
         return ResponseEntity.ok(ApiResponse.success(shopResultPage));
     }
 
-    // Admin xem chi tiết bất kỳ shop nào
+    // Admin xem chi tiết shop
     @GetMapping("/{shopId}")
     public ResponseEntity<ApiResponse<ShopResult>> findById(@PathVariable UUID shopId) {
         ShopResult result = getShopUseCase.get(shopId);
@@ -65,10 +53,12 @@ public class AdminShopController {
             @AuthenticationPrincipal Jwt jwt,
             @RequestParam ShopStatus shopStatus) {
 
-        UUID actorAdminId = currentUserId(jwt);
-        ShopResult updatedShopResult = changeShopStatusUseCase.change(shopId, actorAdminId, shopStatus);
+        UUID actorAdminId = Helper.currentUserId(jwt);
+        ShopResult updatedShopResult = changeShopStatusUseCase.change(shopId, actorAdminId, shopStatus,true);
 
-        return ResponseEntity.ok(ApiResponse.success("Admin đã cập nhật trạng thái cửa hàng", updatedShopResult));
+        return ResponseEntity.ok(
+                ApiResponse.success("Admin đã cập nhật trạng thái cửa hàng", updatedShopResult)
+        );
     }
 
 
@@ -77,7 +67,7 @@ public class AdminShopController {
             @PathVariable UUID shopId,
             @AuthenticationPrincipal Jwt jwt) {
 
-        UUID actorAdminId = currentUserId(jwt);
+        UUID actorAdminId = Helper.currentUserId(jwt);
         closeShopUseCase.close(shopId, actorAdminId);
 
         return ResponseEntity.ok(ApiResponse.success("Admin đã đóng cửa hàng thành công", null));
