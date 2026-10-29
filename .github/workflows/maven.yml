@@ -14,20 +14,53 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 1. Phân tích xem file/thư mục nào vừa bị thay đổi
+      - name: Detect changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            root:
+              - 'backend/multivendor/pom.xml'
+            auth:
+              - 'backend/multivendor/services/auth_service/**'
+            product:
+              - 'backend/multivendor/services/product_service/**'
+
+      # 2. Setup JDK 17 (Chỉ chạy nếu có sự thay đổi ở bất kỳ service nào hoặc file pom gốc)
       - name: Setup JDK 17
-        uses: actions/setup-java@v4
+        if: steps.filter.outputs.root == 'true' || steps.filter.outputs.auth == 'true' || steps.filter.outputs.product == 'true'
+        uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
           java-version: '17'
           cache: 'maven'
 
-      - name: Build with Maven
+      # BUILD AUTH SERVICE
+      - name: Build Auth Service
+        if: steps.filter.outputs.root == 'true' || steps.filter.outputs.auth == 'true'
         working-directory: ./backend/multivendor
-        run: mvn -B -ntp clean package -Dmaven.test.skip=true
+        run: mvn -B -ntp clean package -Dmaven.test.skip=true -pl :auth_service -am
 
-      - name: Upload JAR artifact
+      - name: Upload Auth JAR
+        if: steps.filter.outputs.root == 'true' || steps.filter.outputs.auth == 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: app-jar
-          path: target/*.jar
+          name: auth-service-jar
+          path: 'backend/multivendor/services/auth_service/target/*.jar'
+          if-no-files-found: error
+
+    
+      # BUILD PRODUCT SERVICE
+      - name: Build Product Service
+        if: steps.filter.outputs.root == 'true' || steps.filter.outputs.product == 'true'
+        working-directory: ./backend/multivendor
+        run: mvn -B -ntp clean package -Dmaven.test.skip=true -pl :product_service -am
+
+      - name: Upload Product JAR
+        if: steps.filter.outputs.root == 'true' || steps.filter.outputs.product == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: product-service-jar
+          path: 'backend/multivendor/services/product_service/target/*.jar'
           if-no-files-found: error
