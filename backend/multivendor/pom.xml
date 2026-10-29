@@ -22,7 +22,7 @@
     <modules>
         <module>services/auth_service</module>
         <module>services/product_service</module>
-
+        <module>services/inventory-service</module>
     </modules>
 
     <properties>
