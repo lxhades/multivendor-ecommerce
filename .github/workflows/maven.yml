@@ -64,3 +64,16 @@ jobs:
           name: product-service-jar
           path: 'backend/multivendor/services/product_service/target/*.jar'
           if-no-files-found: error
+       # BUILD INVENTORY SERVICE
+      - name: Build Inventory Service
+        if: steps.filter.outputs.root == 'true' || steps.filter.outputs.inventory == 'true'
+        working-directory: ./backend/multivendor
+        run: mvn -B -ntp clean package -Dmaven.test.skip=true -pl :inventory-service -am
+
+      - name: Upload Inventory JAR
+        if: steps.filter.outputs.root == 'true' || steps.filter.outputs.inventory == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: inventory-service-jar
+          path: 'backend/multivendor/services/inventory_service/target/*.jar'
+          if-no-files-found: error
