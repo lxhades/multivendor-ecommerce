@@ -1,18 +1,18 @@
-package com.product_service.adapter.out.persistence.product.entity;
+package com.product_service.adapter.out.persistence.product.outbox;
 
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import java.time.Instant;
 import java.util.UUID;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor
 @Table(name = "product_outbox_events")
 public class ProductOutboxEventEntity {
+
+    private static final int MAX_RETRY_COUNT = 5;
 
     @Id
     private UUID id;
@@ -29,8 +29,9 @@ public class ProductOutboxEventEntity {
     @Column(name = "payload", nullable = false, columnDefinition = "text")
     private String payload;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false)
-    private String status;
+    private OutboxStatus status;
 
     @Column(name = "retry_count", nullable = false)
     private int retryCount;
@@ -41,6 +42,8 @@ public class ProductOutboxEventEntity {
     @Column(name = "published_at")
     private Instant publishedAt;
 
+    @Version
+    private Long version;
 
     public ProductOutboxEventEntity(
             UUID id,
@@ -55,20 +58,25 @@ public class ProductOutboxEventEntity {
         this.aggregateId = aggregateId;
         this.eventType = eventType;
         this.payload = payload;
-        this.status = "PENDING";
+        this.status = OutboxStatus.PENDING;
         this.retryCount = 0;
         this.createdAt = createdAt;
     }
 
-
-
     public void markPublished(Instant now) {
-        this.status = "PUBLISHED";
+        this.status = OutboxStatus.PUBLISHED;
         this.publishedAt = now;
     }
 
     public void recordFailure() {
         this.retryCount++;
+        if (this.retryCount >= MAX_RETRY_COUNT) {
+            this.status = OutboxStatus.FAILED;
+        }
     }
-
+}
+ enum OutboxStatus {
+    PENDING,
+    PUBLISHED,
+    FAILED
 }

@@ -1,7 +1,7 @@
 package com.product_service.adapter.out.messaging;
 
-import com.product_service.adapter.out.persistence.product.entity.ProductOutboxEventEntity;
-import com.product_service.adapter.out.persistence.product.repository.ProductOutboxJpaRepository;
+import com.product_service.adapter.out.persistence.product.outbox.ProductOutboxEventEntity;
+import com.product_service.adapter.out.persistence.product.outbox.ProductOutboxJpaRepository;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,7 +42,7 @@ public class ProductOutboxPublisher {
     public void publishPending() {
 
         for (ProductOutboxEventEntity event :
-                outbox.findTop50ByStatusOrderByCreatedAtAsc("PENDING")) {
+                outbox.findPendingEventsForUpdate("PENDING",5)) {
 
             try {
                 kafka.send(

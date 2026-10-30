@@ -1,12 +1,9 @@
 
-package com.product_service.adapter.out.persistence.product.adapter;
+package com.product_service.adapter.out.persistence.product.outbox;
 
 import com.product_service.application.integration.port.out.ProductOutboxRepository;
-import com.product_service.adapter.out.persistence.product.entity.ProductOutboxEventEntity;
-import com.product_service.adapter.out.persistence.product.repository.ProductOutboxJpaRepository;
 
 import org.springframework.stereotype.Repository;
-import tools.jackson.databind.JsonNode;
 
 import java.time.Clock;
 import java.time.Instant;
