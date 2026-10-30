@@ -10,6 +10,7 @@ public class DomainException extends RuntimeException {
     private final ErrorCode errorCode;
 
     public DomainException(ErrorCode errorCode) {
+
         this.errorCode = Objects.requireNonNull(errorCode, "errorCode");
     }
 

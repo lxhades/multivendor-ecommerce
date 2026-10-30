@@ -21,6 +21,8 @@ public enum ErrorCode {
     SHOP_SLUG_ALREADY_EXISTS(HttpStatus.CONFLICT, "Slug shop đã tồn tại"),
     CATEGORY_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy danh mục"),
     CATEGORY_SLUG_ALREADY_EXISTS(HttpStatus.CONFLICT, "Slug danh mục đã tồn tại"),
+    INVENTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy kho hàng"),
+    VARIENT_INVENTORY_NOT_FOUND(HttpStatus.NOT_FOUND, "Không tìm thấy kho hàng của biến thể(san phẩm)"),
     INVALID_DOMAIN_RULE(HttpStatus.BAD_REQUEST, "Dữ liệu không hợp lệ theo quy tắc nghiệp vụ"),
     INVALID_DISPLAY_ORDER(HttpStatus.BAD_REQUEST, "Thứ tự hiển thị không được là số âm"),
     INVALID_INVENTORY_QUANTITY(HttpStatus.BAD_REQUEST, "Số lượng tồn kho phải lớn hơn không"),

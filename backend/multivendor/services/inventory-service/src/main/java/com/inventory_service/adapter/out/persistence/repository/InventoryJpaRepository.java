@@ -16,4 +16,7 @@ public interface InventoryJpaRepository
     List<InventoryJpaEntity> findByShopId(UUID shopId);
 
     boolean existsByVariantId(UUID variantId);
+    void deleteByVariantId(UUID variantId);
+    void deleteByShopId(UUID shopId);
+    void deleteByProductId(UUID productId);
 }

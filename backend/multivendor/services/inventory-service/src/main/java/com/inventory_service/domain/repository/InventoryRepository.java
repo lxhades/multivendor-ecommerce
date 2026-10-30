@@ -17,4 +17,7 @@ public interface InventoryRepository {
     List<Inventory> findByShopId(UUID shopId);
 
     boolean existsByVariantId(UUID variantId);
+    void deleteByVariantId(UUID variantId);
+    void deleteByShopId(UUID shopId);
+    void deleteByProductId(UUID productId);
 }
