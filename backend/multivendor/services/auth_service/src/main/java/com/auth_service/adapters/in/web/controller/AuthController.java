@@ -1,13 +1,14 @@
 package com.auth_service.adapters.in.web.controller;
 
 import com.auth_service.adapters.in.web.dto.request.*;
-import com.auth_service.adapters.in.web.dto.response.ApiResponse;
+
 import com.auth_service.application.command.*;
 import com.auth_service.application.port.in.CurrentUserResult;
 import com.auth_service.application.port.in.LoginUserResult;
 import com.auth_service.application.port.in.RefreshTokenResult;
 import com.auth_service.application.port.in.RegisterUserResult;
 import com.auth_service.application.usecase.*;
+import com.common.dto.response.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

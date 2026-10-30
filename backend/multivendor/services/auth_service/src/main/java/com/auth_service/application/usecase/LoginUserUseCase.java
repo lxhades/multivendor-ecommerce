@@ -1,14 +1,13 @@
 package com.auth_service.application.usecase;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.auth_service.application.command.LoginUserCommand;
 import com.auth_service.application.port.in.LoginUserResult;
 import com.auth_service.application.port.out.PasswordHasher;
 import com.auth_service.application.port.out.RefreshTokenRepository;
 import com.auth_service.application.port.out.TokenProvider;
 import com.auth_service.application.port.out.UserRepository;
-import com.auth_service.domain.exception.AccountLockedException;
-import com.auth_service.domain.exception.EmailNotFoundException;
-import com.auth_service.domain.exception.InvalidPasswordException;
 import com.auth_service.domain.model.aggregate.User;
 import com.auth_service.domain.model.entity.RefreshToken;
 import com.auth_service.domain.model.enumtype.UserStatus;
@@ -50,15 +49,15 @@ public class LoginUserUseCase {
         Email email = Email.of(command.email());
 
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new EmailNotFoundException(command.email()));
+                .orElseThrow(() -> new DomainException(ErrorCode.EMAIL_NOT_FOUND));
 
         if (user.getStatus() == UserStatus.LOCKED) {
-            throw new AccountLockedException("Tài khoản đã bị khóa");
+            throw new DomainException(ErrorCode.ACCOUNT_LOCKED);
         }
 
         boolean passwordMatches = passwordHasher.matches(command.rawPassword(), user.getPasswordHash());
         if (!passwordMatches) {
-            throw new InvalidPasswordException("Mật khẩu không đúng");
+            throw new DomainException(ErrorCode.INVALID_PASSWORD);
         }
         String accessToken = tokenProvider.generateAccessToken(user);
 

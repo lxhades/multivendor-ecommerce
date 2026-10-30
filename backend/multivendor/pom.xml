@@ -20,6 +20,7 @@
     <description>Multi-vendor E-commerce Microservices</description>
 
     <modules>
+        <module>common</module>
         <module>services/auth_service</module>
         <module>services/product_service</module>
         <module>services/inventory-service</module>

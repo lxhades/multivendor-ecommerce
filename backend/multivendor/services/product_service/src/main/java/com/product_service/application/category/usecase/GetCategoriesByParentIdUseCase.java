@@ -1,6 +1,7 @@
 package com.product_service.application.category.usecase;
 
-import com.product_service.application.category.exception.CategoryNotFoundException;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.product_service.application.category.mapper.CategoryMapper;
 import com.product_service.application.category.result.CreateCategoryResult;
 import com.product_service.domain.model.vo.CategoryId;
@@ -25,7 +26,7 @@ public class GetCategoriesByParentIdUseCase {
     public List<CreateCategoryResult> get(UUID id) {
         CategoryId parentId = new CategoryId(id);
         if (!repository.existsById(parentId)) {
-            throw new CategoryNotFoundException(id);
+            throw new DomainException(ErrorCode.CATEGORY_NOT_FOUND);
         }
         return repository.findByParentId(parentId).stream()
                 .map(CategoryMapper::toResult)

@@ -1,12 +1,12 @@
 package com.auth_service.application.usecase;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.auth_service.application.command.RefreshTokenCommand;
 import com.auth_service.application.port.in.RefreshTokenResult;
 import com.auth_service.application.port.out.RefreshTokenRepository;
 import com.auth_service.application.port.out.TokenProvider;
 import com.auth_service.application.port.out.UserRepository;
-import com.auth_service.domain.exception.InvalidRefreshTokenException;
-import com.auth_service.domain.exception.UserNotFoundException;
 import com.auth_service.domain.model.aggregate.User;
 import com.auth_service.domain.model.entity.RefreshToken;
 import com.auth_service.infrastructure.security.RefreshTokenGenerator;
@@ -47,21 +47,21 @@ public class RefreshTokenUseCase {
                 || command.refreshToken() == null
                 || command.refreshToken().isBlank()) {
 
-            throw new InvalidRefreshTokenException();
+            throw new DomainException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         RefreshToken oldRefreshToken =
                 refreshTokenRepository
                         .findByToken(command.refreshToken())
-                        .orElseThrow(InvalidRefreshTokenException::new);
+                        .orElseThrow(() -> new DomainException(ErrorCode.INVALID_REFRESH_TOKEN));
 
         if (!oldRefreshToken.isValid()) {
-            throw new InvalidRefreshTokenException();
+            throw new DomainException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         User user = userRepository
                 .findById(oldRefreshToken.getUserId())
-                .orElseThrow(() -> new UserNotFoundException(oldRefreshToken.getUserId()));
+                .orElseThrow(() -> new DomainException(ErrorCode.USER_NOT_FOUND));
 
         refreshTokenRepository.deleteByToken(
                 oldRefreshToken.getToken()

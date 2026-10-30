@@ -1,6 +1,7 @@
 package com.product_service.domain.shared;
 
-import com.product_service.domain.exception.DomainException;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 
 import java.util.Objects;
 
@@ -9,7 +10,7 @@ public final class Checks {
     }
 
     public static void rule(boolean valid, String message) {
-        if (!valid) throw new DomainException(message);
+        if (!valid) throw new DomainException(ErrorCode.INVALID_DOMAIN_RULE);
     }
 
     public static <T> T required(T value, String name) {

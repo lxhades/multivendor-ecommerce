@@ -1,8 +1,8 @@
 package com.product_service.application.shop.usecase;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.product_service.application.shop.command.UpdateShopCommand;
-import com.product_service.application.shop.exception.ShopNotFoundException;
-import com.product_service.application.shop.exception.ShopSlugAlreadyExistsException;
 import com.product_service.application.shop.mapper.ShopMapper;
 import com.product_service.application.shop.result.ShopResult;
 import com.product_service.domain.model.vo.SellerId;
@@ -32,7 +32,7 @@ public class UpdateShopUseCase {
         Objects.requireNonNull(command, "command");
 
         var shop = repository.findById(new ShopId(id))
-                .orElseThrow(() -> new ShopNotFoundException(id));
+                .orElseThrow(() -> new DomainException(ErrorCode.SHOP_NOT_FOUND));
 
         if (!actorSellerId.equals(shop.getSellerId().value()))
             throw new RuntimeException("Không có quyền truy cập vào shop của người khác");
@@ -41,7 +41,7 @@ public class UpdateShopUseCase {
         Slug slug = new Slug(command.slug());
 
         if (repository.existsBySlug(slug, shop.getId())) {
-            throw new ShopSlugAlreadyExistsException(slug.value());
+            throw new DomainException(ErrorCode.SHOP_SLUG_ALREADY_EXISTS);
         }
 
         shop.updateProfile(

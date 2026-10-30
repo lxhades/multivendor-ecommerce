@@ -1,6 +1,7 @@
 package com.product_service.application.shop.usecase;
 
-import com.product_service.application.shop.exception.ShopNotFoundException;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.product_service.domain.model.enumtype.ShopStatus;
 import com.product_service.domain.model.vo.SellerId;
 import com.product_service.domain.model.vo.ShopId;
@@ -23,7 +24,7 @@ public class CloseShopUseCase {
 
     @Transactional
     public void close(UUID id, UUID actorSellerId) {
-        var shop = repository.findById(new ShopId(id)).orElseThrow(() -> new ShopNotFoundException(id));
+        var shop = repository.findById(new ShopId(id)).orElseThrow(() -> new DomainException(ErrorCode.SHOP_NOT_FOUND));
 
         shop.assertOwner(new SellerId(actorSellerId));
         shop.assertOwner(new SellerId(actorSellerId));

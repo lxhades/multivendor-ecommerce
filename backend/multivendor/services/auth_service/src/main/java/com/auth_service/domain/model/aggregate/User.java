@@ -1,6 +1,7 @@
 package com.auth_service.domain.model.aggregate;
 
-import com.auth_service.domain.exception.AddressNotFoundException;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.auth_service.domain.model.entity.Address;
 import com.auth_service.domain.model.enumtype.Role;
 import com.auth_service.domain.model.enumtype.UserStatus;
@@ -92,7 +93,7 @@ public class User {
         Address address = this.addresses.stream()
                 .filter(item -> addressId.equals(item.getAddressId()))
                 .findFirst()
-                .orElseThrow(() -> new AddressNotFoundException(addressId));
+                .orElseThrow(() -> new DomainException(ErrorCode.ADDRESS_NOT_FOUND));
 
         if (isDefault) {
             this.addresses.forEach(item -> item.setDefault(false));
@@ -107,7 +108,7 @@ public class User {
         Address address = this.addresses.stream()
                 .filter(item -> addressId.equals(item.getAddressId()))
                 .findFirst()
-                .orElseThrow(() -> new AddressNotFoundException(addressId));
+                .orElseThrow(() -> new DomainException(ErrorCode.ADDRESS_NOT_FOUND));
         this.addresses.remove(address);
         this.updatedAt = Instant.now();
     }

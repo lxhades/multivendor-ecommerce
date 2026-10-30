@@ -1,8 +1,9 @@
 package com.auth_service.application.usecase;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.auth_service.application.command.DeleteUserCommand;
 import com.auth_service.application.port.out.UserRepository;
-import com.auth_service.domain.exception.UserNotFoundException;
 import com.auth_service.domain.model.vo.UserId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -21,7 +22,7 @@ public class DeleteUserUseCase {
     public void execute(DeleteUserCommand command) {
         UserId userId = UserId.of(UUID.fromString(command.userId()));
         if (!userRepository.existsById(userId)) {
-            throw new UserNotFoundException(userId);
+            throw new DomainException(ErrorCode.USER_NOT_FOUND);
         }
         userRepository.deleteById(userId);
     }

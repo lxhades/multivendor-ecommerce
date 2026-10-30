@@ -1,6 +1,6 @@
 package com.auth_service.adapters.in.web.controller;
 
-import com.auth_service.adapters.in.web.dto.response.ApiResponse;
+
 import com.auth_service.application.command.DeleteUserCommand;
 import com.auth_service.application.port.in.AdminUserListResult;
 import com.auth_service.application.port.in.AdminUserResult;
@@ -9,6 +9,7 @@ import com.auth_service.application.query.SearchUsersQuery;
 import com.auth_service.application.usecase.DeleteUserUseCase;
 import com.auth_service.application.usecase.GetUserUseCase;
 import com.auth_service.application.usecase.ListUsersUseCase;
+import com.common.dto.response.ApiResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

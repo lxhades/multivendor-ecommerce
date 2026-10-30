@@ -1,10 +1,10 @@
 package com.auth_service.application.usecase;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.auth_service.application.command.ChangePasswordCommand;
 import com.auth_service.application.port.out.PasswordHasher;
 import com.auth_service.application.port.out.UserRepository;
-import com.auth_service.domain.exception.InvalidPasswordException;
-import com.auth_service.domain.exception.UserNotFoundException;
 import com.auth_service.domain.model.aggregate.User;
 import com.auth_service.domain.model.vo.PasswordHash;
 import com.auth_service.domain.model.vo.UserId;
@@ -28,13 +28,13 @@ public class ChangePasswordUseCase {
         UserId userId = UserId.of(UUID.fromString(changePasswordCommand.userId()));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> new DomainException(ErrorCode.USER_NOT_FOUND));
         if (passwordHasher.matches(changePasswordCommand.oldPassword(), user.getPasswordHash())) {
             PasswordHash newPassword = passwordHasher.hash(changePasswordCommand.newPassword());
             user.changePassword(newPassword);
             userRepository.save(user);
         } else {
-            throw new InvalidPasswordException("Mật khẩu không đúng");
+            throw new DomainException(ErrorCode.INVALID_PASSWORD);
         }
     }
 }

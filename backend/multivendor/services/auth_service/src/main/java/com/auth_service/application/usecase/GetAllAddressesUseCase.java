@@ -1,9 +1,10 @@
 package com.auth_service.application.usecase;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.auth_service.application.port.in.AddressResult;
 import com.auth_service.application.port.out.UserRepository;
 import com.auth_service.application.query.GetAllAdressesQuery;
-import com.auth_service.domain.exception.UserNotFoundException;
 import com.auth_service.domain.model.aggregate.User;
 import com.auth_service.domain.model.entity.Address;
 import com.auth_service.domain.model.vo.UserId;
@@ -27,7 +28,7 @@ public class GetAllAddressesUseCase {
         UserId userId = UserId.of(UUID.fromString(query.userId()));
 
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> new DomainException(ErrorCode.USER_NOT_FOUND));
 
         return user.getAddresses().stream()
                 .map(this::toAddressResult)

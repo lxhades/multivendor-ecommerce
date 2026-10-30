@@ -17,6 +17,11 @@
     <description>product_service</description>
 
     <dependencies>
+        <dependency>
+            <groupId>com.multivendor</groupId>
+            <artifactId>common</artifactId>
+            <version>1.0.0-SNAPSHOT</version>
+        </dependency>
         <!-- Web & Validation -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

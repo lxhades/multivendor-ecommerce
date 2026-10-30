@@ -3,7 +3,7 @@ package com.product_service.adapter.in.web.shop;
 import com.product_service.adapter.in.web.Helper;
 import com.product_service.adapter.in.web.dto.request.CreateShopRequest;
 import com.product_service.adapter.in.web.dto.request.UpdateShopRequest;
-import com.product_service.adapter.in.web.dto.response.ApiResponse;
+import com.common.dto.response.ApiResponse;
 import com.product_service.application.shop.command.CreateShopCommand;
 import com.product_service.application.shop.command.UpdateShopCommand;
 import com.product_service.application.shop.result.ShopResult;
@@ -30,6 +30,7 @@ public class SellerShopController {
     private final CloseShopUseCase closeShopUseCase;
     private final FindShopBySellerUseCase findShopBySellerUseCase;
     private final ChangeShopStatusUseCase changeShopStatusUseCase;
+
     // Seller xem chi tiết shop của  mình
     @GetMapping("/my-shop")
     public ResponseEntity<ApiResponse<ShopResult>> myShopDetail(@AuthenticationPrincipal Jwt jwt) {

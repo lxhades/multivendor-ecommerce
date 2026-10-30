@@ -1,10 +1,11 @@
 package com.auth_service.application.usecase;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.auth_service.application.command.RegisterUserCommand;
 import com.auth_service.application.port.in.RegisterUserResult;
 import com.auth_service.application.port.out.PasswordHasher;
 import com.auth_service.application.port.out.UserRepository;
-import com.auth_service.domain.exception.EmailAlreadyExistsException;
 import com.auth_service.domain.model.aggregate.User;
 import com.auth_service.domain.model.vo.Email;
 import com.auth_service.domain.model.vo.PasswordHash;
@@ -30,7 +31,7 @@ public class RegisterUserUseCase {
         Phone phone = new Phone(command.phone());
 
         if (userRepository.findByEmail(email).isPresent()) {
-            throw new EmailAlreadyExistsException(command.email());
+            throw new DomainException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
         PasswordHash passwordHash = passwordHasher.hash(command.password());
@@ -40,7 +41,7 @@ public class RegisterUserUseCase {
         try {
             savedUser = userRepository.save(newUser);
         } catch (DataIntegrityViolationException e) {
-            throw new EmailAlreadyExistsException(command.email());
+            throw new DomainException(ErrorCode.EMAIL_ALREADY_EXISTS);
         }
 
         return new RegisterUserResult(

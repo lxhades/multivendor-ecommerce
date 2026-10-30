@@ -5,7 +5,8 @@ import com.auth_service.application.port.in.RefreshTokenResult;
 import com.auth_service.application.port.out.RefreshTokenRepository;
 import com.auth_service.application.port.out.TokenProvider;
 import com.auth_service.application.port.out.UserRepository;
-import com.auth_service.domain.exception.InvalidRefreshTokenException;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.auth_service.domain.model.aggregate.User;
 import com.auth_service.domain.model.entity.RefreshToken;
 import com.auth_service.domain.model.vo.UserId;
@@ -90,7 +91,7 @@ class RefreshTokenUseCaseTest {
                 .thenReturn(Optional.empty());
 
         assertThrows(
-                InvalidRefreshTokenException.class,
+                DomainException.class,
                 () -> useCase.execute(new RefreshTokenCommand("invalid"))
         );
 
@@ -99,10 +100,11 @@ class RefreshTokenUseCaseTest {
 
     @Test
     void blankRefreshTokenIsRejected() {
-        assertThrows(
-                InvalidRefreshTokenException.class,
+        DomainException exception = assertThrows(
+                DomainException.class,
                 () -> useCase.execute(new RefreshTokenCommand(" "))
         );
+        assertEquals(ErrorCode.INVALID_REFRESH_TOKEN, exception.getErrorCode());
 
         verifyNoInteractions(
                 refreshTokenRepository,

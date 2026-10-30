@@ -1,6 +1,7 @@
 package com.product_service.application.category.usecase;
 
-import com.product_service.application.category.exception.CategoryNotFoundException;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.product_service.application.category.mapper.CategoryMapper;
 import com.product_service.application.category.result.CreateCategoryResult;
 import com.product_service.domain.model.vo.CategoryId;
@@ -22,6 +23,6 @@ public class GetCategoryUseCase {
     public CreateCategoryResult get(UUID id) {
         return repository.findById(new CategoryId(id))
                 .map(CategoryMapper::toResult)
-                .orElseThrow(() -> new CategoryNotFoundException(id));
+                .orElseThrow(() -> new DomainException(ErrorCode.CATEGORY_NOT_FOUND));
     }
 }

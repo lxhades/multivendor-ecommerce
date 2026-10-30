@@ -1,10 +1,11 @@
 package com.auth_service.application.usecase;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.auth_service.application.command.ForgotPasswordCommand;
 import com.auth_service.application.port.out.NotificationSender;
 import com.auth_service.application.port.out.PasswordHasher;
 import com.auth_service.application.port.out.UserRepository;
-import com.auth_service.domain.exception.EmailNotFoundException;
 import com.auth_service.domain.model.aggregate.User;
 import com.auth_service.domain.model.vo.Email;
 import com.auth_service.domain.model.vo.PasswordHash;
@@ -28,7 +29,7 @@ public class ForgotPasswordUseCase {
     @Transactional
     public void execute(ForgotPasswordCommand command) {
         User user = userRepository.findByEmail(Email.of(command.email()))
-                .orElseThrow(() -> new EmailNotFoundException(command.email()));
+                .orElseThrow(() -> new DomainException(ErrorCode.EMAIL_NOT_FOUND));
 
         String newPassword = String.format("%06d", new SecureRandom().nextInt(1_000_000));
         PasswordHash newPasswordHash = passwordHasher.hash(newPassword);

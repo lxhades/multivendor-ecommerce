@@ -1,6 +1,7 @@
 package com.inventory_service.domain.model.aggregate;
 
-import com.inventory_service.domain.exception.DomainException;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 
 import java.time.Instant;
 import java.util.Objects;
@@ -91,9 +92,7 @@ public class Inventory {
 
     public void increaseStock(long quantity, Instant now) {
         if (quantity <= 0) {
-            throw new DomainException(
-                    "Quantity must be positive"
-            );
+            throw new DomainException(ErrorCode.INVALID_INVENTORY_QUANTITY);
         }
 
         this.onHandQuantity = Math.addExact(
@@ -104,9 +103,7 @@ public class Inventory {
 
     public void adjustStock(long newQuantity, Instant now) {
         if (newQuantity < reservedQuantity) {
-            throw new DomainException(
-                    "Stock cannot be less than reserved quantity"
-            );
+            throw new DomainException(ErrorCode.STOCK_BELOW_RESERVED_QUANTITY);
         }
 
         this.onHandQuantity = newQuantity;

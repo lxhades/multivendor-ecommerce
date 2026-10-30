@@ -1,6 +1,7 @@
 package com.product_service.application.category.usecase;
 
-import com.product_service.application.category.exception.CategoryNotFoundException;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.product_service.application.category.mapper.CategoryMapper;
 import com.product_service.application.category.result.CreateCategoryResult;
 import com.product_service.domain.model.enumtype.CategoryStatus;
@@ -26,7 +27,7 @@ public class ChangeCategoryStatusUseCase {
     public CreateCategoryResult change(UUID id, String status) {
         CategoryStatus categoryStatus = CategoryStatus.valueOf(status);
         var category = repository.findById(new CategoryId(id))
-                .orElseThrow(() -> new CategoryNotFoundException(id));
+                .orElseThrow(() -> new DomainException(ErrorCode.CATEGORY_NOT_FOUND));
 
         category.changeStatus(categoryStatus, clock.instant());
         return CategoryMapper.toResult(repository.save(category));

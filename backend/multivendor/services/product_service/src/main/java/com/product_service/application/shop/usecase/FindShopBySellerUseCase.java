@@ -1,6 +1,7 @@
 package com.product_service.application.shop.usecase;
 
-import com.product_service.application.shop.exception.ShopNotFoundException;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.product_service.application.shop.mapper.ShopMapper;
 import com.product_service.application.shop.result.ShopResult;
 import com.product_service.domain.model.vo.SellerId;
@@ -21,6 +22,6 @@ public class FindShopBySellerUseCase {
     @Transactional(readOnly = true)
     public ShopResult get(UUID id) {
         return ShopMapper.toResult(
-                repository.findBySellerId(new SellerId(id)).orElseThrow(() -> new ShopNotFoundException(id)));
+                repository.findBySellerId(new SellerId(id)).orElseThrow(() -> new DomainException(ErrorCode.SHOP_NOT_FOUND)));
     }
 }

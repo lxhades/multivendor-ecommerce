@@ -1,6 +1,7 @@
 package com.product_service.application.shop.usecase;
 
-import com.product_service.application.shop.exception.ShopNotFoundException;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.product_service.application.shop.mapper.ShopMapper;
 import com.product_service.application.shop.result.ShopResult;
 import com.product_service.domain.model.enumtype.ShopStatus;
@@ -25,7 +26,7 @@ public class ChangeShopStatusUseCase {
 
     @Transactional
     public ShopResult change(UUID shopId, UUID actorSellerId, ShopStatus status,boolean isAdmin) {
-        var shop = repository.findById(new ShopId(shopId)).orElseThrow(() -> new ShopNotFoundException(shopId));
+        var shop = repository.findById(new ShopId(shopId)).orElseThrow(() -> new DomainException(ErrorCode.SHOP_NOT_FOUND));
         if(isAdmin) {
             shop.changeStatus(status, clock.instant());
             return ShopMapper.toResult(repository.save(shop));

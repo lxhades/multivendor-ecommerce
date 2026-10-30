@@ -1,8 +1,8 @@
 package com.product_service.application.category.usecase;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.product_service.application.category.command.CreateCategoryCommand;
-import com.product_service.application.category.exception.CategoryNotFoundException;
-import com.product_service.application.category.exception.CategorySlugAlreadyExistsException;
 import com.product_service.application.category.mapper.CategoryMapper;
 import com.product_service.application.category.result.CreateCategoryResult;
 import com.product_service.domain.model.aggregate.Category;
@@ -59,14 +59,13 @@ public class CreateCategoryUseCase {
                 now
         );
         if (categoryRepository.existsBySlug(slug, null)) {
-            throw new CategorySlugAlreadyExistsException(slug.value());
+            throw new DomainException(ErrorCode.CATEGORY_SLUG_ALREADY_EXISTS);
         }
 
         if (parentId != null) {
             categoryRepository.findById(parentId)
                     .orElseThrow(() ->
-                            new CategoryNotFoundException(command.parentId())
-                    );
+                            new DomainException(ErrorCode.CATEGORY_NOT_FOUND));
         }
 
         Category savedCategory = categoryRepository.save(category);

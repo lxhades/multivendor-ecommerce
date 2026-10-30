@@ -1,6 +1,7 @@
 package com.product_service.application.category.usecase;
 
-import com.product_service.application.category.exception.CategoryNotFoundException;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.product_service.domain.model.enumtype.CategoryStatus;
 import com.product_service.domain.model.vo.CategoryId;
 import com.product_service.domain.repository.CategoryRepository;
@@ -23,7 +24,7 @@ public class DeleteCategoryUseCase {
     @Transactional
     public void delete(UUID id) {
         var category = repository.findById(new CategoryId(id))
-                .orElseThrow(() -> new CategoryNotFoundException(id));
+                .orElseThrow(() -> new DomainException(ErrorCode.CATEGORY_NOT_FOUND));
 
         if (category.getStatus() != CategoryStatus.INACTIVE) {
             category.changeStatus(CategoryStatus.INACTIVE, clock.instant());

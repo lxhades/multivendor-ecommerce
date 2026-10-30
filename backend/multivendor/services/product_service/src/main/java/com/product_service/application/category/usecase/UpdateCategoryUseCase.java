@@ -1,8 +1,8 @@
 package com.product_service.application.category.usecase;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.product_service.application.category.command.UpdateCategoryCommand;
-import com.product_service.application.category.exception.CategoryNotFoundException;
-import com.product_service.application.category.exception.CategorySlugAlreadyExistsException;
 import com.product_service.application.category.mapper.CategoryMapper;
 import com.product_service.application.category.result.CreateCategoryResult;
 import com.product_service.domain.model.aggregate.Category;
@@ -32,15 +32,15 @@ public class UpdateCategoryUseCase {
 
         CategoryId categoryId = new CategoryId(id);
         Category category = repository.findById(categoryId)
-                .orElseThrow(() -> new CategoryNotFoundException(id));
+                .orElseThrow(() -> new DomainException(ErrorCode.CATEGORY_NOT_FOUND));
 
         Slug slug = new Slug(command.slug());
-        if (repository.existsBySlug(slug, categoryId)) throw new CategorySlugAlreadyExistsException(slug.value());
+        if (repository.existsBySlug(slug, categoryId)) throw new DomainException(ErrorCode.CATEGORY_SLUG_ALREADY_EXISTS);
         CategoryId parentId = command.parentId() == null ? null : new CategoryId(command.parentId());
         if (parentId != null) {
             Checks.rule(!parentId.equals(categoryId), "Category cannot be its own parent");
             repository.findById(parentId).
-                    orElseThrow(() -> new CategoryNotFoundException(parentId.value()));
+                    orElseThrow(() -> new DomainException(ErrorCode.CATEGORY_NOT_FOUND));
             Checks.rule(!repository.isDescendant(parentId, categoryId), "Category hierarchy cannot contain a cycle");
         }
 

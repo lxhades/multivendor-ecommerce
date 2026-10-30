@@ -2,7 +2,7 @@ package com.auth_service.adapters.in.web.controller;
 
 import com.auth_service.adapters.in.web.dto.request.AddAddressRequest;
 import com.auth_service.adapters.in.web.dto.request.UpdateAddressRequest;
-import com.auth_service.adapters.in.web.dto.response.ApiResponse;
+
 import com.auth_service.application.command.AddAddressCommand;
 import com.auth_service.application.command.DeleteAddressCommand;
 import com.auth_service.application.command.UpdateAddressCommand;
@@ -12,6 +12,7 @@ import com.auth_service.application.usecase.AddAddressUseCase;
 import com.auth_service.application.usecase.DeleteAddressUseCase;
 import com.auth_service.application.usecase.GetAllAddressesUseCase;
 import com.auth_service.application.usecase.UpdateAddressUseCase;
+import com.common.dto.response.ApiResponse;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

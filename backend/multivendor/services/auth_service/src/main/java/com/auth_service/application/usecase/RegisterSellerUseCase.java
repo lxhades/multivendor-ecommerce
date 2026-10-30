@@ -1,7 +1,8 @@
 package com.auth_service.application.usecase;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.auth_service.application.port.out.UserRepository;
-import com.auth_service.domain.exception.UserNotFoundException;
 import com.auth_service.domain.model.aggregate.User;
 import com.auth_service.domain.model.enumtype.Role;
 import com.auth_service.domain.model.vo.UserId;
@@ -23,7 +24,7 @@ public class RegisterSellerUseCase {
 
         User user = userRepository.findById(
                         UserId.of(userId))
-                .orElseThrow(() -> new UserNotFoundException(UserId.of(userId)));
+                .orElseThrow(() -> new DomainException(ErrorCode.USER_NOT_FOUND));
         user.assignRole(Role.SELLER);
         userRepository.save(user);
     }

@@ -1,6 +1,7 @@
 package com.product_service.domain.model.aggregate;
 
-import com.product_service.domain.exception.DomainException;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.product_service.domain.model.enumtype.CategoryStatus;
 import com.product_service.domain.model.vo.CategoryId;
 import com.product_service.domain.model.vo.Slug;
@@ -87,7 +88,7 @@ public final class Category {
 
 
         if (finalOrder < 0) {
-            throw new DomainException("Thứ tự hiển thị không được là số âm");
+            throw new DomainException(ErrorCode.INVALID_DISPLAY_ORDER);
         }
         this.displayOrder = finalOrder;
         updatedAt = now;

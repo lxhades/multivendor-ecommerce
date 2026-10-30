@@ -1,7 +1,8 @@
 package com.product_service.application.shop.usecase;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.product_service.application.shop.command.CreateShopCommand;
-import com.product_service.application.shop.exception.ShopSlugAlreadyExistsException;
 import com.product_service.application.shop.mapper.ShopMapper;
 import com.product_service.application.shop.result.ShopResult;
 import com.product_service.domain.model.aggregate.Shop;
@@ -35,7 +36,7 @@ public class CreateShopUseCase {
 
         Objects.requireNonNull(command, "command");
         Slug slug = new Slug(command.slug());
-        if (repository.existsBySlug(slug, null)) throw new ShopSlugAlreadyExistsException(slug.value());
+        if (repository.existsBySlug(slug, null)) throw new DomainException(ErrorCode.SHOP_SLUG_ALREADY_EXISTS);
 
         Shop shop = new Shop(
                 ShopId.random(),

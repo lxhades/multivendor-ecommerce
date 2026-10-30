@@ -1,8 +1,9 @@
 package com.auth_service.application.usecase;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.auth_service.application.command.LogoutCommand;
 import com.auth_service.application.port.out.RefreshTokenRepository;
-import com.auth_service.domain.exception.InvalidRefreshTokenException;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -22,7 +23,7 @@ public class LogoutUseCase {
                 || command.refreshToken() == null
                 || command.refreshToken().isBlank()) {
 
-            throw new InvalidRefreshTokenException();
+            throw new DomainException(ErrorCode.INVALID_REFRESH_TOKEN);
         }
 
         refreshTokenRepository.deleteByToken(

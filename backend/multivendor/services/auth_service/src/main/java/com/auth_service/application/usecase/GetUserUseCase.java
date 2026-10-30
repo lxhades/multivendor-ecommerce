@@ -1,9 +1,10 @@
 package com.auth_service.application.usecase;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.auth_service.application.port.in.AdminUserResult;
 import com.auth_service.application.port.out.UserRepository;
 import com.auth_service.application.query.GetUserQuery;
-import com.auth_service.domain.exception.UserNotFoundException;
 import com.auth_service.domain.model.aggregate.User;
 import com.auth_service.domain.model.vo.UserId;
 import org.springframework.stereotype.Service;
@@ -24,7 +25,7 @@ public class GetUserUseCase {
         UserId userId = UserId.of(UUID.fromString(query.userId()));
         return userRepository.findById(userId)
                 .map(this::toResult)
-                .orElseThrow(() -> new UserNotFoundException(userId));
+                .orElseThrow(() -> new DomainException(ErrorCode.USER_NOT_FOUND));
     }
 
     private AdminUserResult toResult(User user) {
