@@ -1,6 +1,6 @@
-package com.inventory_service.application.usecase;
+package com.inventory_service.application.inventory.usecase;
 
-import com.inventory_service.application.command.InitializeInventoryCommand;
+import com.inventory_service.application.inventory.command.InitializeInventoryCommand;
 import com.inventory_service.domain.model.aggregate.Inventory;
 import com.inventory_service.domain.repository.InventoryRepository;
 import org.springframework.stereotype.Service;

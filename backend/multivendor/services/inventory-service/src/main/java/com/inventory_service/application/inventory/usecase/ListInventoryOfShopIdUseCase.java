@@ -1,6 +1,6 @@
-package com.inventory_service.application.usecase;
+package com.inventory_service.application.inventory.usecase;
 
-import com.inventory_service.application.dto.InventoryResponse;
+import com.inventory_service.application.inventory.dto.InventoryResponse;
 import com.inventory_service.domain.repository.InventoryRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

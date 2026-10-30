@@ -1,4 +1,4 @@
-package com.inventory_service.application.command;
+package com.inventory_service.application.inventory.command;
 
 import java.util.UUID;
 

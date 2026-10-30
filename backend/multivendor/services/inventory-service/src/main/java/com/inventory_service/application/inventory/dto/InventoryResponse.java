@@ -1,4 +1,4 @@
-package com.inventory_service.application.dto;
+package com.inventory_service.application.inventory.dto;
 
 
 
