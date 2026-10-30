@@ -1,6 +1,7 @@
 package com.product_service.adapter.in.web.security.handler;
 
-import com.product_service.adapter.in.web.dto.response.ApiResponse;
+import com.common.dto.response.ErrorResponse;
+import com.common.exception.ErrorCode;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,9 +28,16 @@ public class JwtAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType(MediaType.APPLICATION_JSON_VALUE);
         response.setCharacterEncoding("UTF-8");
 
-        ApiResponse<Object> apiResponse =
-                ApiResponse.error(403 + "", "Bạn không có quyền truy cập vào tài nguyên này!");
+        ErrorCode errorCode = ErrorCode.ACCESS_DENIED;
+        ErrorResponse errorResponse = new ErrorResponse(
+                java.time.Instant.now(),
+                errorCode.getHttpStatus().value(),
+                errorCode.name(),
+                errorCode.getMessage(),
+                null,
+                request.getRequestURI()
+        );
 
-        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 }

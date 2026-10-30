@@ -3,7 +3,7 @@ package com.product_service.adapter.in.web.category;
 import com.product_service.adapter.in.web.dto.request.ChangeStatusCategoryRequest;
 import com.product_service.adapter.in.web.dto.request.CreateCategoryRequest;
 import com.product_service.adapter.in.web.dto.request.UpdateCategoryRequest;
-import com.product_service.adapter.in.web.dto.response.ApiResponse;
+import com.common.dto.response.ApiResponse;
 import com.product_service.application.category.command.CreateCategoryCommand;
 import com.product_service.application.category.command.UpdateCategoryCommand;
 import com.product_service.application.category.result.CreateCategoryResult;

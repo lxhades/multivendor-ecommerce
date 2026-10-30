@@ -1,6 +1,7 @@
 package com.product_service.adapter.in.web.security.handler;
 
-import com.product_service.adapter.in.web.dto.response.ApiResponse;
+import com.common.dto.response.ErrorResponse;
+import com.common.exception.ErrorCode;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -28,9 +29,16 @@ public class JwtAuthenticationEntryPoint implements AuthenticationEntryPoint {
         response.setCharacterEncoding("UTF-8");
 
 
-        ApiResponse<Object> apiResponse =
-                ApiResponse.error(401 + "", "Phiên đăng nhập không hợp lệ hoặc đã hết hạn!");
+        ErrorCode errorCode = ErrorCode.AUTHENTICATION_REQUIRED;
+        ErrorResponse errorResponse = new ErrorResponse(
+                java.time.Instant.now(),
+                errorCode.getHttpStatus().value(),
+                errorCode.name(),
+                errorCode.getMessage(),
+                null,
+                request.getRequestURI()
+        );
 
-        response.getWriter().write(objectMapper.writeValueAsString(apiResponse));
+        response.getWriter().write(objectMapper.writeValueAsString(errorResponse));
     }
 }

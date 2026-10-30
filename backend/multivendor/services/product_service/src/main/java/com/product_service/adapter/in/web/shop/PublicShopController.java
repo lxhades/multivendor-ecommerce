@@ -2,7 +2,7 @@ package com.product_service.adapter.in.web.shop;
 
 import com.product_service.adapter.in.web.Helper;
 import com.product_service.adapter.in.web.dto.request.CreateShopRequest;
-import com.product_service.adapter.in.web.dto.response.ApiResponse;
+import com.common.dto.response.ApiResponse;
 import com.product_service.application.shop.command.CreateShopCommand;
 import com.product_service.application.shop.result.ShopResult;
 import com.product_service.application.shop.usecase.CreateShopUseCase;

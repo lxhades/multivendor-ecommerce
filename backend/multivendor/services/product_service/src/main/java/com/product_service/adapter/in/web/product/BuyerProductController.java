@@ -1,6 +1,6 @@
 package com.product_service.adapter.in.web.product;
 
-import com.product_service.adapter.in.web.dto.response.ApiResponse;
+import com.common.dto.response.ApiResponse;
 import com.product_service.application.product.dto.ProductDtos.Buyer;
 import com.product_service.application.product.usecase.BuyerProductUseCase;
 import org.springframework.http.ResponseEntity;

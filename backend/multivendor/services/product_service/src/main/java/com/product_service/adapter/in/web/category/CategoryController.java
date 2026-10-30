@@ -1,6 +1,6 @@
 package com.product_service.adapter.in.web.category;
 
-import com.product_service.adapter.in.web.dto.response.ApiResponse;
+import com.common.dto.response.ApiResponse;
 import com.product_service.application.category.result.CreateCategoryResult;
 import com.product_service.application.category.usecase.GetCategoriesByParentIdUseCase;
 import com.product_service.application.category.usecase.GetCategoryUseCase;
