@@ -26,10 +26,12 @@ jobs:
               - 'backend/multivendor/services/auth_service/**'
             product:
               - 'backend/multivendor/services/product_service/**'
+            inventory:
+              - 'backend/multivendor/services/inventory_service/**'
 
-      # 2. Setup JDK 17 (Chỉ chạy nếu có sự thay đổi ở bất kỳ service nào hoặc file pom gốc)
+      # 2. Setup JDK 17 (Chạy nếu có bất kỳ sự thay đổi nào)
       - name: Setup JDK 17
-        if: steps.filter.outputs.root == 'true' || steps.filter.outputs.auth == 'true' || steps.filter.outputs.product == 'true'
+        if: steps.filter.outputs.root == 'true' || steps.filter.outputs.auth == 'true' || steps.filter.outputs.product == 'true' || steps.filter.outputs.inventory == 'true'
         uses: actions/setup-java@v5
         with:
           distribution: 'temurin'
@@ -37,6 +39,7 @@ jobs:
           cache: 'maven'
 
       # BUILD AUTH SERVICE
+
       - name: Build Auth Service
         if: steps.filter.outputs.root == 'true' || steps.filter.outputs.auth == 'true'
         working-directory: ./backend/multivendor
@@ -50,7 +53,6 @@ jobs:
           path: 'backend/multivendor/services/auth_service/target/*.jar'
           if-no-files-found: error
 
-    
       # BUILD PRODUCT SERVICE
       - name: Build Product Service
         if: steps.filter.outputs.root == 'true' || steps.filter.outputs.product == 'true'
@@ -64,11 +66,13 @@ jobs:
           name: product-service-jar
           path: 'backend/multivendor/services/product_service/target/*.jar'
           if-no-files-found: error
-       # BUILD INVENTORY SERVICE
+
+      # BUILD INVENTORY SERVICE
+      
       - name: Build Inventory Service
         if: steps.filter.outputs.root == 'true' || steps.filter.outputs.inventory == 'true'
         working-directory: ./backend/multivendor
-        run: mvn -B -ntp clean package -Dmaven.test.skip=true -pl :inventory-service -am
+        run: mvn -B -ntp clean package -Dmaven.test.skip=true -pl :inventory_service -am
 
       - name: Upload Inventory JAR
         if: steps.filter.outputs.root == 'true' || steps.filter.outputs.inventory == 'true'
