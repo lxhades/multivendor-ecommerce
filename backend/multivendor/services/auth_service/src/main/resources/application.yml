@@ -1,0 +1,80 @@
+spring:
+  application:
+    name: auth-service
+
+  # DevTools
+  devtools:
+    restart:
+      enabled: true
+      poll-interval: 1s
+
+  # Load optional local .env file
+  config:
+    import: optional:file:.env[.properties]
+
+  # PostgreSQL
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5432/auth_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+    driver-class-name: org.postgresql.Driver
+
+  # JPA / Hibernate
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: ${JPA_SHOW_SQL:true}
+    properties:
+      hibernate:
+        format_sql: true
+        jdbc:
+          time_zone: Asia/Ho_Chi_Minh
+
+  # Redis
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      password: ${REDIS_PASSWORD:changeme}
+
+  # Mail
+  mail:
+    host: ${MAIL_HOST:smtp.gmail.com}
+    port: ${MAIL_PORT:587}
+    username: ${MAIL_USERNAME:}
+    password: ${MAIL_PASSWORD:}
+    test-connection: false
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# Server
+server:
+  port: ${SERVER_PORT:8081}
+
+# Security / JWT
+security:
+  jwt:
+    issuer: ${JWT_ISSUER:auth-service}
+
+auth:
+  access-token:
+    expiration: ${ACCESS_TOKEN_EXPIRATION:900}
+  refresh-token:
+    expiration: ${REFRESH_TOKEN_EXPIRATION:604800}
+
+# Swagger / Springdoc
+springdoc:
+  api-docs:
+    path: /v3/api-docs
+  swagger-ui:
+    path: /swagger-ui.html
+
+# Logging
+logging:
+  level:
+    com.auth_service: ${LOG_LEVEL:INFO}
+    org.springframework.security: ${SECURITY_LOG_LEVEL:INFO}

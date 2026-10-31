@@ -17,7 +17,8 @@ spring:
         jdbc:
           time_zone: Asia/Ho_Chi_Minh
 
-  # Kafka Consumer & Producer
+
+#   Kafka Consumer & Producer
   kafka:
     bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
     consumer:
@@ -32,13 +33,6 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
-
-  # Security / service authentication
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://localhost:8081/oauth2/jwks
 
 server:
   port: ${SERVER_PORT:8085}
