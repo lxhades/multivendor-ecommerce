@@ -7,17 +7,17 @@ import org.springframework.stereotype.Component;
 @Component
 public class InventoryPersistenceMapper {
 
-    public Inventory toDomain(InventoryJpaEntity jpaEntity) {
-
+    public Inventory toDomain(InventoryJpaEntity entity) {
         return Inventory.restore(
-                jpaEntity.getId(),
-                jpaEntity.getProductId(),
-                jpaEntity.getVariantId(),
-                jpaEntity.getShopId(),
-                jpaEntity.getOnHandQuantity(),
-                jpaEntity.getReservedQuantity(),
-                jpaEntity.getCreatedAt(),
-                jpaEntity.getUpdatedAt()
+                entity.getId(),
+                entity.getProductId(),
+                entity.getVariantId(),
+                entity.getShopId(),
+                entity.getOnHandQuantity(),
+                entity.getReservedQuantity(),
+                entity.getCreatedAt(),
+                entity.getUpdatedAt(),
+                entity.getVersion()
         );
     }
 

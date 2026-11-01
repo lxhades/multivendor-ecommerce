@@ -19,6 +19,7 @@ public class Inventory {
 
     private final Instant createdAt;
     private Instant updatedAt;
+    private final Long version;
 
     private Inventory(
             UUID id,
@@ -28,25 +29,27 @@ public class Inventory {
             long onHandQuantity,
             long reservedQuantity,
             Instant createdAt,
-            Instant updatedAt
+            Instant updatedAt,
+            Long version
     ) {
         this.id = Objects.requireNonNull(id);
         this.productId = Objects.requireNonNull(productId);
         this.variantId = Objects.requireNonNull(variantId);
         this.shopId = Objects.requireNonNull(shopId);
 
-        if (onHandQuantity < 0
-                || reservedQuantity < 0
+        if (onHandQuantity < 0 || reservedQuantity < 0
                 || reservedQuantity > onHandQuantity) {
-            throw new IllegalArgumentException(
-                    "Invalid inventory quantities"
-            );
+            throw new IllegalArgumentException("Invalid inventory quantities");
+        }
+        if (version != null && version < 0) {
+            throw new IllegalArgumentException("Invalid version");
         }
 
         this.onHandQuantity = onHandQuantity;
         this.reservedQuantity = reservedQuantity;
         this.createdAt = Objects.requireNonNull(createdAt);
         this.updatedAt = Objects.requireNonNull(updatedAt);
+        this.version = version;
     }
 
     public static Inventory initialize(
@@ -57,14 +60,8 @@ public class Inventory {
             Instant now
     ) {
         return new Inventory(
-                id,
-                productId,
-                variantId,
-                shopId,
-                0,
-                0,
-                now,
-                now
+                id, productId, variantId, shopId,
+                0, 0, now, now, null
         );
     }
 
@@ -76,18 +73,18 @@ public class Inventory {
             long onHandQuantity,
             long reservedQuantity,
             Instant createdAt,
-            Instant updatedAt
+            Instant updatedAt,
+            Long version
     ) {
         return new Inventory(
-                id,
-                productId,
-                variantId,
-                shopId,
-                onHandQuantity,
-                reservedQuantity,
-                createdAt,
-                updatedAt
+                id, productId, variantId, shopId,
+                onHandQuantity, reservedQuantity,
+                createdAt, updatedAt, Objects.requireNonNull(version)
         );
+    }
+
+    public Long getVersion() {
+        return version;
     }
 
     public void increaseStock(long quantity, Instant now) {

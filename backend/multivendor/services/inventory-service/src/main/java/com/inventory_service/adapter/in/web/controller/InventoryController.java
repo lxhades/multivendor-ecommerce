@@ -1,11 +1,12 @@
 package com.inventory_service.adapter.in.web.controller;
 
 import com.common.dto.response.ApiResponse;
+import com.inventory_service.application.inventory.command.AdjustStockCommand;
+import com.inventory_service.application.inventory.command.IncreaseStockCommand;
 import com.inventory_service.application.inventory.command.InitializeInventoryCommand;
 import com.inventory_service.application.inventory.dto.InventoryResponse;
-import com.inventory_service.application.inventory.usecase.GetInventoryUseCase;
-import com.inventory_service.application.inventory.usecase.InitializeInventoryUseCase;
-import com.inventory_service.application.inventory.usecase.ListInventoryOfShopIdUseCase;
+import com.inventory_service.application.inventory.usecase.*;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -14,22 +15,48 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/inventories")
 public class InventoryController {
 
     private final InitializeInventoryUseCase initializeUseCase;
     private final GetInventoryUseCase getUseCase;
     private final ListInventoryOfShopIdUseCase listUseCase;
+    private final IncreaseStockUseCase  increaseStockUseCase;
+    private final AdjustStockUseCase adjustStockUseCase;
 
-    public InventoryController(
-            InitializeInventoryUseCase initializeUseCase,
-            GetInventoryUseCase getUseCase,
-            ListInventoryOfShopIdUseCase listUseCase
+    @PatchMapping("/increase-stock")
+    public ResponseEntity<ApiResponse<InventoryResponse>> increaseStock(
+            @RequestBody IncreaseStockCommand request
     ) {
-        this.initializeUseCase = initializeUseCase;
-        this.getUseCase = getUseCase;
-        this.listUseCase = listUseCase;
+        InventoryResponse response = increaseStockUseCase.execute(
+                new IncreaseStockCommand(request.variantId(), request.quantity())
+        );
+
+        return ResponseEntity.ok(
+                ApiResponse.success("Nhập kho thành công", response)
+        );
     }
+    @PatchMapping("/variant/adjust-stock")
+    public ResponseEntity<ApiResponse<InventoryResponse>> adjustStock(
+            @RequestBody AdjustStockCommand request
+    ) {
+        InventoryResponse response = adjustStockUseCase.execute(
+                new AdjustStockCommand(
+                        request.variantId(),
+                        request.newQuantity()
+                )
+        );
+
+        return ResponseEntity.ok(
+                ApiResponse.success(
+                        "Điều chỉnh tồn kho thành công",
+                        response
+                )
+        );
+    }
+
+
 
     @PostMapping
     public ResponseEntity<ApiResponse<InventoryResponse>> initialize(
