@@ -29,7 +29,8 @@ public enum ErrorCode {
     STOCK_BELOW_RESERVED_QUANTITY(
             HttpStatus.BAD_REQUEST,
             "Tồn kho không được thấp hơn số lượng đã đặt trước"
-    );
+    ), INSUFFICIENT_STOCK(HttpStatus.CONFLICT,"Số lượng tồn kho không đủ" ),
+    STOCK_RESERVATION_NOT_FOUND(HttpStatus.NOT_FOUND,"Không tìm thấy bản ghi giữ chỗ tồn kho" );
 
     private final HttpStatus httpStatus;
     private final String message;
