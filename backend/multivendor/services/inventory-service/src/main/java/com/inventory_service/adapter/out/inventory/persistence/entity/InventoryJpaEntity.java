@@ -1,5 +1,5 @@
 
-package com.inventory_service.adapter.out.persistence.entity;
+package com.inventory_service.adapter.out.inventory.persistence.entity;
 
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;

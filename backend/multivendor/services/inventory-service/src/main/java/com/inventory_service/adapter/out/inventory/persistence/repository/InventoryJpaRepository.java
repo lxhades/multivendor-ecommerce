@@ -1,6 +1,6 @@
-package com.inventory_service.adapter.out.persistence.repository;
+package com.inventory_service.adapter.out.inventory.persistence.repository;
 
-import com.inventory_service.adapter.out.persistence.entity.InventoryJpaEntity;
+import com.inventory_service.adapter.out.inventory.persistence.entity.InventoryJpaEntity;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 

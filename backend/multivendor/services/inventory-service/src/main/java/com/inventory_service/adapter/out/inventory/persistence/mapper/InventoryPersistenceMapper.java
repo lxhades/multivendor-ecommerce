@@ -1,6 +1,6 @@
-package com.inventory_service.adapter.out.persistence.mapper;
+package com.inventory_service.adapter.out.inventory.persistence.mapper;
 
-import com.inventory_service.adapter.out.persistence.entity.InventoryJpaEntity;
+import com.inventory_service.adapter.out.inventory.persistence.entity.InventoryJpaEntity;
 import com.inventory_service.domain.model.aggregate.Inventory;
 import org.springframework.stereotype.Component;
 
