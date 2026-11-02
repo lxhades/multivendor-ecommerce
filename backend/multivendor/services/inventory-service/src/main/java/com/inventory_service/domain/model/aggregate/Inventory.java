@@ -97,7 +97,27 @@ public class Inventory {
         );
         this.updatedAt = Objects.requireNonNull(now);
     }
+    public void reserveStock(long quantity, Instant now) {
 
+        if (quantity <= 0) {
+            throw new DomainException(
+                    ErrorCode.INVALID_INVENTORY_QUANTITY
+            );
+        }
+
+        if (availableQuantity() < quantity) {
+            throw new DomainException(
+                    ErrorCode.INSUFFICIENT_STOCK
+            );
+        }
+
+        this.reservedQuantity = Math.addExact(
+                this.reservedQuantity,
+                quantity
+        );
+
+        this.updatedAt = Objects.requireNonNull(now);
+    }
     public void adjustStock(long newQuantity, Instant now) {
         if (newQuantity < reservedQuantity) {
             throw new DomainException(ErrorCode.STOCK_BELOW_RESERVED_QUANTITY);
