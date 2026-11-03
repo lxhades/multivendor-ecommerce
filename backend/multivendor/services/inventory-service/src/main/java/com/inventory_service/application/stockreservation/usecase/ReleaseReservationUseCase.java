@@ -52,9 +52,9 @@ public class ReleaseReservationUseCase {
         }
 
         if (reservation.getStatus() != ReservationStatus.RESERVED) {
-            throw new IllegalStateException(
-                    "Cannot release reservation in status: "
-                            + reservation.getStatus()
+            throw new DomainException(
+                    ErrorCode.INVALID_RESERVATION_STATUS
+
             );
         }
 

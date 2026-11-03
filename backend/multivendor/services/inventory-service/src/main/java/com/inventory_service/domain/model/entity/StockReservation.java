@@ -1,5 +1,7 @@
 package com.inventory_service.domain.model.entity;
 
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.inventory_service.domain.model.enums.ReservationStatus;
 
 import java.time.Instant;
@@ -18,7 +20,7 @@ public class StockReservation {
     private final Instant expiresAt;
     private final Instant createdAt;
     private Instant updatedAt;
-    private Long version;
+    private final Long version;
 
     private StockReservation(
             UUID id,
@@ -61,8 +63,8 @@ public class StockReservation {
         Objects.requireNonNull(now);
 
         if (!expiresAt.isAfter(now)) {
-            throw new IllegalArgumentException(
-                    "Expiration must be in the future"
+            throw new DomainException(
+                    ErrorCode.RESERVATION_NOT_EXPIRED
             );
         }
 
@@ -123,14 +125,14 @@ public class StockReservation {
         }
 
         if (status != ReservationStatus.RESERVED) {
-            throw new IllegalStateException(
-                    "Only RESERVED reservation can expire"
+            throw new DomainException(
+                    ErrorCode.INVALID_RESERVATION_STATUS
             );
         }
 
         if (now.isBefore(expiresAt)) {
-            throw new IllegalStateException(
-                    "Reservation has not expired"
+            throw new DomainException(
+                    ErrorCode.RESERVATION_NOT_EXPIRED
             );
         }
 
@@ -142,27 +144,52 @@ public class StockReservation {
         Objects.requireNonNull(now);
 
         if (status != ReservationStatus.RESERVED) {
-            throw new IllegalStateException(
-                    "Reservation is no longer active"
+            throw new DomainException(
+                    ErrorCode.INVALID_RESERVATION_STATUS
             );
         }
 
         if (!now.isBefore(expiresAt)) {
-            throw new IllegalStateException(
-                    "Reservation has expired"
-            );
+            throw new DomainException(
+                    ErrorCode.RESERVATION_EXPIRED);
         }
     }
 
-    public UUID getId() { return id; }
-    public UUID getOrderId() { return orderId; }
-    public UUID getInventoryId() { return inventoryId; }
-    public long getQuantity() { return quantity; }
-    public ReservationStatus getStatus() { return status; }
-    public Instant getExpiresAt() { return expiresAt; }
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
-    public Long getVersion() { return version; }
+    public UUID getId() {
+        return id;
+    }
+
+    public UUID getOrderId() {
+        return orderId;
+    }
+
+    public UUID getInventoryId() {
+        return inventoryId;
+    }
+
+    public long getQuantity() {
+        return quantity;
+    }
+
+    public ReservationStatus getStatus() {
+        return status;
+    }
+
+    public Instant getExpiresAt() {
+        return expiresAt;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
 
 
 }

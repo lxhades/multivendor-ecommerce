@@ -45,9 +45,8 @@ public class ConfirmReservationUseCase {
         }
 
         if (reservation.getStatus() != ReservationStatus.RESERVED) {
-            throw new IllegalStateException(
-                    "Cannot confirm reservation in status: "
-                            + reservation.getStatus()
+            throw new DomainException(
+                   ErrorCode.INVALID_RESERVATION_STATUS
             );
         }
 
