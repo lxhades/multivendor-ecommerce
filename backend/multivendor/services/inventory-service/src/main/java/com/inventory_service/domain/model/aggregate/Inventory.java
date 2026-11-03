@@ -126,6 +126,46 @@ public class Inventory {
         this.onHandQuantity = newQuantity;
         this.updatedAt = Objects.requireNonNull(now);
     }
+    public void confirmStock(long quantity, Instant now) {
+
+        Objects.requireNonNull(now, "now is required");
+
+        if (quantity <= 0) {
+            throw new DomainException(
+                    ErrorCode.INVALID_INVENTORY_QUANTITY
+            );
+        }
+
+        if (quantity > reservedQuantity) {
+            throw new IllegalStateException(
+                    "Confirm quantity exceeds reserved quantity"
+            );
+        }
+
+        this.onHandQuantity -= quantity;
+        this.reservedQuantity -= quantity;
+        this.updatedAt = now;
+    }
+
+    public void releaseStock(long quantity, Instant now) {
+
+        Objects.requireNonNull(now, "now is required");
+
+        if (quantity <= 0) {
+            throw new DomainException(
+                    ErrorCode.INVALID_INVENTORY_QUANTITY
+            );
+        }
+
+        if (quantity > reservedQuantity) {
+            throw new IllegalStateException(
+                    "Release quantity exceeds reserved quantity"
+            );
+        }
+
+        this.reservedQuantity -= quantity;
+        this.updatedAt = now;
+    }
 
     public long availableQuantity() {
         return onHandQuantity - reservedQuantity;

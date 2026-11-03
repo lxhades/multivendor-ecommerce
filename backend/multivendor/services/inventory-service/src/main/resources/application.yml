@@ -44,3 +44,4 @@ logging:
 inventory:
   kafka:
     product-topic: product.inventory-init.v1
+    reserve-topic: inventory.reserve.requested.v1
