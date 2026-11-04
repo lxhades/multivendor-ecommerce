@@ -1,4 +1,3 @@
-
 package com.order_service.domain.model.aggregate;
 
 import com.order_service.domain.model.enums.CheckoutStatus;
@@ -9,22 +8,16 @@ import java.time.Instant;
 import java.util.Objects;
 import java.util.UUID;
 
-public class Checkout {
-
-    private static final Duration CHECKOUT_TTL =
-            Duration.ofMinutes(15);
+public final class Checkout {
 
     private final UUID id;
     private final UUID buyerId;
     private final String idempotencyKey;
-
     private final PaymentMethod paymentMethod;
     private CheckoutStatus status;
-
     private final Instant expiresAt;
     private final Instant createdAt;
     private Instant updatedAt;
-
     private final Long version;
 
     private Checkout(
@@ -38,61 +31,26 @@ public class Checkout {
             Instant updatedAt,
             Long version
     ) {
-        this.id = Objects.requireNonNull(
-                id, "id is required"
-        );
-        this.buyerId = Objects.requireNonNull(
-                buyerId, "buyerId is required"
-        );
-        this.idempotencyKey = Objects.requireNonNull(
-                idempotencyKey, "idempotencyKey is required"
-        );
+        this.id = Objects.requireNonNull(id);
+        this.buyerId = Objects.requireNonNull(buyerId);
 
-        if (idempotencyKey.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Idempotency key cannot be blank"
-            );
+        if (idempotencyKey == null || idempotencyKey.isBlank()) {
+            throw new IllegalArgumentException("Idempotency key required");
         }
+        this.idempotencyKey = idempotencyKey;
 
-        this.paymentMethod = Objects.requireNonNull(
-                paymentMethod, "paymentMethod is required"
-        );
-        this.status = Objects.requireNonNull(
-                status, "status is required"
-        );
-
-        this.expiresAt = Objects.requireNonNull(
-                expiresAt, "expiresAt is required"
-        );
-        this.createdAt = Objects.requireNonNull(
-                createdAt, "createdAt is required"
-        );
-        this.updatedAt = Objects.requireNonNull(
-                updatedAt, "updatedAt is required"
-        );
-
-        if (!expiresAt.isAfter(createdAt)) {
-            throw new IllegalArgumentException(
-                    "expiresAt must be after createdAt"
-            );
-        }
+        this.paymentMethod = Objects.requireNonNull(paymentMethod);
+        this.status = Objects.requireNonNull(status);
+        this.expiresAt = Objects.requireNonNull(expiresAt);
+        this.createdAt = Objects.requireNonNull(createdAt);
+        this.updatedAt = Objects.requireNonNull(updatedAt);
 
         if (updatedAt.isBefore(createdAt)) {
-            throw new IllegalArgumentException(
-                    "updatedAt cannot be before createdAt"
-            );
-        }
-
-        if (version != null && version < 0) {
-            throw new IllegalArgumentException(
-                    "version cannot be negative"
-            );
+            throw new IllegalArgumentException("Invalid timestamps");
         }
 
         this.version = version;
     }
-
-
 
     public static Checkout create(
             UUID id,
@@ -101,22 +59,18 @@ public class Checkout {
             PaymentMethod paymentMethod,
             Instant now
     ) {
-        Objects.requireNonNull(now, "now is required");
-
         return new Checkout(
                 id,
                 buyerId,
                 idempotencyKey,
                 paymentMethod,
                 CheckoutStatus.PENDING,
-                now.plus(CHECKOUT_TTL),
+                now.plus(Duration.ofMinutes(15)),
                 now,
                 now,
                 null
         );
     }
-
-
 
     public static Checkout restore(
             UUID id,
@@ -142,106 +96,63 @@ public class Checkout {
         );
     }
 
+    private void move(
+            CheckoutStatus expectedStatus,
+            CheckoutStatus targetStatus,
+            Instant now
+    ) {
+        Objects.requireNonNull(now);
 
+        if (status == targetStatus) {
+            return;
+        }
 
-    public boolean isExpired(Instant now) {
-        Objects.requireNonNull(now, "now is required");
-        return !now.isBefore(expiresAt);
+        if (status != expectedStatus) {
+            throw new IllegalStateException("Invalid checkout transition");
+        }
+
+        if (now.isBefore(updatedAt)) {
+            throw new IllegalArgumentException("Time went backwards");
+        }
+
+        if (now.isAfter(expiresAt) && targetStatus != CheckoutStatus.EXPIRED) {
+            throw new IllegalStateException("Checkout expired");
+        }
+
+        status = targetStatus;
+        updatedAt = now;
     }
 
     public void startProcessing(Instant now) {
-        Objects.requireNonNull(now, "now is required");
-
-        if (status == CheckoutStatus.PROCESSING) {
-            return;
-        }
-
-        ensurePendingAndNotExpired(now);
-
-        this.status = CheckoutStatus.PROCESSING;
-        this.updatedAt = now;
+        move(CheckoutStatus.PENDING, CheckoutStatus.PROCESSING, now);
     }
 
     public void complete(Instant now) {
-        Objects.requireNonNull(now, "now is required");
-
-        if (status == CheckoutStatus.COMPLETED) {
-            return;
-        }
-
-        if (status != CheckoutStatus.PROCESSING) {
-            throw new IllegalStateException(
-                    "Only PROCESSING checkout can be completed"
-            );
-        }
-
-        if (isExpired(now)) {
-            throw new IllegalStateException(
-                    "Checkout has expired"
-            );
-        }
-
-        this.status = CheckoutStatus.COMPLETED;
-        this.updatedAt = now;
+        move(CheckoutStatus.PROCESSING, CheckoutStatus.COMPLETED, now);
     }
 
     public void fail(Instant now) {
-        Objects.requireNonNull(now, "now is required");
-
-        if (status == CheckoutStatus.FAILED) {
-            return;
-        }
-
-        if (status != CheckoutStatus.PENDING
-                && status != CheckoutStatus.PROCESSING) {
-            throw new IllegalStateException(
-                    "Cannot fail checkout in status: " + status
-            );
-        }
-
-        this.status = CheckoutStatus.FAILED;
-        this.updatedAt = now;
+        move(CheckoutStatus.PROCESSING, CheckoutStatus.FAILED, now);
     }
 
     public void expire(Instant now) {
-        Objects.requireNonNull(now, "now is required");
+        Objects.requireNonNull(now);
+
+        if (now.isBefore(expiresAt)) {
+            throw new IllegalStateException("Not expired yet");
+        }
 
         if (status == CheckoutStatus.EXPIRED) {
             return;
         }
 
-        if (status != CheckoutStatus.PENDING
-                && status != CheckoutStatus.PROCESSING) {
-            throw new IllegalStateException(
-                    "Cannot expire checkout in status: " + status
-            );
+        if (status != CheckoutStatus.PENDING && status != CheckoutStatus.PROCESSING) {
+            throw new IllegalStateException("Cannot expire");
         }
 
-        if (!isExpired(now)) {
-            throw new IllegalStateException(
-                    "Checkout has not expired yet"
-            );
-        }
-
-        this.status = CheckoutStatus.EXPIRED;
-        this.updatedAt = now;
+        status = CheckoutStatus.EXPIRED;
+        updatedAt = now;
     }
-
-    private void ensurePendingAndNotExpired(Instant now) {
-        if (status != CheckoutStatus.PENDING) {
-            throw new IllegalStateException(
-                    "Checkout must be PENDING"
-            );
-        }
-
-        if (isExpired(now)) {
-            throw new IllegalStateException(
-                    "Checkout has expired"
-            );
-        }
-    }
-
-    // ===== GETTERS =====
 
     public UUID getId() {
         return id;
@@ -275,7 +186,7 @@ public class Checkout {
         return updatedAt;
     }
 
-    public Long getVersion() {
+    public Long getVe rsion() {
         return version;
     }
 }

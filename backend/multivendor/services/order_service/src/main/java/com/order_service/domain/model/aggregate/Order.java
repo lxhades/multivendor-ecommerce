@@ -1,4 +1,3 @@
-
 package com.order_service.domain.model.aggregate;
 
 import com.order_service.domain.model.entity.OrderItem;
@@ -7,11 +6,9 @@ import com.order_service.domain.model.enums.PaymentMethod;
 import com.order_service.domain.model.enums.PaymentStatus;
 
 import java.time.Instant;
-import java.util.List;
-import java.util.Objects;
-import java.util.UUID;
+import java.util.*;
 
-public class Order {
+public final class Order {
 
     private final UUID id;
     private final UUID checkoutId;
@@ -23,7 +20,6 @@ public class Order {
 
     private final long subtotal;
     private final long shippingFee;
-    private final long discountAmount;
     private final long totalAmount;
 
     private final PaymentMethod paymentMethod;
@@ -42,7 +38,6 @@ public class Order {
             List<OrderItem> items,
             String shippingAddress,
             long shippingFee,
-            long discountAmount,
             PaymentMethod paymentMethod,
             PaymentStatus paymentStatus,
             OrderStatus orderStatus,
@@ -55,60 +50,56 @@ public class Order {
         this.buyerId = Objects.requireNonNull(buyerId);
         this.shopId = Objects.requireNonNull(shopId);
 
-        Objects.requireNonNull(items, "items are required");
+        this.items = List.copyOf(Objects.requireNonNull(items));
 
-        if (items.isEmpty()) {
-            throw new IllegalArgumentException(
-                    "Order must contain at least one item"
-            );
+        if (this.items.isEmpty()) {
+            throw new IllegalArgumentException("Empty order");
         }
 
-        this.items = List.copyOf(items);
+        Set<UUID> seenVariantIds = new HashSet<>();
 
-        this.shippingAddress =
-                Objects.requireNonNull(shippingAddress);
-
-        if (shippingAddress.isBlank()) {
-            throw new IllegalArgumentException(
-                    "Shipping address cannot be blank"
-            );
+        for (OrderItem item : this.items) {
+            if (!seenVariantIds.add(item.getVariantId())) {
+                throw new IllegalArgumentException("Duplicate variantId");
+            }
         }
 
-        if (shippingFee < 0 || discountAmount < 0) {
-            throw new IllegalArgumentException(
-                    "Shipping fee and discount cannot be negative"
-            );
+        if (shippingAddress == null || shippingAddress.isBlank()) {
+            throw new IllegalArgumentException("Shipping address required");
         }
+        this.shippingAddress = shippingAddress;
 
-        this.subtotal = calculateSubtotal(this.items);
+        if (shippingFee < 0) {
+            throw new IllegalArgumentException("Negative shipping fee");
+        }
         this.shippingFee = shippingFee;
-        this.discountAmount = discountAmount;
 
-        long beforeDiscount =
-                Math.addExact(subtotal, shippingFee);
+        long calculatedSubtotal = 0;
 
-        if (discountAmount > beforeDiscount) {
-            throw new IllegalArgumentException(
-                    "Discount exceeds order amount"
-            );
+        for (OrderItem item : this.items) {
+            calculatedSubtotal = Math.addExact(calculatedSubtotal, item.subtotal());
         }
 
-        this.totalAmount =
-                Math.subtractExact(beforeDiscount, discountAmount);
+        this.subtotal = calculatedSubtotal;
+        this.totalAmount = Math.addExact(calculatedSubtotal, shippingFee);
 
-        this.paymentMethod =
-                Objects.requireNonNull(paymentMethod);
-        this.paymentStatus =
-                Objects.requireNonNull(paymentStatus);
-        this.orderStatus =
-                Objects.requireNonNull(orderStatus);
+        this.paymentMethod = Objects.requireNonNull(paymentMethod);
+        this.paymentStatus = Objects.requireNonNull(paymentStatus);
+        this.orderStatus = Objects.requireNonNull(orderStatus);
 
         this.createdAt = Objects.requireNonNull(createdAt);
         this.updatedAt = Objects.requireNonNull(updatedAt);
+
+        if (updatedAt.isBefore(createdAt)) {
+            throw new IllegalArgumentException("Invalid timestamps");
+        }
+
+        if (version != null && version < 0) {
+            throw new IllegalArgumentException("Negative version");
+        }
+
         this.version = version;
     }
-
-
 
     public static Order create(
             UUID id,
@@ -118,12 +109,9 @@ public class Order {
             List<OrderItem> items,
             String shippingAddress,
             long shippingFee,
-            long discountAmount,
             PaymentMethod paymentMethod,
             Instant now
     ) {
-        Objects.requireNonNull(now, "now is required");
-
         return new Order(
                 id,
                 checkoutId,
@@ -132,7 +120,6 @@ public class Order {
                 items,
                 shippingAddress,
                 shippingFee,
-                discountAmount,
                 paymentMethod,
                 PaymentStatus.UNPAID,
                 OrderStatus.PENDING_PAYMENT,
@@ -142,8 +129,6 @@ public class Order {
         );
     }
 
-
-
     public static Order restore(
             UUID id,
             UUID checkoutId,
@@ -152,7 +137,6 @@ public class Order {
             List<OrderItem> items,
             String shippingAddress,
             long shippingFee,
-            long discountAmount,
             PaymentMethod paymentMethod,
             PaymentStatus paymentStatus,
             OrderStatus orderStatus,
@@ -168,7 +152,6 @@ public class Order {
                 items,
                 shippingAddress,
                 shippingFee,
-                discountAmount,
                 paymentMethod,
                 paymentStatus,
                 orderStatus,
@@ -178,45 +161,39 @@ public class Order {
         );
     }
 
+    private void validateTime(Instant now) {
+        Objects.requireNonNull(now);
 
-    private static long calculateSubtotal(List<OrderItem> items) {
-        long total = 0;
-
-        for (OrderItem item : items) {
-            total = Math.addExact(
-                    total,
-                    Objects.requireNonNull(item).subtotal()
-            );
+        if (now.isBefore(updatedAt)) {
+            throw new IllegalArgumentException("Time went backwards");
         }
-
-        return total;
     }
 
     public void markPaid(Instant now) {
-        Objects.requireNonNull(now);
+        validateTime(now);
 
         if (paymentStatus == PaymentStatus.PAID) {
             return;
         }
 
-        if (orderStatus != OrderStatus.PENDING_PAYMENT) {
-            throw new IllegalStateException(
-                    "Order is not pending payment"
-            );
+        if (paymentMethod == PaymentMethod.COD) {
+            throw new IllegalStateException("COD cannot use online paid flow");
         }
 
-        this.paymentStatus = PaymentStatus.PAID;
-        this.orderStatus = OrderStatus.CONFIRMED;
-        this.updatedAt = now;
+        if (orderStatus != OrderStatus.PENDING_PAYMENT) {
+            throw new IllegalStateException("Not pending payment");
+        }
+
+        paymentStatus = PaymentStatus.PAID;
+        orderStatus = OrderStatus.CONFIRMED;
+        updatedAt = now;
     }
 
     public void confirmCod(Instant now) {
-        Objects.requireNonNull(now);
+        validateTime(now);
 
         if (paymentMethod != PaymentMethod.COD) {
-            throw new IllegalStateException(
-                    "Order payment method is not COD"
-            );
+            throw new IllegalStateException("Not COD");
         }
 
         if (orderStatus == OrderStatus.CONFIRMED) {
@@ -224,41 +201,48 @@ public class Order {
         }
 
         if (orderStatus != OrderStatus.PENDING_PAYMENT) {
+            throw new IllegalStateException("Cannot confirm");
+        }
+
+        orderStatus = OrderStatus.CONFIRMED;
+        updatedAt = now;
+    }
+
+    private void transition(
+            OrderStatus expectedStatus,
+            OrderStatus targetStatus,
+            Instant now
+    ) {
+        validateTime(now);
+
+        if (orderStatus == targetStatus) {
+            return;
+        }
+
+        if (orderStatus != expectedStatus) {
             throw new IllegalStateException(
-                    "Cannot confirm order in current status"
+                    "Invalid transition: " + orderStatus + " -> " + targetStatus
             );
         }
 
-        this.orderStatus = OrderStatus.CONFIRMED;
-        this.updatedAt = now;
+        orderStatus = targetStatus;
+        updatedAt = now;
     }
 
     public void startProcessing(Instant now) {
-        transition(
-                OrderStatus.CONFIRMED,
-                OrderStatus.PROCESSING,
-                now
-        );
+        transition(OrderStatus.CONFIRMED, OrderStatus.PROCESSING, now);
     }
 
     public void markShipped(Instant now) {
-        transition(
-                OrderStatus.PROCESSING,
-                OrderStatus.SHIPPED,
-                now
-        );
+        transition(OrderStatus.PROCESSING, OrderStatus.SHIPPED, now);
     }
 
     public void markDelivered(Instant now) {
-        transition(
-                OrderStatus.SHIPPED,
-                OrderStatus.DELIVERED,
-                now
-        );
+        transition(OrderStatus.SHIPPED, OrderStatus.DELIVERED, now);
     }
 
     public void cancel(Instant now) {
-        Objects.requireNonNull(now);
+        validateTime(now);
 
         if (orderStatus == OrderStatus.CANCELLED) {
             return;
@@ -266,52 +250,74 @@ public class Order {
 
         if (orderStatus != OrderStatus.PENDING_PAYMENT
                 && orderStatus != OrderStatus.CONFIRMED) {
-            throw new IllegalStateException(
-                    "Order cannot be cancelled in current status"
-            );
+            throw new IllegalStateException("Cannot cancel");
         }
 
-        this.orderStatus = OrderStatus.CANCELLED;
-        this.updatedAt = now;
-    }
-
-    private void transition(
-            OrderStatus expected,
-            OrderStatus target,
-            Instant now
-    ) {
-        Objects.requireNonNull(now);
-
-        if (orderStatus != expected) {
-            throw new IllegalStateException(
-                    "Invalid order transition: "
-                            + orderStatus + " -> " + target
-            );
+        if (paymentStatus == PaymentStatus.PAID) {
+            throw new IllegalStateException("Refund flow not implemented");
         }
 
-        this.orderStatus = target;
-        this.updatedAt = now;
+        orderStatus = OrderStatus.CANCELLED;
+        updatedAt = now;
     }
 
+    public UUID getId() {
+        return id;
+    }
 
-    public UUID getId() { return id; }
-    public UUID getCheckoutId() { return checkoutId; }
-    public UUID getBuyerId() { return buyerId; }
-    public UUID getShopId() { return shopId; }
+    public UUID getCheckoutId() {
+        return checkoutId;
+    }
 
-    public List<OrderItem> getItems() { return items; }
-    public String getShippingAddress() { return shippingAddress; }
+    public UUID getBuyerId() {
+        return buyerId;
+    }
 
-    public long getSubtotal() { return subtotal; }
-    public long getShippingFee() { return shippingFee; }
-    public long getDiscountAmount() { return discountAmount; }
-    public long getTotalAmount() { return totalAmount; }
+    public UUID getShopId() {
+        return shopId;
+    }
 
-    public PaymentMethod getPaymentMethod() { return paymentMethod; }
-    public PaymentStatus getPaymentStatus() { return paymentStatus; }
-    public OrderStatus getOrderStatus() { return orderStatus; }
+    public List<OrderItem> getItems() {
+        return items;
+    }
 
-    public Instant getCreatedAt() { return createdAt; }
-    public Instant getUpdatedAt() { return updatedAt; }
-    public Long getVersion() { return version; }
+    public String getShippingAddress() {
+        return shippingAddress;
+    }
+
+    public long getSubtotal() {
+        return subtotal;
+    }
+
+    public long getShippingFee() {
+        return shippingFee;
+    }
+
+    public long getTotalAmount() {
+        return totalAmount;
+    }
+
+    public PaymentMethod getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public PaymentStatus getPaymentStatus() {
+        return paymentStatus;
+    }
+
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
+    }
+
+    public Instant getCreatedAt() {
+        return createdAt;
+    }
+
+    public Instant getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
 }

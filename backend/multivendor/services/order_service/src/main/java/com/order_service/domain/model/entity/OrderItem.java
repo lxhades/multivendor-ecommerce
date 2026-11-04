@@ -1,4 +1,3 @@
-
 package com.order_service.domain.model.entity;
 
 import java.util.Objects;
@@ -49,6 +48,20 @@ public class OrderItem {
     }
 
     public static OrderItem create(
+            UUID id,
+            UUID productId,
+            UUID variantId,
+            String productName,
+            long unitPrice,
+            int quantity
+    ) {
+        return new OrderItem(
+                id, productId, variantId,
+                productName, unitPrice, quantity
+        );
+    }
+
+    public static OrderItem restore(
             UUID id,
             UUID productId,
             UUID variantId,
