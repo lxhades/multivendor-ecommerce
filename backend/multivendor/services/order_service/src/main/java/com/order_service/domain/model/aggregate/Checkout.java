@@ -186,7 +186,7 @@ public final class Checkout {
         return updatedAt;
     }
 
-    public Long getVe rsion() {
+    public Long getVersion() {
         return version;
     }
 }
