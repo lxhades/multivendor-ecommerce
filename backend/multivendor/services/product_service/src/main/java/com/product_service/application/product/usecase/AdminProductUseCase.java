@@ -4,6 +4,7 @@ import com.product_service.application.integration.event.ProductVarientInventory
 import com.product_service.application.integration.port.out.ProductOutboxRepository;
 import com.product_service.application.product.dto.ProductDtos.Seller;
 import com.product_service.domain.model.enumtype.ApprovalStatus;
+import com.product_service.domain.model.enumtype.ProductStatus;
 import com.product_service.domain.repository.ProductRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -51,7 +52,7 @@ public class AdminProductUseCase {
                 .orElseThrow(() -> new RuntimeException("Không tìm thấy sản phẩm"));
 
         p.decide(status, adminId, reason, clock.instant());
-
+        p.changeStatus(ProductStatus.ACTIVE,clock.instant());
         repo.save(p);
 
         if (status == ApprovalStatus.APPROVED) {

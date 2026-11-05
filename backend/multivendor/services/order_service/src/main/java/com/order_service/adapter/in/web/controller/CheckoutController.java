@@ -1,4 +1,4 @@
-package com.order_service.adapter.in.web;
+package com.order_service.adapter.in.web.controller;
 
 import com.common.dto.response.ApiResponse;
 import com.order_service.adapter.in.web.request.CreateCheckoutRequest;
@@ -9,6 +9,8 @@ import com.order_service.application.checkout.usecase.GetCheckoutUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -30,13 +32,22 @@ public class CheckoutController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<CreateCheckoutResult>> create(
-            @Valid @RequestBody CreateCheckoutRequest request
+            @Valid @RequestBody CreateCheckoutRequest request,
+            @RequestHeader("Idempotency-Key") String idempotencyKey,
+            @AuthenticationPrincipal Jwt jwt
     ) {
-        CreateCheckoutResult result = createCheckoutUseCase.execute(request.toCommand());
+        UUID buyerId = UUID.fromString(jwt.getSubject());
+
+        CreateCheckoutResult result = createCheckoutUseCase.execute(
+                request.toCommand(buyerId, idempotencyKey)
+        );
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Tạo checkout thành công", result));
     }
+
+
 
     @GetMapping("/{id}")
     public ApiResponse<CheckoutResult> getById(@PathVariable UUID id) {
