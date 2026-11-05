@@ -122,8 +122,11 @@ public enum ErrorCode {
     STOCK_RESERVATION_NOT_FOUND(
             HttpStatus.NOT_FOUND,
             "Không tìm thấy bản ghi giữ chỗ tồn kho"
+    ),
+    ProductServiceUnavailableException(
+            HttpStatus.NOT_FOUND,
+            "Loi ProductServiceUnavailableException"
     );
-
     private final HttpStatus httpStatus;
     private final String message;
 }

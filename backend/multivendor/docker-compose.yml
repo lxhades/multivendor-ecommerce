@@ -37,6 +37,7 @@ services:
       - kafka
     networks:
       - backend
+
   # Kong
   kong:
     image: kong:3.9
@@ -102,7 +103,6 @@ services:
       timeout: 5s
       retries: 5
 
-
   # INVENTORY DB
   postgres-inventory:
     image: postgres:16
@@ -119,6 +119,26 @@ services:
       - backend
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U postgres -d inventory_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # ORDER DB
+  postgres-order:
+    image: postgres:16
+    container_name: postgres-order
+    environment:
+      POSTGRES_DB: order_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5435:5432"
+    volumes:
+      - postgres_order_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d order_db" ]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -150,6 +170,7 @@ volumes:
   postgres_auth_data:
   postgres_product_data:
   postgres_inventory_data:
+  postgres_order_data:
   redis_data:
 
 networks:

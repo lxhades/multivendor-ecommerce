@@ -1,4 +1,4 @@
-package com.order_service.adapter.out.persistence.repository;
+package com.order_service.adapter.out.persistence.adapter;
 
 import com.order_service.adapter.out.persistence.jpa.SpringCheckoutJpaRepository;
 import com.order_service.adapter.out.persistence.mapper.CheckoutJpaMapper;

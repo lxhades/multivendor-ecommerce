@@ -8,6 +8,7 @@ public record ShopOrderCommand(UUID shopId, List<OrderItemCommand> items, long s
     public ShopOrderCommand {
         Objects.requireNonNull(shopId);
         items = List.copyOf(Objects.requireNonNull(items));
-        if (items.isEmpty() || shippingFee < 0) throw new IllegalArgumentException("Invalid shop");
+        if (items.isEmpty() || shippingFee < 0)
+            throw new IllegalArgumentException("Invalid shop");
     }
 }

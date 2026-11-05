@@ -1,7 +1,7 @@
+
 package com.order_service.application.checkout.command;
 
 import com.order_service.domain.model.enums.PaymentMethod;
-
 import java.util.*;
 
 public record CreateCheckoutCommand(
@@ -9,9 +9,8 @@ public record CreateCheckoutCommand(
         String idempotencyKey,
         PaymentMethod paymentMethod,
         String shippingAddress,
-        List<ShopOrderCommand> shops
+        List<CheckoutItemCommand> items
 ) {
-
     public CreateCheckoutCommand {
         Objects.requireNonNull(buyerId);
         Objects.requireNonNull(paymentMethod);
@@ -21,17 +20,16 @@ public record CreateCheckoutCommand(
             throw new IllegalArgumentException("Invalid checkout");
         }
 
-        shops = List.copyOf(Objects.requireNonNull(shops));
+        items = List.copyOf(Objects.requireNonNull(items));
 
-        if (shops.isEmpty()) {
+        if (items.isEmpty()) {
             throw new IllegalArgumentException("Empty checkout");
         }
 
-        Set<UUID> ids = new HashSet<>();
-
-        for (ShopOrderCommand shop : shops) {
-            if (!ids.add(shop.shopId())) {
-                throw new IllegalArgumentException("Duplicate shop");
+        Set<UUID> variants = new HashSet<>();
+        for (CheckoutItemCommand item : items) {
+            if (!variants.add(item.variantId())) {
+                throw new IllegalArgumentException("Duplicate variantId");
             }
         }
     }

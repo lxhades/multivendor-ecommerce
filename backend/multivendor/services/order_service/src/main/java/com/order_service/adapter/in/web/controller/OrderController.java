@@ -1,4 +1,4 @@
-package com.order_service.adapter.in.web;
+package com.order_service.adapter.in.web.controller;
 
 import com.common.dto.response.ApiResponse;
 import com.order_service.application.order.dto.OrderResult;
