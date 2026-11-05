@@ -34,7 +34,7 @@ public class OrderOutboxJpaAdapter implements OutboxPort {
         OrderOutboxEntity entity = new OrderOutboxEntity(
                 event.eventId(),
                 event.checkoutId(),
-                "InventoryReservationRequested",
+                InventoryReservationRequested.EVENT_TYPE,
                 payload,
                 clock.instant()
         );

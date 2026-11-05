@@ -3,7 +3,6 @@ package com.inventory_service.adapter.in.messaging;
 
 import com.inventory_service.adapter.in.messaging.event.InventoryReserveRequestedEvent;
 import com.inventory_service.application.stockreservation.command.ReserveCheckoutStockCommand;
-import com.inventory_service.application.stockreservation.usecase.ProcessInventoryReservationUseCase;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;

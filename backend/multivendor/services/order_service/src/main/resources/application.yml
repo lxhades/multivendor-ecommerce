@@ -21,6 +21,17 @@ spring:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:8081/oauth2/jwks
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
+        max.block.ms: 15000
+        delivery.timeout.ms: 15000
+        request.timeout.ms: 10000
 server:
   port: ${SERVER_PORT:8084}
 springdoc:
@@ -32,3 +43,12 @@ services:
   product:
     base-url: ${PRODUCT_SERVICE_URL:http://localhost:8082}
     internal-token: ${PRODUCT_SERVICE_INTERNAL_TOKEN:test123}
+
+order:
+  kafka:
+    reserve-topic: ${INVENTORY_RESERVE_TOPIC:inventory.reserve.requested.v1}
+  outbox:
+    enabled: ${ORDER_OUTBOX_ENABLED:true}
+    poll-delay-ms: ${ORDER_OUTBOX_POLL_DELAY_MS:3000}
+    batch-size: ${ORDER_OUTBOX_BATCH_SIZE:50}
+    send-timeout-ms: ${ORDER_OUTBOX_SEND_TIMEOUT_MS:15000}
