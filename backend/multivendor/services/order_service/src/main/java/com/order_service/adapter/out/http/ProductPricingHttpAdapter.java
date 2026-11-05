@@ -53,8 +53,8 @@ public class ProductPricingHttpAdapter implements ProductPricingPort {
             return List.of(response);
 
         } catch (RestClientException ex) {
-            throw new DomainException(
-                    ErrorCode.ProductServiceUnavailableException
+            throw new IllegalArgumentException(
+                    " ProductServiceUnavailableException"
             );
         }
     }
