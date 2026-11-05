@@ -50,7 +50,6 @@ public class CheckoutPersistenceService {
         List<Order> savedOrders = orders.saveAll(newOrders);
 
         // BUILD INVENTORY EVENT
-        // Chuyển List<Order> (mỗi Order chứa nhiều OrderItem) thành list phẳng các Item
         List<InventoryReservationRequested.Item> items =
                 savedOrders.stream()
                         .flatMap(this::toReservationItems)

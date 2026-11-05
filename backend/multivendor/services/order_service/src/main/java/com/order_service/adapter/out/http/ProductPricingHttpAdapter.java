@@ -1,8 +1,5 @@
-
 package com.order_service.adapter.out.http;
 
-import com.common.exception.DomainException;
-import com.common.exception.ErrorCode;
 import com.order_service.application.checkout.port.ProductPricingPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
@@ -53,12 +50,14 @@ public class ProductPricingHttpAdapter implements ProductPricingPort {
             return List.of(response);
 
         } catch (RestClientException ex) {
-            throw new DomainException(
-                    ErrorCode.ProductServiceUnavailableException
+            throw new IllegalStateException(
+                    "Cannot verify variants from Product Service",
+                    ex
             );
         }
     }
 
-    private record VerifyRequest(List<UUID> variantIds) {}
+    private record VerifyRequest(List<UUID> variantIds) {
+    }
 
 }

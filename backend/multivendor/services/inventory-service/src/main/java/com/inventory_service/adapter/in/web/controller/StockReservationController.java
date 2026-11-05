@@ -7,6 +7,7 @@ import com.inventory_service.application.stockreservation.command.*;
 import com.inventory_service.application.stockreservation.usecase.*;
 import com.inventory_service.domain.model.entity.StockReservation;
 import com.inventory_service.domain.repository.StockReservationRepository;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+@AllArgsConstructor
 @RequestMapping("/api/reservations")
 public class StockReservationController {
     private final ReserveStockUseCase reserve;
@@ -23,15 +25,7 @@ public class StockReservationController {
     private final ExpireReservationUseCase expire;
     private final StockReservationRepository repository;
 
-    public StockReservationController(ReserveStockUseCase reserve, ConfirmReservationUseCase confirm,
-                                      ReleaseReservationUseCase release, ExpireReservationUseCase expire,
-                                      StockReservationRepository repository) {
-        this.reserve = reserve;
-        this.confirm = confirm;
-        this.release = release;
-        this.expire = expire;
-        this.repository = repository;
-    }
+
 
     @PostMapping
     public ResponseEntity<ApiResponse<ReservationResponse>> reserve(@RequestBody ReserveStockCommand command) {
