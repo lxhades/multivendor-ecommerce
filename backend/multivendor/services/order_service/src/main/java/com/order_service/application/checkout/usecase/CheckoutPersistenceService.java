@@ -55,10 +55,11 @@ public class CheckoutPersistenceService {
                 savedOrders.stream()
                         .flatMap(this::toReservationItems)
                         .toList();
-        // tạo event
+
         InventoryReservationRequested event =
                 new InventoryReservationRequested(
                         UUID.randomUUID(),
+                        InventoryReservationRequested.EVENT_TYPE,
                         savedCheckout.getId(),
                         savedCheckout.getBuyerId(),
                         items

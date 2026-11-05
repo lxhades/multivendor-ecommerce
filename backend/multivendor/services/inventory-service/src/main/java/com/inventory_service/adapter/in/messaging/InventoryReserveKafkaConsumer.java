@@ -2,32 +2,21 @@
 package com.inventory_service.adapter.in.messaging;
 
 import com.inventory_service.adapter.in.messaging.event.InventoryReserveRequestedEvent;
-import com.inventory_service.application.stockreservation.command.ReserveOrderItem;
-import com.inventory_service.application.stockreservation.command.ReserveOrderStockCommand;
-import com.inventory_service.application.stockreservation.usecase.ReserveOrderStockUseCase;
+import com.inventory_service.application.stockreservation.command.ReserveCheckoutStockCommand;
+import com.inventory_service.application.stockreservation.usecase.ProcessInventoryReservationUseCase;
 
+import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.stereotype.Component;
-
 import tools.jackson.databind.ObjectMapper;
 
-import java.util.Objects;
-
 @Component
+@RequiredArgsConstructor
 public class InventoryReserveKafkaConsumer {
 
     private final ObjectMapper objectMapper;
-    private final ReserveOrderStockUseCase reserveOrderStockUseCase;
-
-    public InventoryReserveKafkaConsumer(
-            ObjectMapper objectMapper,
-            ReserveOrderStockUseCase reserveOrderStockUseCase
-    ) {
-        this.objectMapper = Objects.requireNonNull(objectMapper);
-        this.reserveOrderStockUseCase =
-                Objects.requireNonNull(reserveOrderStockUseCase);
-    }
+    private final ProcessInventoryReservationUseCase processUseCase;
 
     @KafkaListener(
             topics = "${inventory.kafka.reserve-topic}",
@@ -35,36 +24,35 @@ public class InventoryReserveKafkaConsumer {
     )
     public void consume(ConsumerRecord<String, String> record) {
 
+        // Deserialize event
         InventoryReserveRequestedEvent event =
                 objectMapper.readValue(
                         record.value(),
                         InventoryReserveRequestedEvent.class
                 );
 
-        Objects.requireNonNull(event.eventId());
-        Objects.requireNonNull(event.orderId());
-
-        if (!InventoryReserveRequestedEvent.EVENT_TYPE
-                .equals(event.eventType())) {
+        // Validate Kafka key.
+        if (!event.checkoutId().toString().equals(record.key())) {
             throw new IllegalArgumentException(
-                    "Unsupported eventType: " + event.eventType()
+                    "Kafka key must match checkoutId"
             );
         }
-
-        Objects.requireNonNull(event.items());
-
+        //map list
         var items = event.items().stream()
-                .map(item -> new ReserveOrderItem(
+                .map(item -> new ReserveCheckoutStockCommand.Item(
+                        item.orderId(),
                         item.variantId(),
                         item.quantity()
                 ))
                 .toList();
 
-        reserveOrderStockUseCase.execute(
-                new ReserveOrderStockCommand(
-                        event.orderId(),
+        ReserveCheckoutStockCommand command =
+                new ReserveCheckoutStockCommand(
+                        event.checkoutId(),
                         items
-                )
-        );
+                );
+
+        // STEP 4: Inbox + Reserve trong cùng transaction.
+        processUseCase.execute(event.eventId(), command);
     }
 }
