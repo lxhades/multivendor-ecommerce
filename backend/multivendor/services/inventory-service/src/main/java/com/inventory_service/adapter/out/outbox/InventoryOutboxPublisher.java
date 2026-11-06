@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 
 @Component
@@ -39,9 +40,7 @@ public class InventoryOutboxPublisher {
         this.topic = topic;
     }
 
-    @Scheduled(
-            fixedDelayString = "${inventory.outbox.poll-delay-ms:3000}"
-    )
+    @Scheduled(fixedDelayString = "${inventory.outbox.poll-delay-ms:3000}")
     public void publishPending() {
 
         List<InventoryOutboxEntity> events =
@@ -51,40 +50,55 @@ public class InventoryOutboxPublisher {
                         PageRequest.of(0, 5)
                 );
 
+        if (events.isEmpty()) {
+            log.debug("Không có event nào trong Outbox cần gửi.");
+            return;
+        }
+
+        log.info("Tìm thấy {} event trong Outbox cần xử lý.", events.size());
+
         for (InventoryOutboxEntity event : events) {
 
+            log.info("Đang gửi event lên Kafka: outboxId={}, aggregateId={}, type={}",
+                    event.getId(), event.getAggregateId(), event.getEventType());
+
             try {
+                // Gửi Kafka và chờ ACK
                 kafkaTemplate.send(
                         topic,
                         event.getAggregateId().toString(),
                         event.getPayload()
                 ).get(15, TimeUnit.SECONDS);
 
+                log.info("Đã gửi event lên Kafka thành công: outboxId={}, aggregateId={}, type={}",
+                        event.getId(), event.getAggregateId(), event.getEventType());
+
             } catch (InterruptedException ex) {
                 Thread.currentThread().interrupt();
+                log.error("Luồng bị ngắt khi đang gửi Kafka. outboxId={}", event.getId(), ex);
                 recordFailure(event, ex);
                 return;
 
             } catch (Exception ex) {
+                log.error("Gửi Kafka thất bại. outboxId={}", event.getId(), ex);
                 recordFailure(event, ex);
                 continue;
             }
 
-
+            // Cập nhật DB sau khi Kafka ACK thành công
             try {
                 markPublished(event.getId());
+                log.info("Đã cập nhật Outbox thành PUBLISHED thành công. outboxId={}, aggregateId={}",
+                        event.getId(), event.getAggregateId());
             } catch (Exception ex) {
-                log.error(
-                        "Đã nhận Kafka ACK nhưng cập nhật outbox thất bại. eventId={}",
-                        event.getId(),
-                        ex
-                );
+                log.error("LỖI NGHIÊM TRỌNG: Kafka đã nhận event nhưng cập nhật Outbox DB thất bại! outboxId={}",
+                        event.getId(), ex);
             }
         }
     }
 
     @Transactional
-    public void markPublished(java.util.UUID eventId) {
+    public void markPublished(UUID eventId) {
         repository.markPublished(
                 eventId,
                 clock.instant(),
@@ -109,26 +123,19 @@ public class InventoryOutboxPublisher {
 
         try {
             saveFailure(event.getId(), nextRetryAt, error);
+            log.warn("Đã ghi nhận retry vào DB. outboxId={}, attempt={}, nextRetryAt={}",
+                    event.getId(), attempt, nextRetryAt);
         } catch (Exception dbEx) {
-            log.error(
-                    "Ghi nhận retry cho outbox thất bại. eventId={}",
-                    event.getId(),
-                    dbEx
-            );
+            log.error("Không thể ghi nhận retry vào DB. outboxId={}", event.getId(), dbEx);
         }
 
-        log.warn(
-                "Gửi event từ Inventory outbox thất bại. eventId={}, attempt={}, retryIn={}s",
-                event.getId(),
-                attempt,
-                delay,
-                ex
-        );
+        log.warn("Gửi event thất bại, sẽ thử lại sau {}s. outboxId={}, attempt={}, error={}",
+                delay, event.getId(), attempt, ex.getMessage());
     }
 
     @Transactional
     public void saveFailure(
-            java.util.UUID eventId,
+            UUID eventId,
             Instant nextRetryAt,
             String error
     ) {
