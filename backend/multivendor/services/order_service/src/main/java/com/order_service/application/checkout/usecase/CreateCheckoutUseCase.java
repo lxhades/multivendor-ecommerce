@@ -148,13 +148,16 @@ public class CreateCheckoutUseCase {
             CreateCheckoutCommand command,
             Instant now
     ) {
-        return Checkout.create(
+        Checkout checkout = Checkout.create(
                 UUID.randomUUID(),
                 command.buyerId(),
                 command.idempotencyKey(),
                 command.paymentMethod(),
                 now
         );
+
+        checkout.startProcessing(now);
+        return checkout;
     }
 
 
