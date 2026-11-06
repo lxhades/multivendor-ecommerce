@@ -240,7 +240,9 @@ public final class Order {
     }
 
     public void markDelivered(Instant now) {
+
         transition(OrderStatus.SHIPPED, OrderStatus.DELIVERED, now);
+        paymentStatus=PaymentStatus.PAID;
     }
 
     public void cancel(Instant now) {
