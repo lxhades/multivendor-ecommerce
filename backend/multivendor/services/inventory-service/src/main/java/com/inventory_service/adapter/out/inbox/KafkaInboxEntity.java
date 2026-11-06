@@ -31,7 +31,7 @@ public class KafkaInboxEntity {
     private Instant processedAt;
 
     protected KafkaInboxEntity() {
-        // JPA
+
     }
 
     public KafkaInboxEntity(

@@ -1,6 +1,5 @@
 package com.inventory_service.adapter.in.messaging;
 
-
 import com.inventory_service.adapter.in.messaging.event.InventoryReservationRequestedEvent;
 import com.inventory_service.application.stockreservation.command.ReserveCheckoutCommand;
 import com.inventory_service.application.stockreservation.usecase.ReserveCheckoutUseCase;
@@ -18,17 +17,16 @@ import java.util.Objects;
 @Component
 public class InventoryReservationConsumer {
 
-    private static final Logger log =
-            LoggerFactory.getLogger(InventoryReservationConsumer.class);
+    private static final Logger log = LoggerFactory.getLogger(InventoryReservationConsumer.class);
 
-    private final ReserveCheckoutUseCase useCase;
+    private final ReserveCheckoutUseCase reserveCheckoutUseCase;
     private final ObjectMapper objectMapper;
 
     public InventoryReservationConsumer(
-            ReserveCheckoutUseCase useCase,
+            ReserveCheckoutUseCase reserveCheckoutUseCase,
             ObjectMapper objectMapper
     ) {
-        this.useCase = Objects.requireNonNull(useCase);
+        this.reserveCheckoutUseCase = Objects.requireNonNull(reserveCheckoutUseCase);
         this.objectMapper = Objects.requireNonNull(objectMapper);
     }
 
@@ -36,26 +34,24 @@ public class InventoryReservationConsumer {
             topics = "${inventory.kafka.reserve-topic}",
             groupId = "${spring.kafka.consumer.group-id}"
     )
-    public void consume(String payload) {
+    public void consume(String jsonPayload) {
 
-        InventoryReservationRequestedEvent event =
-                objectMapper.readValue(
-                        payload,
-                        InventoryReservationRequestedEvent.class
-                );
+        // 1. Parse JSON thành Object
+        InventoryReservationRequestedEvent reservationEvent =
+                objectMapper.readValue(jsonPayload, InventoryReservationRequestedEvent.class);
 
-        if (!"InventoryReservationRequested".equals(event.eventType())) {
-            throw new IllegalArgumentException(
-                    "Unexpected eventType: " + event.eventType()
-            );
+        // 2. Validate dữ liệu đầu vào
+        if (!"InventoryReservationRequested".equals(reservationEvent.eventType())) {
+            throw new IllegalArgumentException("Unexpected eventType: " + reservationEvent.eventType());
         }
 
-        if (event.items() == null) {
+        if (reservationEvent.items() == null) {
             throw new IllegalArgumentException("items cannot be null");
         }
 
-        List<ReserveCheckoutCommand.Item> items =
-                event.items().stream()
+        // 3. Map dữ liệu từ Event sang Command
+        List<ReserveCheckoutCommand.Item> requestedItems =
+                reservationEvent.items().stream()
                         .map(item -> new ReserveCheckoutCommand.Item(
                                 item.orderId(),
                                 item.variantId(),
@@ -63,20 +59,28 @@ public class InventoryReservationConsumer {
                         ))
                         .toList();
 
-        ReserveCheckoutCommand command =
+        ReserveCheckoutCommand reserveCommand =
                 new ReserveCheckoutCommand(
-                        event.eventId(),
-                        event.checkoutId(),
-                        event.buyerId(),
-                        items
+                        reservationEvent.eventId(),
+                        reservationEvent.checkoutId(),
+                        reservationEvent.buyerId(),
+                        requestedItems
                 );
 
-        useCase.execute(command);
+        // 4. Gọi UseCase xử lý (Trả về true nếu xử lý thành công, false nếu là event trùng)
+        int isProcessed = reserveCheckoutUseCase.execute(reserveCommand);
 
-        log.info(
-                "Inventory reservation event processed. eventId={}, checkoutId={}",
-                event.eventId(),
-                event.checkoutId()
-        );
+        // 5. Chỉ in log khi thực sự xử lý thành công
+        if (isProcessed==1) {
+            log.info("Xử lý giữ kho thành công. eventId={}, checkoutId={}",
+                    reservationEvent.eventId(),
+                    reservationEvent.checkoutId());
+        } else if (isProcessed==0) {
+            log.info("Bỏ qua event trùng lặp (Idempotency). eventId={}",
+                    reservationEvent.eventId());
+        }else {
+            log.info("Lôi inventory hoặc số lương",
+                    reservationEvent.eventId());
+        }
     }
 }

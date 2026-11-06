@@ -46,12 +46,12 @@ public class ReserveCheckoutUseCase {
     }
 
     @Transactional
-    public void execute(ReserveCheckoutCommand command) {
+    public int execute(ReserveCheckoutCommand command) {
         Objects.requireNonNull(command, "command is required");
 
         // 1. Chống xử lý trùng event (Idempotency)
         if (!isFirstTimeProcessed(command)) {
-            return;
+            return -1;
         }
 
         Instant now = clock.instant();
@@ -61,14 +61,14 @@ public class ReserveCheckoutUseCase {
         Optional<String> planningError = prepareReservations(command, context);
         if (planningError.isPresent()) {
             publishReservationFailedEvent(command, planningError.get());
-            return;
+            return 0;
         }
 
         // 3. Kiểm tra số lượng tồn kho
         Optional<String> stockError = validateStockAvailability(context);
         if (stockError.isPresent()) {
             publishReservationFailedEvent(command, stockError.get());
-            return;
+            return 0;
         }
 
         // 4. Thực hiện giữ kho (Domain logic)
@@ -79,8 +79,8 @@ public class ReserveCheckoutUseCase {
 
         // 6. Bắn event thành công
         publishReservationSuccessEvent(command);
+        return 1;
 
-        // 7. Transaction tự động commit khi kết thúc hàm
     }
 
 
