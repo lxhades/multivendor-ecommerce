@@ -1,4 +1,3 @@
-
 package com.inventory_service.adapter.in.messaging;
 
 import com.inventory_service.adapter.in.messaging.event.ProductVarientInventoryCreatedEvent;
@@ -43,8 +42,9 @@ public class ProductVariantKafkaConsumer {
 
         String payload = record.value();
 
+        // 1. Log nhận message
         log.info(
-                "Received Product inventory event: topic={}, partition={}, offset={}",
+                "Đã nhận sự kiện khởi tạo tồn kho từ Product Service: topic={}, partition={}, offset={}",
                 record.topic(),
                 record.partition(),
                 record.offset()
@@ -56,19 +56,22 @@ public class ProductVariantKafkaConsumer {
                         ProductVarientInventoryCreatedEvent.class
                 );
 
+        // 2. Validate eventType
         if (!ProductVarientInventoryCreatedEvent.EVENT_TYPE
                 .equals(event.eventType())) {
 
             throw new IllegalArgumentException(
-                    "Unsupported eventType: " + event.eventType()
+                    "Loại sự kiện không được hỗ trợ: " + event.eventType()
             );
         }
 
-        Objects.requireNonNull(event.eventId(), "eventId is required");
-        Objects.requireNonNull(event.productId(), "productId is required");
-        Objects.requireNonNull(event.variantId(), "variantId is required");
-        Objects.requireNonNull(event.shopId(), "shopId is required");
+        // 3. Validate dữ liệu đầu vào
+        Objects.requireNonNull(event.eventId(), "Thiếu thông tin eventId");
+        Objects.requireNonNull(event.productId(), "Thiếu thông tin productId");
+        Objects.requireNonNull(event.variantId(), "Thiếu thông tin variantId");
+        Objects.requireNonNull(event.shopId(), "Thiếu thông tin shopId");
 
+        // 4. Map sang Command
         InitializeInventoryCommand command =
                 new InitializeInventoryCommand(
                         event.productId(),
@@ -76,10 +79,12 @@ public class ProductVariantKafkaConsumer {
                         event.shopId()
                 );
 
+        // 5. Thực thi UseCase
         initializeUseCase.execute(command);
 
+        // 6. Log thành công
         log.info(
-                "Inventory initialized successfully: eventId={}, variantId={}",
+                "Khởi tạo tồn kho thành công: eventId={}, variantId={}",
                 event.eventId(),
                 event.variantId()
         );

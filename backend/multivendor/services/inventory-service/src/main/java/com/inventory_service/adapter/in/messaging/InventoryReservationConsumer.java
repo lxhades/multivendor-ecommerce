@@ -40,13 +40,17 @@ public class InventoryReservationConsumer {
         InventoryReservationRequestedEvent reservationEvent =
                 objectMapper.readValue(jsonPayload, InventoryReservationRequestedEvent.class);
 
+
+        log.info("Đã nhận sự kiện yêu cầu giữ kho: eventId={}, checkoutId={}",
+                reservationEvent.eventId(), reservationEvent.checkoutId());
+
         // 2. Validate dữ liệu đầu vào
         if (!"InventoryReservationRequested".equals(reservationEvent.eventType())) {
-            throw new IllegalArgumentException("Unexpected eventType: " + reservationEvent.eventType());
+            throw new IllegalArgumentException("Loại sự kiện không hợp lệ: " + reservationEvent.eventType());
         }
 
         if (reservationEvent.items() == null) {
-            throw new IllegalArgumentException("items cannot be null");
+            throw new IllegalArgumentException("Danh sách items không được để trống");
         }
 
         // 3. Map dữ liệu từ Event sang Command
@@ -67,19 +71,22 @@ public class InventoryReservationConsumer {
                         requestedItems
                 );
 
-        // 4. Gọi UseCase xử lý (Trả về true nếu xử lý thành công, false nếu là event trùng)
-        int isProcessed = reserveCheckoutUseCase.execute(reserveCommand);
+        // 4. Gọi UseCase xử lý
+        int processStatus = reserveCheckoutUseCase.execute(reserveCommand);
 
-        // 5. Chỉ in log khi thực sự xử lý thành công
-        if (isProcessed==1) {
+        // 5. Phân nhánh in log
+        if (processStatus == 1) {
             log.info("Xử lý giữ kho thành công. eventId={}, checkoutId={}",
                     reservationEvent.eventId(),
                     reservationEvent.checkoutId());
-        } else if (isProcessed==0) {
-            log.info("Bỏ qua event trùng lặp (Idempotency). eventId={}",
+
+        } else if (processStatus == -1) {
+            log.info("Bỏ qua sự kiện trùng lặp (Idempotency). eventId={}",
                     reservationEvent.eventId());
-        }else {
-            log.info("Lôi inventory hoặc số lương",
+
+        } else {
+            // Sửa lại lỗi thiếu {} và sửa lỗi chính tả
+            log.warn("Không thể giữ kho (Lỗi không tìm thấy tồn kho hoặc số lượng không đủ). eventId={}",
                     reservationEvent.eventId());
         }
     }

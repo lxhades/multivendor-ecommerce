@@ -35,6 +35,14 @@ spring:
         max.in.flight.requests.per.connection: 5
         delivery.timeout.ms: 30000
         request.timeout.ms: 10000
+    consumer:
+      group-id: order-inventory-result-consumer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: record
 server:
   port: ${SERVER_PORT:8084}
 springdoc:
@@ -50,6 +58,8 @@ services:
 order:
   kafka:
     inventory-topic: inventory.reserve.requested.v1
+    inventory-result-topic: inventory.reservation.result.v1
+
   outbox:
     poll-delay-ms: 3000
 
