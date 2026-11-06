@@ -75,7 +75,7 @@ public class InventoryOutboxPublisher {
                 markPublished(event.getId());
             } catch (Exception ex) {
                 log.error(
-                        "Kafka ACK received but outbox update failed. eventId={}",
+                        "Đã nhận Kafka ACK nhưng cập nhật outbox thất bại. eventId={}",
                         event.getId(),
                         ex
                 );
@@ -111,14 +111,14 @@ public class InventoryOutboxPublisher {
             saveFailure(event.getId(), nextRetryAt, error);
         } catch (Exception dbEx) {
             log.error(
-                    "Failed to record outbox retry. eventId={}",
+                    "Ghi nhận retry cho outbox thất bại. eventId={}",
                     event.getId(),
                     dbEx
             );
         }
 
         log.warn(
-                "Inventory outbox publish failed. eventId={}, attempt={}, retryIn={}s",
+                "Gửi event từ Inventory outbox thất bại. eventId={}, attempt={}, retryIn={}s",
                 event.getId(),
                 attempt,
                 delay,

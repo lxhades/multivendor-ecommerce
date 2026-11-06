@@ -27,7 +27,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler(DomainException.class)
     public ResponseEntity<ErrorResponse> handleDomainException(
             DomainException ex, HttpServletRequest request) {
-        log.warn("Business error at {}: {}", request.getRequestURI(), ex.getMessage());
+        log.warn("Lỗi nghiệp vụ tại {}: {}", request.getRequestURI(), ex.getMessage());
         return buildErrorResponse(
                 ex.getErrorCode().getHttpStatus(),
                 ex.getErrorCode().getMessage(),
@@ -45,7 +45,7 @@ public class CommonExceptionHandler {
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.toList());
 
-        log.warn("Validation failed at {}: {}", request.getRequestURI(), details);
+        log.warn("Kiểm tra dữ liệu thất bại tại {}: {}", request.getRequestURI(), details);
         return buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 "Dữ liệu đầu vào không hợp lệ",
@@ -57,7 +57,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<ErrorResponse> handleNotReadable(
             HttpMessageNotReadableException ex, HttpServletRequest request) {
-        log.warn("Malformed JSON at {}: {}", request.getRequestURI(), ex.getMessage());
+        log.warn("JSON không đúng định dạng tại {}: {}", request.getRequestURI(), ex.getMessage());
         return buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 "Dữ liệu gửi lên không đúng định dạng JSON",
@@ -69,7 +69,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler(MissingServletRequestParameterException.class)
     public ResponseEntity<ErrorResponse> handleMissingParams(
             MissingServletRequestParameterException ex, HttpServletRequest request) {
-        log.warn("Missing parameter '{}' at {}", ex.getParameterName(), request.getRequestURI());
+        log.warn("Thiếu tham số '{}' tại {}", ex.getParameterName(), request.getRequestURI());
         return buildErrorResponse(
                 HttpStatus.BAD_REQUEST,
                 "Thiếu tham số yêu cầu: " + ex.getParameterName(),
@@ -81,7 +81,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<ErrorResponse> handleIllegalArgument(
             IllegalArgumentException ex, HttpServletRequest request) {
-        log.warn("Illegal argument at {}: {}", request.getRequestURI(), ex.getMessage());
+        log.warn("Tham số không hợp lệ tại {}: {}", request.getRequestURI(), ex.getMessage());
         return buildErrorResponse(HttpStatus.BAD_REQUEST, ex.getMessage(), null, request);
     }
 
@@ -96,14 +96,14 @@ public class CommonExceptionHandler {
         }
         String message = ex.getReason() != null ? ex.getReason() : "Request failed";
 
-        log.warn("ResponseStatusException at {}: {} - {}", request.getRequestURI(), status, message);
+        log.warn("Lỗi ResponseStatusException tại {}: {} - {}", request.getRequestURI(), status, message);
         return buildErrorResponse(status, message, null, request);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
     public ResponseEntity<ErrorResponse> handleNoResourceFound(
             NoResourceFoundException ex, HttpServletRequest request) {
-        log.warn("API endpoint not found: {}", request.getRequestURI());
+        log.warn("Không tìm thấy API endpoint: {}", request.getRequestURI());
         return buildErrorResponse(
                 HttpStatus.NOT_FOUND,
                 "Đường dẫn hoặc tài nguyên không tồn tại",
@@ -117,7 +117,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ErrorResponse> handleRuntimeException(
             RuntimeException ex, HttpServletRequest request) {
-        log.error("Unhandled RuntimeException at {}: ", request.getRequestURI(), ex);
+        log.error("RuntimeException chưa được xử lý tại {}: ", request.getRequestURI(), ex);
         String message = ex.getMessage() != null
                 ? ex.getMessage()
                 : "Đã xảy ra lỗi trong quá trình xử lý.";
@@ -127,7 +127,7 @@ public class CommonExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleAllUncaughtException(
             Exception ex, HttpServletRequest request) {
-        log.error("Unhandled exception at {}: ", request.getRequestURI(), ex);
+        log.error("Ngoại lệ chưa được xử lý tại {}: ", request.getRequestURI(), ex);
         return buildErrorResponse(
                 HttpStatus.INTERNAL_SERVER_ERROR,
                 "Đã xảy ra lỗi từ phía hệ thống. Vui lòng thử lại sau!",

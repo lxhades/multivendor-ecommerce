@@ -21,7 +21,7 @@ public class AuthExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex, HttpServletRequest request) {
-        log.warn("Access denied at {}: {}", request.getRequestURI(), ex.getMessage());
+        log.warn("Truy cập bị từ chối tại {}: {}", request.getRequestURI(), ex.getMessage());
         return build(HttpStatus.FORBIDDEN, MSG_ACCESS_DENIED, request);
     }
 

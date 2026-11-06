@@ -66,14 +66,14 @@ public class ProductOutboxPublisher {
                     outbox.save(event);
                 } catch (Exception dbError) {
                     log.error(
-                            "Failed to update outbox {}",
+                            "Cập nhật outbox thất bại: {}",
                             event.getId(),
                             dbError
                     );
                 }
 
                 log.warn(
-                        "Outbox publish failed for event {}",
+                        "Gửi event từ outbox thất bại: {}",
                         event.getId(),
                         e
                 );

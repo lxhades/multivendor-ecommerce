@@ -75,7 +75,7 @@ public class OrderOutboxPublisher {
 
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            log.warn("Publisher interrupted: {}", event.getId());
+            log.warn("Publisher bị gián đoạn: {}", event.getId());
             return;
 
         } catch (ExecutionException | TimeoutException | RuntimeException ex) {
@@ -103,7 +103,7 @@ public class OrderOutboxPublisher {
                 );
             } else {
                 log.warn(
-                        "Outbox status not updated: {}",
+                        "Trạng thái outbox chưa được cập nhật: {}",
                         event.getId()
                 );
             }
@@ -112,7 +112,7 @@ public class OrderOutboxPublisher {
 
             //  Kafka đã ACK nhưng DB update lỗi.
             log.error(
-                    "Kafka ACK succeeded but DB update failed: {}",
+                    "Kafka ACK thành công nhưng cập nhật DB thất bại: {}",
                     event.getId(),
                     dbError
             );
@@ -149,7 +149,7 @@ public class OrderOutboxPublisher {
 
             if (updated == 1) {
                 log.warn(
-                        "Outbox retry: eventId={}, failures={}, delay={}s",
+                        "Thử lại outbox: eventId={}, failures={}, delay={}s",
                         event.getId(),
                         failureCount,
                         delaySeconds,
@@ -157,14 +157,14 @@ public class OrderOutboxPublisher {
                 );
             } else {
                 log.warn(
-                        "Could not record retry for event: {}",
+                        "Không thể ghi nhận retry cho event: {}",
                         event.getId()
                 );
             }
 
         } catch (RuntimeException dbError) {
             log.error(
-                    "Failed to persist retry metadata: {}",
+                    "Lưu retry metadata thất bại: {}",
                     event.getId(),
                     dbError
             );
