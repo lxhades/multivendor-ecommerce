@@ -2,6 +2,12 @@
 package com.order_service.adapter.out.outbox;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
+import tools.jackson.databind.JsonNode;
+
 import java.time.Instant;
 import java.util.UUID;
 
@@ -15,6 +21,8 @@ import java.util.UUID;
                 )
         }
 )
+@Getter
+@Setter
 public class OrderOutboxEntity {
 
     @Id
@@ -27,9 +35,11 @@ public class OrderOutboxEntity {
     @Column(name = "event_type", nullable = false, length = 100)
     private String eventType;
 
-    @Column(name = "payload", nullable = false, columnDefinition = "jsonb")
-    @org.hibernate.annotations.JdbcTypeCode(
-            org.hibernate.type.SqlTypes.JSON
+    @JdbcTypeCode(SqlTypes.JSON)
+    @Column(
+            name = "payload",
+            nullable = false,
+            columnDefinition = "jsonb"
     )
     private String payload;
 
@@ -66,27 +76,5 @@ public class OrderOutboxEntity {
         this.publishedAt = now;
     }
 
-    public UUID getId() {
-        return id;
-    }
 
-    public UUID getAggregateId() {
-        return aggregateId;
-    }
-
-    public String getEventType() {
-        return eventType;
-    }
-
-    public String getPayload() {
-        return payload;
-    }
-
-    public OutboxStatus getStatus() {
-        return status;
-    }
-
-    public Instant getCreatedAt() {
-        return createdAt;
-    }
 }

@@ -58,6 +58,7 @@ public class CheckoutPersistenceService {
         InventoryReservationRequested event =
                 new InventoryReservationRequested(
                         UUID.randomUUID(),
+                        InventoryReservationRequested.EVENT_TYPE,
                         savedCheckout.getId(),
                         savedCheckout.getBuyerId(),
                         items
