@@ -33,6 +33,9 @@ spring:
     producer:
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      properties:
+        enable.idempotence: true
 
 server:
   port: ${SERVER_PORT:8085}
@@ -45,3 +48,6 @@ inventory:
   kafka:
     product-topic: product.inventory-init.v1
     reserve-topic: inventory.reserve.requested.v1
+    result-topic: inventory.reservation.result.v1
+  outbox:
+      poll-delay-ms: 3000
