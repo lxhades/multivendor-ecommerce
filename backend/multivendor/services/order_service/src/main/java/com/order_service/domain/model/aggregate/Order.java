@@ -122,7 +122,9 @@ public final class Order {
                 shippingFee,
                 paymentMethod,
                 PaymentStatus.UNPAID,
-                OrderStatus.PENDING_PAYMENT,
+                paymentMethod == PaymentMethod.COD
+                        ? OrderStatus.PENDING
+                        : OrderStatus.PENDING_PAYMENT,
                 now,
                 now,
                 null
@@ -249,7 +251,9 @@ public final class Order {
         }
 
         if (orderStatus != OrderStatus.PENDING_PAYMENT
-                && orderStatus != OrderStatus.CONFIRMED) {
+                && orderStatus != OrderStatus.PENDING
+                && orderStatus != OrderStatus.CONFIRMED
+        ) {
             throw new IllegalStateException("Cannot cancel");
         }
 
