@@ -11,16 +11,30 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
-    open-in-view: false
+    show-sql: false
     properties:
       hibernate:
+        format_sql: true
         jdbc:
           time_zone: Asia/Ho_Chi_Minh
+
   security:
     oauth2:
       resourceserver:
         jwt:
           jwk-set-uri: http://localhost:8081/oauth2/jwks
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    producer:
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.apache.kafka.common.serialization.StringSerializer
+      acks: all
+      retries: 100000
+      properties:
+        enable.idempotence: true
+        max.in.flight.requests.per.connection: 5
+        delivery.timeout.ms: 30000
+        request.timeout.ms: 10000
 server:
   port: ${SERVER_PORT:8084}
 springdoc:
@@ -32,3 +46,10 @@ services:
   product:
     base-url: ${PRODUCT_SERVICE_URL:http://localhost:8082}
     internal-token: ${PRODUCT_SERVICE_INTERNAL_TOKEN:test123}
+
+order:
+  kafka:
+    inventory-topic: inventory.reserve.requested.v1
+  outbox:
+    poll-delay-ms: 3000
+

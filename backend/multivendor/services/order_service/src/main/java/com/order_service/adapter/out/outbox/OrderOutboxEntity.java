@@ -3,12 +3,11 @@ package com.order_service.adapter.out.outbox;
 
 import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
-import tools.jackson.databind.JsonNode;
 
 import java.time.Instant;
+import java.util.Objects;
 import java.util.UUID;
 
 @Entity
@@ -22,7 +21,6 @@ import java.util.UUID;
         }
 )
 @Getter
-@Setter
 public class OrderOutboxEntity {
 
     @Id
@@ -36,11 +34,7 @@ public class OrderOutboxEntity {
     private String eventType;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(
-            name = "payload",
-            nullable = false,
-            columnDefinition = "jsonb"
-    )
+    @Column(name = "payload", nullable = false, columnDefinition = "jsonb")
     private String payload;
 
     @Enumerated(EnumType.STRING)
@@ -53,6 +47,15 @@ public class OrderOutboxEntity {
     @Column(name = "published_at")
     private Instant publishedAt;
 
+    @Column(name = "attempt_count", nullable = false, columnDefinition = "int default 0")
+    private int attemptCount = 0;
+
+    @Column(name = "next_retry_at")
+    private Instant nextRetryAt;
+
+    @Column(name = "last_error", columnDefinition = "text")
+    private String lastError;
+
     protected OrderOutboxEntity() {
     }
 
@@ -63,18 +66,24 @@ public class OrderOutboxEntity {
             String payload,
             Instant createdAt
     ) {
-        this.id = id;
-        this.aggregateId = aggregateId;
-        this.eventType = eventType;
-        this.payload = payload;
+        this.id = Objects.requireNonNull(id);
+        this.aggregateId = Objects.requireNonNull(aggregateId);
+        this.eventType = Objects.requireNonNull(eventType);
+        this.payload = Objects.requireNonNull(payload);
+        this.createdAt = Objects.requireNonNull(createdAt);
+
+
         this.status = OutboxStatus.PENDING;
-        this.createdAt = createdAt;
+        this.attemptCount = 0;
+        this.nextRetryAt = null;
+        this.lastError = null;
     }
+
 
     public void markPublished(Instant now) {
         this.status = OutboxStatus.PUBLISHED;
-        this.publishedAt = now;
+        this.publishedAt = Objects.requireNonNull(now);
+        this.nextRetryAt = null;
+        this.lastError = null;
     }
-
-
 }
