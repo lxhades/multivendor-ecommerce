@@ -119,7 +119,8 @@ public enum ErrorCode {
             HttpStatus.NOT_FOUND,
             "Dịch vụ sản phẩm hiện không khả dụng"
     ),
-    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND,"Không tìm thấy đơn hàng ");
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND,"Không tìm thấy đơn hàng "),
+    INVALID_CANCEL_PENDING_ORDER(HttpStatus.BAD_REQUEST,"Bạn không thể hủy đơn ở trạng thái hiện tại, hãy thử lại khi trạng thái order là CONFIRMED" );
     private final HttpStatus httpStatus;
     private final String message;
 }

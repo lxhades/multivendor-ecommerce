@@ -65,7 +65,7 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/cancel")
-    public ApiResponse<OrderResult> cancel(@PathVariable UUID orderId,
+    public ApiResponse<OrderResult> cancel(@PathVariable("id") UUID orderId,
                                            @AuthenticationPrincipal Jwt jwt
     ) {
         UUID buyerId = UUID.fromString(jwt.getSubject());

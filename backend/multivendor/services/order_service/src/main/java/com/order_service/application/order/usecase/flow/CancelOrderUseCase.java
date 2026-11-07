@@ -11,8 +11,10 @@ import com.order_service.domain.model.enums.OrderStatus;
 import com.order_service.domain.model.enums.PaymentMethod;
 import com.order_service.domain.repository.OrderRepository;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Clock;
 import java.util.UUID;
@@ -35,18 +37,13 @@ public class CancelOrderUseCase {
     }
 
     @Transactional
-    public OrderResult execute(UUID buyerId,UUID orderId) {
+    public OrderResult execute(UUID buyerId, UUID orderId) {
 
         Order order = orders.findById(orderId)
                 .orElseThrow(() ->
                         new DomainException(ErrorCode.ORDER_NOT_FOUND));
 
-        if (order.getPaymentMethod() != PaymentMethod.COD) {
-            throw new IllegalStateException(
-                    "Chưa hỗ trợ hủy đơn thanh toán qua ATM"
-            );
-        }
-        if(!order.getBuyerId().equals(buyerId)) {
+        if (!order.getBuyerId().equals(buyerId)) {
             throw new DomainException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -54,11 +51,21 @@ public class CancelOrderUseCase {
             return OrderResult.from(order);
         }
 
-        if (order.getOrderStatus() != OrderStatus.CONFIRMED &&
-                order.getOrderStatus() != OrderStatus.PENDING
-        ) {
-            throw new IllegalStateException(
-                    "Chỉ có thể hủy đơn thanh toán khi nhận hàng ở trạng thái đã xác nhận hoặc chờ xác nhận"
+        if (order.getOrderStatus() == OrderStatus.PENDING) {
+            throw new DomainException(ErrorCode.INVALID_CANCEL_PENDING_ORDER);
+        }
+
+        if (order.getPaymentMethod() != PaymentMethod.COD) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Chưa hỗ trợ hủy đơn thanh toán qua ATM"
+            );
+        }
+
+        if (order.getOrderStatus() != OrderStatus.CONFIRMED) {
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Chỉ có thể hủy đơn hàng ở trạng thái đã xác nhận"
             );
         }
 
