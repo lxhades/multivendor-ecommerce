@@ -6,6 +6,7 @@ import com.order_service.application.event.InventoryReservationRequested;
 import com.order_service.application.checkout.port.OutboxPort;
 
 import com.order_service.application.event.OrderShipped;
+import com.order_service.application.event.OrderDelivered;
 import org.springframework.stereotype.Repository;
 import tools.jackson.databind.ObjectMapper;
 
@@ -14,6 +15,8 @@ import java.util.Objects;
 
 @Repository
 public class OrderOutboxJpaAdapter implements OutboxPort {
+
+
 
     private final SpringDataOrderOutboxRepository repository;
     private final ObjectMapper objectMapper;
@@ -90,5 +93,15 @@ public class OrderOutboxJpaAdapter implements OutboxPort {
         );
 
         repository.save(entity);
+    }
+    @Override
+    public void saveOrderDelivered(OrderDelivered event) {
+        repository.save(new OrderOutboxEntity(
+                event.eventId(),
+                event.orderId(),
+                OrderDelivered.EVENT_TYPE,
+                objectMapper.writeValueAsString(event),
+                clock.instant()
+        ));
     }
 }

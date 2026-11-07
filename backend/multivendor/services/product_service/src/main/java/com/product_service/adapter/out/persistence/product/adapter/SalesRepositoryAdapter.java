@@ -21,6 +21,33 @@ public class SalesRepositoryAdapter implements SalesPort {
     }
 
     @Override
+    public boolean claimDeliveredOrder(UUID orderId) {
+        return jdbc.update("""
+                INSERT INTO processed_delivered_orders (order_id)
+                VALUES (?) ON CONFLICT (order_id) DO NOTHING
+                """, orderId) == 1;
+    }
+
+    @Override
+    public void incrementSoldCount(UUID shopId, UUID productId, UUID variantId, long quantity) {
+        int products = jdbc.update("""
+                UPDATE products SET sold_count = sold_count + ?
+                WHERE id = ? AND shop_id = ?
+                """, quantity, productId, shopId);
+        if (products != 1) {
+            throw new IllegalStateException("Không tìm thấy sản phẩm thuộc cửa hàng: " + productId);
+        }
+
+        int variants = jdbc.update("""
+                UPDATE product_variants SET sold_count = sold_count + ?
+                WHERE id = ? AND product_id = ?
+                """, quantity, variantId, productId);
+        if (variants != 1) {
+            throw new IllegalStateException("Không tìm thấy biến thể thuộc sản phẩm: " + variantId);
+        }
+    }
+
+    @Override
     public Summary stats(UUID shop, UUID product, LocalDate from, LocalDate to) {
         String sql = """
                 SELECT 

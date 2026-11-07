@@ -30,7 +30,7 @@ public class ProductJpaEntity {
     public ApprovalStatus approvalStatus;
     @Column(name = "min_price")
     public BigDecimal minPrice;
-    @Column(name = "sold_count")
+    @Column(name = "sold_count", updatable = false)
     public long soldCount;
     @Column(name = "rating_avg")
     public BigDecimal ratingAvg = BigDecimal.ZERO;

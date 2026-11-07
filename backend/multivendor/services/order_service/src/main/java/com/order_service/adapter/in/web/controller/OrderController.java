@@ -75,22 +75,6 @@ public class OrderController {
         );
     }
 
-    @PostMapping("/{id}/confirm-cod")
-    public ApiResponse<OrderResult> confirmCod(@PathVariable UUID id) {
-        return ApiResponse.success(
-                "Xác nhận đơn hàng COD thành công",
-                confirmCodOrderUseCase.execute(id)
-        );
-    }
-
-    @PostMapping("/{id}/processing")
-    public ApiResponse<OrderResult> startProcessing(@PathVariable UUID id) {
-        return ApiResponse.success(
-                "Bắt đầu xử lý đơn hàng thành công",
-                startProcessingOrderUseCase.execute(id)
-        );
-    }
-
     @PostMapping("/{id}/ship")
     @PreAuthorize("hasRole('SELLER')")
     public ApiResponse<OrderResult> ship(
@@ -105,11 +89,5 @@ public class OrderController {
         );
     }
 
-    @PostMapping("/{id}/deliver")
-    public ApiResponse<OrderResult> deliver(@PathVariable UUID id) {
-        return ApiResponse.success(
-                "Xác nhận giao hàng thành công",
-                deliverOrderUseCase.execute(id)
-        );
-    }
+
 }

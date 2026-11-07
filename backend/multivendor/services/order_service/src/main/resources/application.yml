@@ -63,6 +63,7 @@ order:
     inventory-result-topic: inventory.reservation.result.v1
     inventory-release-topic: inventory.release.requested.v1
     shipped-topic: order.shipped.v1
+    delivered-topic: order.delivered.v1
     shipping-status-topic: shipping.status.v1
 
   outbox:

@@ -52,6 +52,7 @@ public class ProductRepositoryAdapter implements ProductRepository {
             e.id = p.id();
             e.shopId = p.shopId();
             e.createdAt = p.createdAt();
+            e.soldCount = p.soldCount();
         }
 
         e.categoryId = p.categoryId();
@@ -62,7 +63,6 @@ public class ProductRepositoryAdapter implements ProductRepository {
         e.status = p.status();
         e.approvalStatus = p.approvalStatus();
         e.minPrice = p.minPrice();
-        e.soldCount = p.soldCount();
         e.updatedAt = p.updatedAt();
         e.deletedAt = p.deletedAt();
 
@@ -79,13 +79,13 @@ public class ProductRepositoryAdapter implements ProductRepository {
                 row.id = v.id();
                 row.product = e;
                 row.createdAt = p.createdAt();
+                row.soldCount = v.soldCount();
                 e.variants.add(row);
             }
             row.sku = v.sku();
             row.price = v.price();
             row.attributesJson = v.attributesJson();
             row.active = v.active();
-            row.soldCount = v.soldCount();
             row.deletedAt = v.deletedAt();
             row.updatedAt = p.updatedAt();
         }

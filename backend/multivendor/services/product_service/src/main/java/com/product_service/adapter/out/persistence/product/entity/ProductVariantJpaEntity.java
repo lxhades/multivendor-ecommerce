@@ -19,7 +19,7 @@ public class ProductVariantJpaEntity {
     @Column(name = "attributes_json")
     public String attributesJson;
     public boolean active;
-    @Column(name = "sold_count")
+    @Column(name = "sold_count", updatable = false)
     public long soldCount;
     @Column(name = "created_at")
     public Instant createdAt;

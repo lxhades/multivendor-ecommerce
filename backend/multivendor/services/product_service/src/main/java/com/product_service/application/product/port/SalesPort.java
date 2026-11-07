@@ -7,6 +7,10 @@ import java.util.UUID;
 
 public interface SalesPort {
 
+    boolean claimDeliveredOrder(UUID orderId);
+
+    void incrementSoldCount(UUID shopId, UUID productId, UUID variantId, long quantity);
+
     record Summary(
             long sold,
             long refunded,

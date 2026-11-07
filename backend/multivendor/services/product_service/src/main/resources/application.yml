@@ -48,6 +48,7 @@ spring:
 product:
   kafka:
     inventory-topic: product.inventory-init.v1
+    delivered-topic: order.delivered.v1
 
   outbox:
     poll-delay-ms: 3000

@@ -1,5 +1,6 @@
 package com.order_service.adapter.out.outbox;
 
+import com.order_service.application.event.OrderDelivered;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -32,6 +33,7 @@ public class OrderOutboxPublisher {
     private final String reservationTopic;
     private final String releaseTopic;
     private final String orderShippedTopic;
+    private final String orderDeliveredTopic;
     public OrderOutboxPublisher(
             SpringDataOrderOutboxRepository outboxRepository,
             KafkaTemplate<String, String> kafkaTemplate,
@@ -41,7 +43,9 @@ public class OrderOutboxPublisher {
             @Value("${order.kafka.inventory-release-topic:inventory.release.requested.v1}")
             String releaseTopic,
             @Value("${order.kafka.shipped-topic:order.shipped.v1}")
-                    String orderShippedTopic
+            String orderShippedTopic,
+            @Value("${order.kafka.delivered-topic:order.delivered.v1}")
+            String orderDeliveredTopic
     ) {
         this.outboxRepository = outboxRepository;
         this.kafkaTemplate = kafkaTemplate;
@@ -49,6 +53,7 @@ public class OrderOutboxPublisher {
         this.reservationTopic = reservationTopic;
         this.releaseTopic = releaseTopic;
         this.orderShippedTopic=orderShippedTopic;
+        this.orderDeliveredTopic = orderDeliveredTopic;
     }
 
     @Scheduled(fixedDelayString = "${order.outbox.poll-delay-ms:3000}")
@@ -139,6 +144,8 @@ public class OrderOutboxPublisher {
             case EVENT_TYPE_RELEASE -> releaseTopic;
 
             case EVENT_TYPE_ORDER_SHIPPED -> orderShippedTopic;
+
+            case OrderDelivered.EVENT_TYPE -> orderDeliveredTopic;
 
             default -> throw new IllegalArgumentException(
                     "Unsupported event type: " + eventType
