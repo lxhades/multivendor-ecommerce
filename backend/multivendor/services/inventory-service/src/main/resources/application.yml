@@ -49,5 +49,6 @@ inventory:
     product-topic: product.inventory-init.v1
     reserve-topic: inventory.reserve.requested.v1
     result-topic: inventory.reservation.result.v1
+    release-topic: inventory.release.requested.v1
   outbox:
       poll-delay-ms: 3000

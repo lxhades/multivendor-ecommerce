@@ -59,6 +59,7 @@ order:
   kafka:
     inventory-topic: inventory.reserve.requested.v1
     inventory-result-topic: inventory.reservation.result.v1
+    inventory-release-topic: inventory.release.requested.v1
 
   outbox:
     poll-delay-ms: 3000

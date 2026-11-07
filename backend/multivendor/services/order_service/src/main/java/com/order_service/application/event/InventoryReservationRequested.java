@@ -1,5 +1,5 @@
 
-package com.order_service.application.checkout.event;
+package com.order_service.application.event;
 
 import java.util.HashSet;
 import java.util.List;

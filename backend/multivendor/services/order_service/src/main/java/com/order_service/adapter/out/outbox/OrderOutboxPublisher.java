@@ -1,4 +1,3 @@
-
 package com.order_service.adapter.out.outbox;
 
 import org.slf4j.Logger;
@@ -12,6 +11,7 @@ import org.springframework.stereotype.Component;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -19,170 +19,156 @@ import java.util.concurrent.TimeoutException;
 @Component
 public class OrderOutboxPublisher {
 
-    private static final Logger log =
-            LoggerFactory.getLogger(OrderOutboxPublisher.class);
+    private static final Logger log = LoggerFactory.getLogger(OrderOutboxPublisher.class);
 
-    private final SpringDataOrderOutboxRepository outbox;
-    private final KafkaTemplate<String, String> kafka;
+    private static final String EVENT_TYPE_RESERVATION = "InventoryReservationRequested";
+    private static final String EVENT_TYPE_RELEASE = "InventoryReleaseRequested";
+
+    private final SpringDataOrderOutboxRepository outboxRepository;
+    private final KafkaTemplate<String, String> kafkaTemplate;
     private final Clock clock;
-    private final String topic;
+    private final String reservationTopic;
+    private final String releaseTopic;
 
     public OrderOutboxPublisher(
-            SpringDataOrderOutboxRepository outbox,
-            KafkaTemplate<String, String> kafka,
+            SpringDataOrderOutboxRepository outboxRepository,
+            KafkaTemplate<String, String> kafkaTemplate,
             Clock clock,
             @Value("${order.kafka.inventory-topic:inventory.reserve.requested.v1}")
-            String topic
+            String reservationTopic,
+            @Value("${order.kafka.inventory-release-topic:inventory.release.requested.v1}")
+            String releaseTopic
     ) {
-        this.outbox = outbox;
-        this.kafka = kafka;
+        this.outboxRepository = outboxRepository;
+        this.kafkaTemplate = kafkaTemplate;
         this.clock = clock;
-        this.topic = topic;
+        this.reservationTopic = reservationTopic;
+        this.releaseTopic = releaseTopic;
     }
 
-    @Scheduled(
-            fixedDelayString = "${order.outbox.poll-delay-ms:3000}"
-    )
+    @Scheduled(fixedDelayString = "${order.outbox.poll-delay-ms:3000}")
     public void publishPending() {
-
-        // lấy 5 event đã đến hạn retry.
-        var events = outbox.findReadyEvents(
+        List<OrderOutboxEntity> readyEvents = outboxRepository.findReadyEvents(
                 OutboxStatus.PENDING,
                 clock.instant(),
                 PageRequest.of(0, 5)
         );
 
-        for (OrderOutboxEntity event : events) {
+        if (readyEvents.isEmpty()) {
+            log.debug("Không có event nào trong Outbox cần gửi.");
+            return;
+        }
+
+        log.info("Tìm thấy {} event(s) trong Outbox cần xử lý.", readyEvents.size());
+
+        for (OrderOutboxEntity event : readyEvents) {
             if (Thread.currentThread().isInterrupted()) {
+                log.warn("Luồng Publisher bị ngắt. Dừng xử lý các event còn lại.");
                 return;
             }
-
             publishOne(event);
         }
     }
 
     private void publishOne(OrderOutboxEntity event) {
 
-        // Gửi Kafka và chờ ACK.
+        String targetTopic;
         try {
-            kafka.send(
-                    topic,
+            targetTopic = resolveTopic(event.getEventType());
+        } catch (IllegalArgumentException ex) {
+            log.error("Lỗi cấu hình: Không tìm thấy topic cho loại sự kiện '{}'. eventId={}",
+                    event.getEventType(), event.getId(), ex);
+            return;
+        }
+
+        log.info("Đang gửi event lên Kafka: type={}, topic={}, eventId={}",
+                event.getEventType(), targetTopic, event.getId());
+
+        // 1. Gửi Kafka và chờ ACK
+        try {
+            kafkaTemplate.send(
+                    targetTopic,
                     event.getAggregateId().toString(),
                     event.getPayload()
             ).get(15, TimeUnit.SECONDS);
 
-            log.info("Kafka ACK received for event: id={}", event.getId());
+            log.debug("Nhận Kafka ACK thành công. eventId={}", event.getId());
 
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
-            log.warn("Publisher bị gián đoạn: {}", event.getId());
+            log.warn("Luồng bị gián đoạn khi đang chờ Kafka ACK. eventId={}", event.getId());
             return;
 
         } catch (ExecutionException | TimeoutException | RuntimeException ex) {
-
-            // Kafka lỗi -> lưu retry.
+            log.error("Gửi Kafka thất bại. eventId={}", event.getId(), ex);
             recordFailure(event, ex);
             return;
         }
 
-        // Kafka ACK thành công.
-        // Chỉ cập nhật PUBLISHED sau ACK.
-        // Tách khỏi catch Kafka để không coi lỗi DB là lỗi gửi.
         try {
-            int updated = outbox.markPublished(
+            int updatedRows = outboxRepository.markPublished(
                     event.getId(),
                     clock.instant(),
                     OutboxStatus.PENDING,
                     OutboxStatus.PUBLISHED
             );
 
-            if (updated == 1) {
-                log.info(
-                        "Outbox published: {}",
-                        event.getId()
-                );
+            if (updatedRows == 1) {
+                log.info("Đã cập nhật Outbox thành PUBLISHED thành công. eventId={}", event.getId());
             } else {
-                log.warn(
-                        "Trạng thái outbox chưa được cập nhật: {}",
-                        event.getId()
-                );
+                log.warn("Không thể cập nhật trạng thái Outbox eventId={}", event.getId());
             }
 
         } catch (RuntimeException dbError) {
-
-            //  Kafka đã ACK nhưng DB update lỗi.
-            log.error(
-                    "Kafka ACK thành công nhưng cập nhật DB thất bại: {}",
-                    event.getId(),
-                    dbError
-            );
+            log.error("LỖI NGHIÊM TRỌNG: Kafka đã nhận event nhưng cập nhật DB thất bại! eventId={}",
+                    event.getId(), dbError);
         }
     }
 
-    private void recordFailure(
-            OrderOutboxEntity event,
-            Exception error
-    ) {
-        // Tính exponential backoff.
+    private String resolveTopic(String eventType) {
+        return switch (eventType) {
+            case EVENT_TYPE_RESERVATION -> reservationTopic;
+            case EVENT_TYPE_RELEASE -> releaseTopic;
+            default -> throw new IllegalArgumentException(
+                    "Loại sự kiện không được hỗ trợ: " + eventType
+            );
+        };
+    }
+
+    private void recordFailure(OrderOutboxEntity event, Exception error) {
         int failureCount = event.getAttemptCount() + 1;
-
         long delaySeconds = calculateBackoff(failureCount);
+        Instant nextRetryAt = clock.instant().plusSeconds(delaySeconds);
 
-        Instant nextRetryAt =
-                clock.instant().plusSeconds(delaySeconds);
-
-        String message = error.toString();
-
-        // Giới hạn kích thước lỗi lưu DB.
-        if (message.length() > 2000) {
-            message = message.substring(0, 2000);
+        // Giới hạn độ dài chuỗi lỗi để tránh tràn cột trong DB
+        String errorMessage = error.toString();
+        if (errorMessage.length() > 2000) {
+            errorMessage = errorMessage.substring(0, 2000);
         }
 
-        // Lưu retry
         try {
-            int updated = outbox.recordFailure(
+            int updatedRows = outboxRepository.recordFailure(
                     event.getId(),
                     nextRetryAt,
-                    message,
+                    errorMessage,
                     OutboxStatus.PENDING
             );
 
-            if (updated == 1) {
-                log.warn(
-                        "Thử lại outbox: eventId={}, failures={}, delay={}s",
-                        event.getId(),
-                        failureCount,
-                        delaySeconds,
-                        error
-                );
+            if (updatedRows == 1) {
+                log.warn("Đã ghi nhận thử lại. eventId={}, số lần lỗi={}, thời gian chờ={}s",
+                        event.getId(), failureCount, delaySeconds);
             } else {
-                log.warn(
-                        "Không thể ghi nhận retry cho event: {}",
-                        event.getId()
-                );
+                log.warn("Không thể lưu thông tin thử lại vào DB. eventId={}", event.getId());
             }
 
         } catch (RuntimeException dbError) {
-            log.error(
-                    "Lưu retry metadata thất bại: {}",
-                    event.getId(),
-                    dbError
-            );
+            log.error("Lỗi khi lưu thông tin retry vào DB. eventId={}", event.getId(), dbError);
         }
     }
 
 
-    // 5s -> 10s -> 20s -> 40s -> ... -> 300s.
     private long calculateBackoff(int failureCount) {
-
-        int exponent = Math.min(
-                Math.max(failureCount - 1, 0),
-                6
-        );
-
-        return Math.min(
-                5L * (1L << exponent),
-                Duration.ofMinutes(5).toSeconds()
-        );
+        int exponent = Math.min(Math.max(failureCount - 1, 0), 6);
+        return Math.min(5L * (1L << exponent), Duration.ofMinutes(5).toSeconds());
     }
 }

@@ -112,9 +112,16 @@ public class StockReservation {
     }
 
     public void release(Instant now) {
-        ensureReserved(now);
-        this.status = ReservationStatus.RELEASED;
-        this.updatedAt = now;
+        Objects.requireNonNull(now);
+
+        if (status != ReservationStatus.RESERVED) {
+            throw new DomainException(
+                    ErrorCode.INVALID_RESERVATION_STATUS
+            );
+        }
+
+        status = ReservationStatus.RELEASED;
+        updatedAt = now;
     }
 
     public void expire(Instant now) {

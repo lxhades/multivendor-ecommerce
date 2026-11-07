@@ -1,11 +1,11 @@
 
 package com.order_service.adapter.out.outbox;
 
-import com.order_service.application.checkout.event.InventoryReservationRequested;
+import com.order_service.application.event.InventoryReleaseRequested;
+import com.order_service.application.event.InventoryReservationRequested;
 import com.order_service.application.checkout.port.OutboxPort;
 
 import org.springframework.stereotype.Repository;
-import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Clock;
@@ -60,5 +60,18 @@ public class OrderOutboxJpaAdapter implements OutboxPort {
         );
 
         repository.save(entity);
+    }
+    @Override
+    public void saveInventoryReleaseRequested(InventoryReleaseRequested event)
+    {
+        String payload = objectMapper.writeValueAsString(event);
+
+        repository.save(new OrderOutboxEntity(
+                event.eventId(),
+                event.orderId(),
+                InventoryReleaseRequested.EVENT_TYPE,
+                payload,
+                clock.instant()
+        ));
     }
 }

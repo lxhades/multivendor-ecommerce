@@ -126,7 +126,8 @@ public enum ErrorCode {
     ProductServiceUnavailableException(
             HttpStatus.NOT_FOUND,
             "Loi ProductServiceUnavailableException"
-    );
+    ),
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND,"Không tìm thấy đơn hàng ");
     private final HttpStatus httpStatus;
     private final String message;
 }

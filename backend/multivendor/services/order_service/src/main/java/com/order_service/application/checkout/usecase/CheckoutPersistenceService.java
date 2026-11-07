@@ -2,7 +2,7 @@ package com.order_service.application.checkout.usecase;
 
 import com.order_service.application.checkout.dto.CheckoutResult;
 import com.order_service.application.checkout.dto.CreateCheckoutResult;
-import com.order_service.application.checkout.event.InventoryReservationRequested;
+import com.order_service.application.event.InventoryReservationRequested;
 
 import com.order_service.application.checkout.port.OutboxPort;
 import com.order_service.application.order.dto.OrderResult;

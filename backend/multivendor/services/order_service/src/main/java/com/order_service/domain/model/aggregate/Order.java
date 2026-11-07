@@ -202,8 +202,10 @@ public final class Order {
             return;
         }
 
-        if (orderStatus != OrderStatus.PENDING_PAYMENT) {
-            throw new IllegalStateException("Cannot confirm");
+        if (orderStatus != OrderStatus.PENDING) {
+            throw new IllegalStateException(
+                    "Cannot confirm COD from " + orderStatus
+            );
         }
 
         orderStatus = OrderStatus.CONFIRMED;
@@ -240,9 +242,10 @@ public final class Order {
     }
 
     public void markDelivered(Instant now) {
-
-        transition(OrderStatus.SHIPPED, OrderStatus.DELIVERED, now);
+        if(paymentMethod == PaymentMethod.COD) {
         paymentStatus=PaymentStatus.PAID;
+        }
+        transition(OrderStatus.SHIPPED, OrderStatus.DELIVERED, now);
     }
 
     public void cancel(Instant now) {
