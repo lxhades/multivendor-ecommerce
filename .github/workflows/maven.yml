@@ -81,3 +81,18 @@ jobs:
           name: inventory-service-jar
           path: 'backend/multivendor/services/inventory_service/target/*.jar'
           if-no-files-found: error
+      # BUILD ORDER SERVICE
+      
+      - name: Build ODRER Service
+        if: steps.filter.outputs.root == 'true' || steps.filter.outputs.order == 'true'
+        working-directory: ./backend/multivendor
+        run: mvn -B -ntp clean package -Dmaven.test.skip=true -pl :order_service -am
+
+      - name: Upload Order JAR
+        if: steps.filter.outputs.root == 'true' || steps.filter.outputs.order == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: order-service-jar
+          path: 'backend/multivendor/services/order_service/target/*.jar'
+          if-no-files-found: error
+
