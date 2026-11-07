@@ -35,7 +35,7 @@ public class CancelOrderUseCase {
     }
 
     @Transactional
-    public OrderResult execute(UUID orderId) {
+    public OrderResult execute(UUID buyerId,UUID orderId) {
 
         Order order = orders.findById(orderId)
                 .orElseThrow(() ->
@@ -45,6 +45,9 @@ public class CancelOrderUseCase {
             throw new IllegalStateException(
                     "Chưa hỗ trợ hủy đơn thanh toán qua ATM"
             );
+        }
+        if(!order.getBuyerId().equals(buyerId)) {
+            throw new DomainException(ErrorCode.ACCESS_DENIED);
         }
 
         if (order.getOrderStatus() == OrderStatus.CANCELLED) {

@@ -242,10 +242,16 @@ public final class Order {
     }
 
     public void markDelivered(Instant now) {
-        if(paymentMethod == PaymentMethod.COD) {
-        paymentStatus=PaymentStatus.PAID;
+
+        transition(
+                OrderStatus.SHIPPED,
+                OrderStatus.DELIVERED,
+                now
+        );
+
+        if (paymentMethod == PaymentMethod.COD) {
+            paymentStatus = PaymentStatus.PAID;
         }
-        transition(OrderStatus.SHIPPED, OrderStatus.DELIVERED, now);
     }
 
     public void cancel(Instant now) {

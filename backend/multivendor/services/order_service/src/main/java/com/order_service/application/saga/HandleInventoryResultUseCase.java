@@ -118,6 +118,7 @@ public class HandleInventoryResultUseCase {
             checkout.complete(now);
             checkoutRepository.save(checkout);
 
+
         }
         //TODO chưa thực hiện checkout = ATM
         else if (checkout.getPaymentMethod() == PaymentMethod.ATM) {

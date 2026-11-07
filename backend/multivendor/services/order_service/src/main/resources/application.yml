@@ -54,12 +54,16 @@ services:
   product:
     base-url: ${PRODUCT_SERVICE_URL:http://localhost:8082}
     internal-token: ${PRODUCT_SERVICE_INTERNAL_TOKEN:test123}
+  shipping:
+    base-url: ${SHIPPING_SERVICE_URL:http://localhost:8086}
 
 order:
   kafka:
     inventory-topic: inventory.reserve.requested.v1
     inventory-result-topic: inventory.reservation.result.v1
     inventory-release-topic: inventory.release.requested.v1
+    shipped-topic: order.shipped.v1
+    shipping-status-topic: shipping.status.v1
 
   outbox:
     poll-delay-ms: 3000

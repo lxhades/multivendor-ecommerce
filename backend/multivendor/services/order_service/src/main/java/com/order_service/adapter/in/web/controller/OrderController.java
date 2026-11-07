@@ -8,6 +8,9 @@ import com.order_service.application.order.usecase.ListOrdersByCheckoutUseCase;
 import com.order_service.application.order.usecase.ListOrdersByShopUseCase;
 import com.order_service.application.order.usecase.flow.*;
 import lombok.AllArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -62,10 +65,13 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/cancel")
-    public ApiResponse<OrderResult> cancel(@PathVariable UUID id) {
+    public ApiResponse<OrderResult> cancel(@PathVariable UUID orderId,
+                                           @AuthenticationPrincipal Jwt jwt
+    ) {
+        UUID buyerId = UUID.fromString(jwt.getSubject());
         return ApiResponse.success(
                 "Hủy đơn hàng thành công",
-                cancelOrderUseCase.execute(id)
+                cancelOrderUseCase.execute(buyerId, orderId)
         );
     }
 
@@ -86,10 +92,16 @@ public class OrderController {
     }
 
     @PostMapping("/{id}/ship")
-    public ApiResponse<OrderResult> ship(@PathVariable UUID id) {
+    @PreAuthorize("hasRole('SELLER')")
+    public ApiResponse<OrderResult> ship(
+            @PathVariable UUID id,
+            @AuthenticationPrincipal Jwt jwt
+    ) {
+        UUID sellerId = UUID.fromString(jwt.getSubject());
+
         return ApiResponse.success(
-                "Giao đơn hàng cho đơn vị vận chuyển thành công",
-                shipOrderUseCase.execute(id)
+                "Đã gửi đơn hàng cho Bên Ship",
+                shipOrderUseCase.execute(id, sellerId)
         );
     }
 

@@ -23,13 +23,15 @@ public class OrderOutboxPublisher {
 
     private static final String EVENT_TYPE_RESERVATION = "InventoryReservationRequested";
     private static final String EVENT_TYPE_RELEASE = "InventoryReleaseRequested";
+    private static final String EVENT_TYPE_ORDER_SHIPPED = "OrderShipped";
+
 
     private final SpringDataOrderOutboxRepository outboxRepository;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final Clock clock;
     private final String reservationTopic;
     private final String releaseTopic;
-
+    private final String orderShippedTopic;
     public OrderOutboxPublisher(
             SpringDataOrderOutboxRepository outboxRepository,
             KafkaTemplate<String, String> kafkaTemplate,
@@ -37,13 +39,16 @@ public class OrderOutboxPublisher {
             @Value("${order.kafka.inventory-topic:inventory.reserve.requested.v1}")
             String reservationTopic,
             @Value("${order.kafka.inventory-release-topic:inventory.release.requested.v1}")
-            String releaseTopic
+            String releaseTopic,
+            @Value("${order.kafka.shipped-topic:order.shipped.v1}")
+                    String orderShippedTopic
     ) {
         this.outboxRepository = outboxRepository;
         this.kafkaTemplate = kafkaTemplate;
         this.clock = clock;
         this.reservationTopic = reservationTopic;
         this.releaseTopic = releaseTopic;
+        this.orderShippedTopic=orderShippedTopic;
     }
 
     @Scheduled(fixedDelayString = "${order.outbox.poll-delay-ms:3000}")
@@ -126,11 +131,17 @@ public class OrderOutboxPublisher {
     }
 
     private String resolveTopic(String eventType) {
+
         return switch (eventType) {
+
             case EVENT_TYPE_RESERVATION -> reservationTopic;
+
             case EVENT_TYPE_RELEASE -> releaseTopic;
+
+            case EVENT_TYPE_ORDER_SHIPPED -> orderShippedTopic;
+
             default -> throw new IllegalArgumentException(
-                    "Loại sự kiện không được hỗ trợ: " + eventType
+                    "Unsupported event type: " + eventType
             );
         };
     }

@@ -1,0 +1,30 @@
+server:
+  port: ${SERVER_PORT:8086}
+spring:
+  application:
+    name: shipping-service
+  datasource:
+    url: ${DB_URL:jdbc:postgresql://localhost:5436/shipping_db}
+    username: ${DB_USERNAME:postgres}
+    password: ${DB_PASSWORD:postgres}
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: update
+  kafka:
+    bootstrap-servers: ${KAFKA_BOOTSTRAP_SERVERS:localhost:9092}
+    consumer:
+      group-id: shipping-order-shipped-consumer
+      auto-offset-reset: earliest
+      enable-auto-commit: false
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+    listener:
+      ack-mode: record
+shipping:
+  poll-ms: 1000
+  kafka:
+    order-shipped-topic: order.shipped.v1
+    status-topic: shipping.status.v1
+  outbox:
+    poll-ms: 1000

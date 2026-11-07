@@ -5,6 +5,7 @@ import com.order_service.application.event.InventoryReleaseRequested;
 import com.order_service.application.event.InventoryReservationRequested;
 import com.order_service.application.checkout.port.OutboxPort;
 
+import com.order_service.application.event.OrderShipped;
 import org.springframework.stereotype.Repository;
 import tools.jackson.databind.ObjectMapper;
 
@@ -38,14 +39,13 @@ public class OrderOutboxJpaAdapter implements OutboxPort {
         Objects.requireNonNull(event.checkoutId(), "Mã phiên thanh toán không được để trống");
         Objects.requireNonNull(event.buyerId(), "Mã người mua không được để trống");
 
-        // Kiểm tra danh sách Item.
         if (event.items() == null || event.items().isEmpty()) {
             throw new IllegalArgumentException(
                     "Danh sách sản phẩm giữ chỗ tồn kho không được để trống"
             );
         }
 
-        // Serialize Event thành JSON String.
+
         String payload = objectMapper.writeValueAsString(event);
 
 
@@ -73,5 +73,22 @@ public class OrderOutboxJpaAdapter implements OutboxPort {
                 payload,
                 clock.instant()
         ));
+    }
+    @Override
+    public void saveOrderShipped(OrderShipped event) {
+
+        Objects.requireNonNull(event, "Sự kiện không được để trống");
+
+        String payload = objectMapper.writeValueAsString(event);
+
+        OrderOutboxEntity entity = new OrderOutboxEntity(
+                event.eventId(),
+                event.orderId(),
+                OrderShipped.EVENT_TYPE,
+                payload,
+                clock.instant()
+        );
+
+        repository.save(entity);
     }
 }
