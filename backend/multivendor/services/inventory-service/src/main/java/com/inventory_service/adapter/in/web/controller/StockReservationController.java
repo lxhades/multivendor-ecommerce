@@ -22,7 +22,6 @@ public class StockReservationController {
     private final ReserveStockUseCase reserve;
     private final ConfirmReservationUseCase confirm;
     private final ReleaseReservationUseCase release;
-    private final ExpireReservationUseCase expire;
     private final StockReservationRepository repository;
 
 
@@ -45,12 +44,6 @@ public class StockReservationController {
                 ReservationResponse.from(release.execute(new ReleaseReservationCommand(id)))));
     }
 
-    @PostMapping("/{id}/expire")
-    public ResponseEntity<ApiResponse<ReservationResponse>> expire(@PathVariable UUID id) {
-        return ResponseEntity.ok(ApiResponse.success("Hết hạn thành công",
-                ReservationResponse.from(expire.execute(new ExpireReservationCommand(id)))));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ReservationResponse>> get(@PathVariable UUID id) {
         StockReservation r = repository.findById(id)
@@ -65,10 +58,10 @@ public class StockReservationController {
     }
 
     public record ReservationResponse(UUID id, UUID orderId, UUID inventoryId, long quantity,
-                                      String status, Instant expiresAt, Instant createdAt, Instant updatedAt, Long version) {
+                                      String status, Instant createdAt, Instant updatedAt, Long version) {
         public static ReservationResponse from(StockReservation r) {
             return new ReservationResponse(r.getId(), r.getOrderId(), r.getInventoryId(),
-                    r.getQuantity(), r.getStatus().name(), r.getExpiresAt(), r.getCreatedAt(),
+                    r.getQuantity(), r.getStatus().name(), r.getCreatedAt(),
                     r.getUpdatedAt(), r.getVersion());
         }
     }

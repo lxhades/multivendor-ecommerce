@@ -89,9 +89,6 @@ class ReserveStockIntegrationTest {
         assertEquals(orderId, reservation.getOrderId());
         assertEquals(inventory.getId(), reservation.getInventoryId());
 
-        assertTrue(reservation.getExpiresAt()
-                .isAfter(reservation.getCreatedAt()));
-
         StockReservation persisted = reservationRepository
                 .findById(reservation.getId())
                 .orElseThrow();
@@ -240,7 +237,6 @@ class ReserveStockIntegrationTest {
                 orderId,
                 inventory.getId(),
                 5,
-                Instant.now().plusSeconds(900),
                 Instant.now()
         );
 

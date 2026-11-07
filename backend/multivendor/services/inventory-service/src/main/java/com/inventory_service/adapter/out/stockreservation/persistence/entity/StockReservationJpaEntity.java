@@ -22,10 +22,6 @@ import java.util.UUID;
                 @Index(
                         name = "idx_reservation_order",
                         columnList = "order_id"
-                ),
-                @Index(
-                        name = "idx_reservation_status_expiry",
-                        columnList = "status, expires_at"
                 )
         }
 )
@@ -50,9 +46,6 @@ public class StockReservationJpaEntity {
     @Column(name = "status", nullable = false, length = 20)
     private ReservationStatus status;
 
-    @Column(name = "expires_at", nullable = false)
-    private Instant expiresAt;
-
     @Column(name = "created_at", nullable = false)
     private Instant createdAt;
 
@@ -69,7 +62,6 @@ public class StockReservationJpaEntity {
             UUID inventoryId,
             long quantity,
             ReservationStatus status,
-            Instant expiresAt,
             Instant createdAt,
             Instant updatedAt
     ) {
@@ -78,7 +70,6 @@ public class StockReservationJpaEntity {
         this.inventoryId = inventoryId;
         this.quantity = quantity;
         this.status = status;
-        this.expiresAt = expiresAt;
         this.createdAt = createdAt;
         this.updatedAt = updatedAt;
     }

@@ -17,7 +17,6 @@ public class StockReservationPersistenceMapper {
                 entity.getInventoryId(),
                 entity.getQuantity(),
                 entity.getStatus(),
-                entity.getExpiresAt(),
                 entity.getCreatedAt(),
                 entity.getUpdatedAt(),
                 entity.getVersion()
@@ -33,7 +32,6 @@ public class StockReservationPersistenceMapper {
                 reservation.getInventoryId(),
                 reservation.getQuantity(),
                 reservation.getStatus(),
-                reservation.getExpiresAt(),
                 reservation.getCreatedAt(),
                 reservation.getUpdatedAt()
         );

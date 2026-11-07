@@ -14,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
-import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 
@@ -23,8 +22,6 @@ public class ReserveCheckoutUseCase {
 
     private static final String CONSUMER_GROUP = "inventory-reservation-consumer";
     private static final String INBOX_EVENT_TYPE = "InventoryReservationRequested";
-    private static final Duration RESERVATION_TIMEOUT = Duration.ofMinutes(15);
-
     private final InboxPort inboxPort;
     private final InventoryRepository inventoryRepository;
     private final StockReservationRepository reservationRepository;
@@ -151,7 +148,6 @@ public class ReserveCheckoutUseCase {
                     item.orderId(),
                     inventory.getId(),
                     item.quantity(),
-                    now.plus(RESERVATION_TIMEOUT),
                     now
             );
 

@@ -134,9 +134,9 @@ public class Product {
         recalculateMinPrice();
     }
 
-    public void recordSale(UUID variantId, long qty) {
-        variant(variantId).recordSale(qty);
-        soldCount = Math.addExact(soldCount, qty);
+    public void recordSale(UUID variantId, long soldCount) {
+        variant(variantId).recordSale(soldCount);
+        this.soldCount = Math.addExact(this.soldCount, soldCount);
     }
 
     public void recalculateMinPrice() {

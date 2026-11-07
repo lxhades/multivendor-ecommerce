@@ -13,15 +13,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.time.Duration;
 import java.util.Objects;
 import java.util.UUID;
 
 @Service
 public class ReserveStockUseCase {
-
-    private static final Duration RESERVATION_TTL =
-            Duration.ofMinutes(15);
 
     private final InventoryRepository inventoryRepository;
     private final StockReservationRepository reservationRepository;
@@ -77,7 +73,6 @@ public class ReserveStockUseCase {
                 command.orderId(),
                 inventory.getId(),
                 command.quantity(),
-                now.plus(RESERVATION_TTL),
                 now
         );
 

@@ -111,14 +111,6 @@ public enum ErrorCode {
             HttpStatus.CONFLICT,
             "Trạng thái giữ hàng không hợp lệ"
     ),
-    RESERVATION_NOT_EXPIRED(
-            HttpStatus.CONFLICT,
-            "Thời gian giữ chỗ tồn kho chưa hết hạn"
-    ),
-    RESERVATION_EXPIRED(
-            HttpStatus.CONFLICT,
-            "Thời gian giữ chỗ tồn kho đã hết hạn"
-    ),
     STOCK_RESERVATION_NOT_FOUND(
             HttpStatus.NOT_FOUND,
             "Không tìm thấy bản ghi giữ chỗ tồn kho"

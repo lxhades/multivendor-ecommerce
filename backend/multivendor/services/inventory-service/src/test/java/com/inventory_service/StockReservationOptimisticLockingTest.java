@@ -14,7 +14,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.OptimisticLockingFailureException;
 
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
 import java.util.TimeZone;
 import java.util.UUID;
 
@@ -53,7 +52,6 @@ class StockReservationOptimisticLockingTest {
                 UUID.randomUUID(),
                 savedInventory.getId(),
                 5,
-                now.plus(15, ChronoUnit.MINUTES),
                 now
         );
 

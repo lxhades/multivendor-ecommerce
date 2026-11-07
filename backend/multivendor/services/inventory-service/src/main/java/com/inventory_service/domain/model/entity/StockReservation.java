@@ -17,7 +17,6 @@ public class StockReservation {
 
     private ReservationStatus status;
 
-    private final Instant expiresAt;
     private final Instant createdAt;
     private Instant updatedAt;
     private final Long version;
@@ -28,7 +27,6 @@ public class StockReservation {
             UUID inventoryId,
             long quantity,
             ReservationStatus status,
-            Instant expiresAt,
             Instant createdAt,
             Instant updatedAt,
             Long version
@@ -45,7 +43,6 @@ public class StockReservation {
 
         this.quantity = quantity;
         this.status = Objects.requireNonNull(status);
-        this.expiresAt = Objects.requireNonNull(expiresAt);
         this.createdAt = Objects.requireNonNull(createdAt);
         this.updatedAt = Objects.requireNonNull(updatedAt);
         this.version = version;
@@ -56,17 +53,9 @@ public class StockReservation {
             UUID orderId,
             UUID inventoryId,
             long quantity,
-            Instant expiresAt,
             Instant now
     ) {
-        Objects.requireNonNull(expiresAt);
         Objects.requireNonNull(now);
-
-        if (!expiresAt.isAfter(now)) {
-            throw new DomainException(
-                    ErrorCode.RESERVATION_NOT_EXPIRED
-            );
-        }
 
         return new StockReservation(
                 id,
@@ -74,7 +63,6 @@ public class StockReservation {
                 inventoryId,
                 quantity,
                 ReservationStatus.RESERVED,
-                expiresAt,
                 now,
                 now,
                 null
@@ -87,7 +75,6 @@ public class StockReservation {
             UUID inventoryId,
             long quantity,
             ReservationStatus status,
-            Instant expiresAt,
             Instant createdAt,
             Instant updatedAt,
             Long version
@@ -98,7 +85,6 @@ public class StockReservation {
                 inventoryId,
                 quantity,
                 status,
-                expiresAt,
                 createdAt,
                 updatedAt,
                 version
@@ -124,29 +110,6 @@ public class StockReservation {
         updatedAt = now;
     }
 
-    public void expire(Instant now) {
-        Objects.requireNonNull(now);
-
-        if (status == ReservationStatus.EXPIRED) {
-            return;
-        }
-
-        if (status != ReservationStatus.RESERVED) {
-            throw new DomainException(
-                    ErrorCode.INVALID_RESERVATION_STATUS
-            );
-        }
-
-        if (now.isBefore(expiresAt)) {
-            throw new DomainException(
-                    ErrorCode.RESERVATION_NOT_EXPIRED
-            );
-        }
-
-        this.status = ReservationStatus.EXPIRED;
-        this.updatedAt = now;
-    }
-
     private void ensureReserved(Instant now) {
         Objects.requireNonNull(now);
 
@@ -154,11 +117,6 @@ public class StockReservation {
             throw new DomainException(
                     ErrorCode.INVALID_RESERVATION_STATUS
             );
-        }
-
-        if (!now.isBefore(expiresAt)) {
-            throw new DomainException(
-                    ErrorCode.RESERVATION_EXPIRED);
         }
     }
 
@@ -180,10 +138,6 @@ public class StockReservation {
 
     public ReservationStatus getStatus() {
         return status;
-    }
-
-    public Instant getExpiresAt() {
-        return expiresAt;
     }
 
     public Instant getCreatedAt() {
