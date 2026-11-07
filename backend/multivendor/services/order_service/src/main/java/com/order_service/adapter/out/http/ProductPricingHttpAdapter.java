@@ -30,7 +30,7 @@ public class ProductPricingHttpAdapter implements ProductPricingPort {
     public List<VerifiedVariant> verifyVariants(List<UUID> variantIds) {
 
         if (variantIds == null || variantIds.isEmpty()) {
-            throw new IllegalArgumentException("Empty variants");
+            throw new IllegalArgumentException("Danh sách biến thể không được để trống");
         }
 
         try {
@@ -43,7 +43,7 @@ public class ProductPricingHttpAdapter implements ProductPricingPort {
 
             if (response == null) {
                 throw new IllegalStateException(
-                        "Empty response from Product Service"
+                        "Phản hồi từ dịch vụ sản phẩm rỗng"
                 );
             }
 
@@ -51,7 +51,7 @@ public class ProductPricingHttpAdapter implements ProductPricingPort {
 
         } catch (RestClientException ex) {
             throw new IllegalStateException(
-                    "Cannot verify variants from Product Service",
+                    "Không thể xác minh biến thể từ dịch vụ sản phẩm",
                     ex
             );
         }

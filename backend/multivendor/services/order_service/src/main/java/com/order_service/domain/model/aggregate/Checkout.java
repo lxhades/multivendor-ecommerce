@@ -35,7 +35,7 @@ public final class Checkout {
         this.buyerId = Objects.requireNonNull(buyerId);
 
         if (idempotencyKey == null || idempotencyKey.isBlank()) {
-            throw new IllegalArgumentException("Idempotency key required");
+            throw new IllegalArgumentException("Khóa chống xử lý trùng không được để trống");
         }
         this.idempotencyKey = idempotencyKey;
 
@@ -46,7 +46,7 @@ public final class Checkout {
         this.updatedAt = Objects.requireNonNull(updatedAt);
 
         if (updatedAt.isBefore(createdAt)) {
-            throw new IllegalArgumentException("Invalid timestamps");
+            throw new IllegalArgumentException("Các mốc thời gian không hợp lệ");
         }
 
         this.version = version;
@@ -108,15 +108,15 @@ public final class Checkout {
         }
 
         if (status != expectedStatus) {
-            throw new IllegalStateException("Invalid checkout transition");
+            throw new IllegalStateException("Chuyển trạng thái phiên thanh toán không hợp lệ");
         }
 
         if (now.isBefore(updatedAt)) {
-            throw new IllegalArgumentException("Time went backwards");
+            throw new IllegalArgumentException("Thời điểm xử lý không được trước thời điểm cập nhật gần nhất");
         }
 
         if (now.isAfter(expiresAt) && targetStatus != CheckoutStatus.EXPIRED) {
-            throw new IllegalStateException("Checkout expired");
+            throw new IllegalStateException("Phiên thanh toán đã hết hạn");
         }
 
         status = targetStatus;
@@ -139,7 +139,7 @@ public final class Checkout {
         Objects.requireNonNull(now);
 
         if (now.isBefore(expiresAt)) {
-            throw new IllegalStateException("Not expired yet");
+            throw new IllegalStateException("Phiên thanh toán chưa hết hạn");
         }
 
         if (status == CheckoutStatus.EXPIRED) {
@@ -147,7 +147,7 @@ public final class Checkout {
         }
 
         if (status != CheckoutStatus.PENDING && status != CheckoutStatus.PROCESSING) {
-            throw new IllegalStateException("Cannot expire");
+            throw new IllegalStateException("Không thể chuyển phiên thanh toán sang trạng thái hết hạn");
         }
 
         status = CheckoutStatus.EXPIRED;

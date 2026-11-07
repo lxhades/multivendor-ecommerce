@@ -21,7 +21,7 @@ spring:
       hibernate:
         format_sql: true
         jdbc:
-          time_zone: UTC
+          time_zone: Asia/Ho_Chi_Minh
 
   security:
     oauth2:

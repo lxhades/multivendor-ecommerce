@@ -10,14 +10,14 @@ import java.util.List;
 import java.util.UUID;
 
 public record CreateCheckoutRequest(
-        @NotNull PaymentMethod paymentMethod,
-        @NotBlank String shippingAddress,
-        @NotEmpty List<@Valid ItemRequest> items
+        @NotNull(message = "Phương thức thanh toán không được để trống") PaymentMethod paymentMethod,
+        @NotBlank(message = "Địa chỉ giao hàng không được để trống") String shippingAddress,
+        @NotEmpty(message = "Danh sách sản phẩm không được để trống") List<@Valid ItemRequest> items
 ) {
 
     public record ItemRequest(
-            @NotNull UUID variantId,
-            @Positive int quantity
+            @NotNull(message = "Mã biến thể không được để trống") UUID variantId,
+            @Positive(message = "Số lượng phải lớn hơn 0") int quantity
     ) {}
 
     public CreateCheckoutCommand toCommand(

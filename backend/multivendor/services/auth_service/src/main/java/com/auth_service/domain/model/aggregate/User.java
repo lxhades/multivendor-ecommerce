@@ -25,10 +25,10 @@ public class User {
     private Instant updatedAt;
 
     private User(UserId userId, Email email, Phone phone, PasswordHash passwordHash) {
-        this.userId = Objects.requireNonNull(userId, "User id must not be null");
-        this.email = Objects.requireNonNull(email, "Email must not be null");
-        this.phone = Objects.requireNonNull(phone, "Phone must not be null");
-        this.passwordHash = Objects.requireNonNull(passwordHash, "Password hash must not be null");
+        this.userId = Objects.requireNonNull(userId, "Mã người dùng không được để trống");
+        this.email = Objects.requireNonNull(email, "Email không được để trống");
+        this.phone = Objects.requireNonNull(phone, "Số điện thoại không được để trống");
+        this.passwordHash = Objects.requireNonNull(passwordHash, "Mã băm mật khẩu không được để trống");
         this.status = UserStatus.ACTIVE;
         this.roles = new HashSet<>();
         this.roles.add(Role.BUYER);
@@ -55,31 +55,31 @@ public class User {
 
         User user = new User(userId, email, phone, passwordHash);
 
-        user.status = Objects.requireNonNull(status, "Status must not be null");
+        user.status = Objects.requireNonNull(status, "Trạng thái không được để trống");
 
         user.roles.clear();
-        user.roles.addAll(Objects.requireNonNull(roles, "Roles must not be null"));
+        user.roles.addAll(Objects.requireNonNull(roles, "Danh sách vai trò không được để trống"));
         if (user.roles.isEmpty()) {
-            throw new IllegalArgumentException("User must have at least one role");
+            throw new IllegalArgumentException("Người dùng phải có ít nhất một vai trò");
         }
 
         user.addresses.clear();
-        user.addresses.addAll(Objects.requireNonNull(addresses, "Addresses must not be null"));
+        user.addresses.addAll(Objects.requireNonNull(addresses, "Danh sách địa chỉ không được để trống"));
 
-        user.createdAt = Objects.requireNonNull(createdAt, "CreatedAt must not be null");
-        user.updatedAt = Objects.requireNonNull(updatedAt, "UpdatedAt must not be null");
+        user.createdAt = Objects.requireNonNull(createdAt, "Thời điểm tạo không được để trống");
+        user.updatedAt = Objects.requireNonNull(updatedAt, "Thời điểm cập nhật không được để trống");
 
         return user;
     }
 
     public void changePassword(PasswordHash newPasswordHash) {
-        this.passwordHash = Objects.requireNonNull(newPasswordHash, "Password hash must not be null");
+        this.passwordHash = Objects.requireNonNull(newPasswordHash, "Mã băm mật khẩu không được để trống");
         this.updatedAt = Instant.now();
     }
 
 
     public void addAddress(Address address) {
-        Objects.requireNonNull(address, "Address must not be null");
+        Objects.requireNonNull(address, "Địa chỉ không được để trống");
         if (address.isDefault()) {
             this.addresses.forEach(item -> item.setDefault(false));
         }
@@ -88,7 +88,7 @@ public class User {
     }
 
     public void updateAddress(Long addressId, String receiverName, Phone phone, String location, String detail, boolean isDefault) {
-        Objects.requireNonNull(addressId, "Address id must not be null");
+        Objects.requireNonNull(addressId, "Mã địa chỉ không được để trống");
 
         Address address = this.addresses.stream()
                 .filter(item -> addressId.equals(item.getAddressId()))
@@ -104,7 +104,7 @@ public class User {
     }
 
     public void deleteAddress(Long addressId) {
-        Objects.requireNonNull(addressId, "Address id must not be null");
+        Objects.requireNonNull(addressId, "Mã địa chỉ không được để trống");
         Address address = this.addresses.stream()
                 .filter(item -> addressId.equals(item.getAddressId()))
                 .findFirst()
@@ -114,14 +114,14 @@ public class User {
     }
 
     public void assignRole(Role role) {
-        Objects.requireNonNull(role, "Role must not be null");
+        Objects.requireNonNull(role, "Vai trò không được để trống");
         this.roles.add(role);
         this.updatedAt = Instant.now();
     }
 
     public void revokeRole(Role role) {
         if (this.roles.size() == 1 && this.roles.contains(role)) {
-            throw new IllegalStateException("User must have at least one role");
+            throw new IllegalStateException("Người dùng phải có ít nhất một vai trò");
         }
         this.roles.remove(role);
         this.updatedAt = Instant.now();
@@ -129,7 +129,7 @@ public class User {
 
     public void lock() {
         if (this.status == UserStatus.LOCKED) {
-            throw new IllegalStateException("User is already locked");
+            throw new IllegalStateException("Tài khoản đã bị khóa");
         }
         this.status = UserStatus.LOCKED;
         this.updatedAt = Instant.now();
@@ -137,7 +137,7 @@ public class User {
 
     public void activate() {
         if (this.status == UserStatus.ACTIVE) {
-            throw new IllegalStateException("User is already active");
+            throw new IllegalStateException("Tài khoản đã ở trạng thái hoạt động");
         }
         this.status = UserStatus.ACTIVE;
         this.updatedAt = Instant.now();

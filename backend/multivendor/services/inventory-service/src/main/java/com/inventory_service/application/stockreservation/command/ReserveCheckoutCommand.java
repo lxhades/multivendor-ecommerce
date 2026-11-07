@@ -13,27 +13,27 @@ public record ReserveCheckoutCommand(
         List<Item> items
 ) {
     public ReserveCheckoutCommand {
-        Objects.requireNonNull(eventId, "eventId is required");
-        Objects.requireNonNull(checkoutId, "checkoutId is required");
-        Objects.requireNonNull(buyerId, "buyerId is required");
-        Objects.requireNonNull(items, "items is required");
+        Objects.requireNonNull(eventId, "Mã sự kiện không được để trống");
+        Objects.requireNonNull(checkoutId, "Mã phiên thanh toán không được để trống");
+        Objects.requireNonNull(buyerId, "Mã người mua không được để trống");
+        Objects.requireNonNull(items, "Danh sách sản phẩm không được để trống");
 
         items = List.copyOf(items);
 
         if (items.isEmpty()) {
-            throw new IllegalArgumentException("items cannot be empty");
+            throw new IllegalArgumentException("Danh sách sản phẩm không được để trống");
         }
 
         Set<String> uniqueItems = new HashSet<>();
 
         for (Item item : items) {
-            Objects.requireNonNull(item, "item cannot be null");
+            Objects.requireNonNull(item, "Sản phẩm không được để trống");
 
             String key = item.orderId() + ":" + item.variantId();
 
             if (!uniqueItems.add(key)) {
                 throw new IllegalArgumentException(
-                        "Duplicate orderId/variantId: " + key
+                        "Trùng cặp mã đơn hàng và mã biến thể: " + key
                 );
             }
         }
@@ -50,7 +50,7 @@ public record ReserveCheckoutCommand(
 
             if (quantity <= 0) {
                 throw new IllegalArgumentException(
-                        "quantity must be positive"
+                        "Số lượng phải lớn hơn 0"
                 );
             }
         }

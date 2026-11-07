@@ -25,8 +25,8 @@ public record CreateCategoryRequest(
         @Size(max = 1000, message = "Mô tả không được vượt quá 1000 ký tự")
         String description,
 
-        @URL(message = "Image URL không hợp lệ")
-        @Size(max = 255, message = "Image URL quá dài")
+        @URL(message = "Đường dẫn hình ảnh không hợp lệ")
+        @Size(max = 255, message = "Đường dẫn hình ảnh quá dài")
         String imageUrl,
 
 

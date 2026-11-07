@@ -21,10 +21,10 @@ public class ExpireCheckoutUseCase {
 
     @Transactional
     public CheckoutResult execute(UUID checkoutId) {
-        java.util.Objects.requireNonNull(checkoutId, "checkoutId is required");
+        java.util.Objects.requireNonNull(checkoutId, "Mã phiên thanh toán không được để trống");
 
         Checkout checkout = checkouts.findById(checkoutId)
-                .orElseThrow(() -> new IllegalArgumentException("Checkout not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phiên thanh toán"));
         checkout.expire(clock.instant());
 
         return CheckoutResult.from(checkouts.save(checkout));

@@ -35,7 +35,7 @@ public class ReleaseOrderReservationsUseCase {
 
         if (records.isEmpty()) {
             throw new IllegalStateException(
-                    "Reservations not found: " + orderId
+                    "Không tìm thấy bản ghi giữ chỗ: " + orderId
             );
         }
 
@@ -56,7 +56,7 @@ public class ReleaseOrderReservationsUseCase {
 
             if (reservation.getStatus() != ReservationStatus.RESERVED) {
                 throw new IllegalStateException(
-                        "Cannot release reservation: "
+                        "Không thể giải phóng giữ chỗ tồn kho: "
                                 + reservation.getId()
                 );
             }

@@ -11,8 +11,8 @@ import lombok.Setter;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DeleteAddressRequest {
-    @NotBlank(message = "UserId không được để trống")
+    @NotBlank(message = "Mã người dùng không được để trống")
     private String userId;
-    @NotBlank(message = "AddressId không được để trống")
+    @NotBlank(message = "Mã địa chỉ không được để trống")
     private String addressId;
 }

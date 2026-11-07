@@ -47,7 +47,7 @@ public class ReserveCheckoutUseCase {
 
     @Transactional
     public int execute(ReserveCheckoutCommand command) {
-        Objects.requireNonNull(command, "command is required");
+        Objects.requireNonNull(command, "Yêu cầu xử lý không được để trống");
 
         // 1. Chống xử lý trùng event (Idempotency)
         if (!isFirstTimeProcessed(command)) {
@@ -110,8 +110,8 @@ public class ReserveCheckoutUseCase {
 
             if (existingReservation.isPresent()) {
                 throw new IllegalStateException(
-                        "Reservation already exists for order " + item.orderId()
-                                + ", inventory " + inventory.getId()
+                        "Đã có bản ghi giữ chỗ cho đơn hàng " + item.orderId()
+                                + ", kho hàng " + inventory.getId()
                 );
             }
 

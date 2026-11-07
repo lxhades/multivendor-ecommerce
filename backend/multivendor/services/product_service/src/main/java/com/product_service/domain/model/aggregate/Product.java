@@ -56,7 +56,7 @@ public class Product {
     private void editFields(
             UUID categoryId, String name, String slug, String description, String mediaJson) {
         if (categoryId == null || name == null || name.isBlank() || slug == null || slug.isBlank())
-            throw new IllegalArgumentException("Invalid product");
+            throw new IllegalArgumentException("Thông tin sản phẩm không hợp lệ");
         this.categoryId = categoryId;
         this.name = name;
         this.slug = slug;
@@ -65,7 +65,7 @@ public class Product {
     }
 
     private void checkLive() {
-        if (deletedAt != null) throw new IllegalStateException("Product deleted");
+        if (deletedAt != null) throw new IllegalStateException("Sản phẩm đã bị xóa");
     }
 
     public void edit(
@@ -80,7 +80,7 @@ public class Product {
         checkLive();
         if (variants.stream()
                 .anyMatch(x -> x.id().equals(v.id()) || x.deletedAt() == null && x.sku().equals(v.sku())))
-            throw new IllegalArgumentException("Duplicate variant");
+            throw new IllegalArgumentException("Biến thể đã tồn tại");
         variants.add(v);
         approvalStatus = ApprovalStatus.PENDING;
         updatedAt = at;
@@ -91,7 +91,7 @@ public class Product {
         checkLive();
         ProductVariant v = variant(id);
         if (variants.stream().anyMatch(x -> !x.id().equals(id) && x.deletedAt() == null && x.sku().equals(sku)))
-            throw new IllegalArgumentException("Duplicate SKU");
+            throw new IllegalArgumentException("Mã SKU đã tồn tại");
         v.edit(sku, price, attrs, active);
         approvalStatus = ApprovalStatus.PENDING;
         updatedAt = at;
@@ -107,7 +107,7 @@ public class Product {
     }
 
     public ProductVariant variant(UUID id) {
-        return variants.stream().filter(v -> v.id().equals(id) && v.deletedAt() == null).findFirst().orElseThrow(() -> new NoSuchElementException("Variant not found"));
+        return variants.stream().filter(v -> v.id().equals(id) && v.deletedAt() == null).findFirst().orElseThrow(() -> new NoSuchElementException("Không tìm thấy biến thể"));
     }
 
     public void changeStatus(ProductStatus s, Instant at) {
@@ -118,8 +118,8 @@ public class Product {
 
     public void decide(ApprovalStatus decision, UUID adminId, String reason, Instant at) {
         checkLive();
-        if (decision == ApprovalStatus.PENDING) throw new IllegalArgumentException("Invalid decision");
-        if (approvalStatus != ApprovalStatus.PENDING) throw new IllegalStateException("Not pending");
+        if (decision == ApprovalStatus.PENDING) throw new IllegalArgumentException("Quyết định duyệt sản phẩm không hợp lệ");
+        if (approvalStatus != ApprovalStatus.PENDING) throw new IllegalStateException("Sản phẩm không ở trạng thái chờ duyệt");
         approvalStatus = decision;
         histories.add(new ProductApprovalHistory(UUID.randomUUID(), adminId, decision, reason, at));
         updatedAt = at;

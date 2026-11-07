@@ -21,14 +21,14 @@ public class RefreshToken {
             Instant expiresAt,
             boolean revoked
     ) {
-        this.id = Objects.requireNonNull(id, "Refresh token id must not be null");
-        this.userId = Objects.requireNonNull(userId, "User id must not be null");
-        this.token = Objects.requireNonNull(token, "Token must not be null");
-        this.expiresAt = Objects.requireNonNull(expiresAt, "Expires at must not be null");
+        this.id = Objects.requireNonNull(id, "Mã định danh làm mới phiên đăng nhập không được để trống");
+        this.userId = Objects.requireNonNull(userId, "Mã người dùng không được để trống");
+        this.token = Objects.requireNonNull(token, "Mã xác thực không được để trống");
+        this.expiresAt = Objects.requireNonNull(expiresAt, "Thời điểm hết hạn không được để trống");
         this.revoked = revoked;
 
         if (token.isBlank()) {
-            throw new IllegalArgumentException("Token must not be blank");
+            throw new IllegalArgumentException("Mã xác thực không được để trống");
         }
     }
 

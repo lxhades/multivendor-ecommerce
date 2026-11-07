@@ -9,13 +9,13 @@ public record ReserveStockCommand(
 ) {
     public ReserveStockCommand {
         if (orderId == null) {
-            throw new IllegalArgumentException("orderId is required");
+            throw new IllegalArgumentException("Mã đơn hàng không được để trống");
         }
         if (variantId == null) {
-            throw new IllegalArgumentException("variantId is required");
+            throw new IllegalArgumentException("Mã biến thể không được để trống");
         }
         if (quantity <= 0) {
-            throw new IllegalArgumentException("quantity must be positive");
+            throw new IllegalArgumentException("Số lượng phải lớn hơn 0");
         }
     }
 }

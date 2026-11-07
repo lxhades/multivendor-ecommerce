@@ -8,7 +8,7 @@ public final class UserId {
     private final UUID value;
 
     private UserId(UUID value) {
-        this.value = Objects.requireNonNull(value, "UserId cannot be null");
+        this.value = Objects.requireNonNull(value, "Mã người dùng không được để trống");
     }
 
     public static UserId generate() {

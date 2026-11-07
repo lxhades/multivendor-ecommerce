@@ -36,7 +36,7 @@ public class VerifyVariantsUseCase {
         if (ids == null || ids.isEmpty() || ids.size() > 100
                 || ids.stream().anyMatch(Objects::isNull)
                 || new HashSet<>(ids).size() != ids.size()) {
-            throw new IllegalArgumentException("Invalid variant IDs");
+            throw new IllegalArgumentException("Danh sách mã biến thể không hợp lệ");
         }
 
         var rows = variants.findAllWithProduct(ids);

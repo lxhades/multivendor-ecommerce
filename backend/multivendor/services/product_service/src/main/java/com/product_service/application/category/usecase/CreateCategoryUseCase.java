@@ -32,7 +32,7 @@ public class CreateCategoryUseCase {
 
     @Transactional
     public CreateCategoryResult create(CreateCategoryCommand command) {
-        Objects.requireNonNull(command, "command");
+        Objects.requireNonNull(command, "Yêu cầu xử lý không được để trống");
 
         Instant now = clock.instant();
 

@@ -17,10 +17,10 @@ public class GetOrderUseCase {
 
     @Transactional(readOnly = true)
     public OrderResult execute(UUID orderId) {
-        java.util.Objects.requireNonNull(orderId, "orderId is required");
+        java.util.Objects.requireNonNull(orderId, "Mã đơn hàng không được để trống");
 
         return OrderResult.from(
                 orders.findById(orderId)
-                        .orElseThrow(() -> new IllegalArgumentException("Order not found")));
+                        .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng")));
     }
 }

@@ -27,19 +27,19 @@ public class OrderItem {
 
         if (productName.isBlank()) {
             throw new IllegalArgumentException(
-                    "Product name cannot be blank"
+                    "Tên sản phẩm không được để trống"
             );
         }
 
         if (unitPrice < 0) {
             throw new IllegalArgumentException(
-                    "Unit price cannot be negative"
+                    "Đơn giá không được là số âm"
             );
         }
 
         if (quantity <= 0) {
             throw new IllegalArgumentException(
-                    "Quantity must be positive"
+                    "Số lượng phải lớn hơn 0"
             );
         }
 

@@ -18,7 +18,7 @@ public class ListOrdersByCheckoutUseCase {
 
     @Transactional(readOnly = true)
     public List<OrderResult> execute(UUID checkoutId) {
-        java.util.Objects.requireNonNull(checkoutId, "checkoutId is required");
+        java.util.Objects.requireNonNull(checkoutId, "Mã phiên thanh toán không được để trống");
 
         return orders.findByCheckoutId(checkoutId)
                 .stream()

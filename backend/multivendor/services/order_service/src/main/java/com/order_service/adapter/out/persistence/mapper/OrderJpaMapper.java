@@ -80,7 +80,7 @@ public final class OrderJpaMapper {
         );
 
         if (o.getSubtotal() != e.subtotal || o.getTotalAmount() != e.totalAmount) {
-            throw new IllegalStateException("Stored order totals do not match items");
+            throw new IllegalStateException("Tổng tiền đơn hàng đã lưu không khớp với các sản phẩm");
         }
 
         return o;

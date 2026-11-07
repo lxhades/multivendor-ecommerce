@@ -17,19 +17,19 @@ public record CreateCheckoutCommand(
 
         if (idempotencyKey == null || idempotencyKey.isBlank()
                 || shippingAddress == null || shippingAddress.isBlank()) {
-            throw new IllegalArgumentException("Invalid checkout");
+            throw new IllegalArgumentException("Thông tin phiên thanh toán không hợp lệ");
         }
 
         items = List.copyOf(Objects.requireNonNull(items));
 
         if (items.isEmpty()) {
-            throw new IllegalArgumentException("Empty checkout");
+            throw new IllegalArgumentException("Phiên thanh toán phải có ít nhất một sản phẩm");
         }
 
         Set<UUID> variants = new HashSet<>();
         for (CheckoutItemCommand item : items) {
             if (!variants.add(item.variantId())) {
-                throw new IllegalArgumentException("Duplicate variantId");
+                throw new IllegalArgumentException("Mã biến thể bị trùng");
             }
         }
     }

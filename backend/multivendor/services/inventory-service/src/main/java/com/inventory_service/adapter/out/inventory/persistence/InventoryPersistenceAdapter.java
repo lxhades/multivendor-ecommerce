@@ -51,7 +51,7 @@ public class InventoryPersistenceAdapter implements InventoryRepository {
 
     @Override
     public Inventory save(Inventory inventory) {
-        Objects.requireNonNull(inventory, "inventory is required");
+        Objects.requireNonNull(inventory, "Thông tin tồn kho không được để trống");
 
         if (inventory.getVersion() == null) {
             InventoryJpaEntity newEntity = mapper.toJpaEntity(inventory);

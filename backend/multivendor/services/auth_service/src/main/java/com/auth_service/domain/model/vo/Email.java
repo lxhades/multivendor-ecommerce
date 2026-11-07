@@ -13,10 +13,10 @@ public final class Email {
 
     private Email(String value) {
         if (value == null || value.isBlank()) {
-            throw new IllegalArgumentException("Email must not be null or blank");
+            throw new IllegalArgumentException("Email không được để trống");
         }
         if (!EMAIL_PATTERN.matcher(value).matches()) {
-            throw new IllegalArgumentException("Invalid email format: " + value);
+            throw new IllegalArgumentException("Định dạng email không hợp lệ: " + value);
         }
         this.value = value;
     }

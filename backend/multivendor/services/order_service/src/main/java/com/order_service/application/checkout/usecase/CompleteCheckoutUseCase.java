@@ -23,7 +23,7 @@ public class CompleteCheckoutUseCase {
     public CheckoutResult execute(UUID checkoutId) {
 
         Checkout checkout = checkouts.findById(checkoutId)
-                .orElseThrow(() -> new IllegalArgumentException("Checkout not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phiên thanh toán"));
         checkout.complete(clock.instant());
         return CheckoutResult.from(checkouts.save(checkout));
     }

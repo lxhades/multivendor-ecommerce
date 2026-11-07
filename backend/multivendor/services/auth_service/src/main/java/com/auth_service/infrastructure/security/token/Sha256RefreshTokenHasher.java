@@ -14,7 +14,7 @@ public class Sha256RefreshTokenHasher implements RefreshTokenHasher {
     @Override
     public String hash(String refreshToken) {
         if (refreshToken == null || refreshToken.isBlank()) {
-            throw new IllegalArgumentException("Refresh token must not be blank");
+            throw new IllegalArgumentException("Mã làm mới phiên đăng nhập không được để trống");
         }
 
         try {
@@ -24,7 +24,7 @@ public class Sha256RefreshTokenHasher implements RefreshTokenHasher {
             );
             return HexFormat.of().formatHex(hash);
         } catch (NoSuchAlgorithmException e) {
-            throw new IllegalStateException("SHA-256 algorithm is not available", e);
+            throw new IllegalStateException("Thuật toán SHA-256 không khả dụng", e);
         }
     }
 }

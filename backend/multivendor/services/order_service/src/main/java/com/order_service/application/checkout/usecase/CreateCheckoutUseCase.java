@@ -45,7 +45,7 @@ public class CreateCheckoutUseCase {
 
     public CreateCheckoutResult execute(CreateCheckoutCommand command) {
 
-        Objects.requireNonNull(command, "Command is required");
+        Objects.requireNonNull(command, "Yêu cầu xử lý không được để trống");
 
         // IDEMPOTENCY CHECK
         Optional<CreateCheckoutResult> existingResult =
@@ -202,7 +202,7 @@ public class CreateCheckoutUseCase {
 
         if (verifiedVariants == null) {
             throw new IllegalStateException(
-                    "Product Service returned null response"
+                    "Dịch vụ sản phẩm trả về phản hồi rỗng"
             );
         }
 
@@ -210,13 +210,13 @@ public class CreateCheckoutUseCase {
 
         if (requestedSet.size() != requestedIds.size()) {
             throw new IllegalArgumentException(
-                    "Duplicate variantId in request"
+                    "Mã biến thể bị trùng trong yêu cầu"
             );
         }
 
         if (verifiedVariants.size() != requestedSet.size()) {
             throw new IllegalStateException(
-                    "Product Service returned incomplete variants"
+                    "Dịch vụ sản phẩm trả về danh sách biến thể không đầy đủ"
             );
         }
 
@@ -227,14 +227,14 @@ public class CreateCheckoutUseCase {
 
             if (variant == null) {
                 throw new IllegalStateException(
-                        "Null variant from Product Service"
+                        "Dịch vụ sản phẩm trả về biến thể rỗng"
                 );
             }
 
             System.out.println("variant available: " + variant+ " "+variant.available());
             if (!variant.available()) {
                 throw new IllegalArgumentException(
-                        "Variant is not available: " + variant.variantId()
+                        "Biến thể không khả dụng: " + variant.variantId()
                 );
             }
 
@@ -246,13 +246,13 @@ public class CreateCheckoutUseCase {
                     || variant.unitPrice() < 0) {
 
                 throw new IllegalStateException(
-                        "Invalid product data returned by Product Service"
+                        "Dữ liệu sản phẩm do dịch vụ sản phẩm trả về không hợp lệ"
                 );
             }
 
             if (!requestedSet.contains(variant.variantId())) {
                 throw new IllegalStateException(
-                        "Unexpected variant: " + variant.variantId()
+                        "Biến thể không có trong yêu cầu: " + variant.variantId()
                 );
             }
 
@@ -260,7 +260,7 @@ public class CreateCheckoutUseCase {
                     variant.variantId(), variant
             ) != null) {
                 throw new IllegalStateException(
-                        "Duplicate verified variant: "
+                        "Biến thể đã xác minh bị trùng: "
                                 + variant.variantId()
                 );
             }

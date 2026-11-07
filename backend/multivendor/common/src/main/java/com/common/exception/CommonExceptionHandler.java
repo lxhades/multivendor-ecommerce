@@ -94,7 +94,7 @@ public class CommonExceptionHandler {
         if (status == null) {
             status = HttpStatus.INTERNAL_SERVER_ERROR;
         }
-        String message = ex.getReason() != null ? ex.getReason() : "Request failed";
+        String message = ex.getReason() != null ? ex.getReason() : "Xử lý yêu cầu thất bại";
 
         log.warn("Lỗi ResponseStatusException tại {}: {} - {}", request.getRequestURI(), status, message);
         return buildErrorResponse(status, message, null, request);

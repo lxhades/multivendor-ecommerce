@@ -35,7 +35,7 @@ public class StockReservationPersistenceAdapter
 
         if (reservation.getVersion() != null) {
             throw new IllegalArgumentException(
-                    "New reservation must not have a version"
+                    "Bản ghi giữ chỗ mới không được có phiên bản"
             );
         }
 
@@ -63,19 +63,19 @@ public class StockReservationPersistenceAdapter
                 !reservation.getVersion().equals(entity.getVersion())) {
 
             throw new OptimisticLockingFailureException(
-                    "StockReservation version conflict"
+                    "Xung đột phiên bản bản ghi giữ chỗ tồn kho"
             );
         }
 
         if (entity.getStatus() != ReservationStatus.RESERVED) {
             throw new IllegalStateException(
-                    "Reservation is no longer active"
+                    "Bản ghi giữ chỗ không còn hiệu lực"
             );
         }
 
         if (reservation.getStatus() == ReservationStatus.RESERVED) {
             throw new IllegalStateException(
-                    "No valid status transition"
+                    "Không có chuyển đổi trạng thái hợp lệ"
             );
         }
 

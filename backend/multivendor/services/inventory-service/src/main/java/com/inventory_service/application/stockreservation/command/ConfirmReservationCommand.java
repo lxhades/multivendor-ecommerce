@@ -9,7 +9,7 @@ public record ConfirmReservationCommand(
     public ConfirmReservationCommand {
         Objects.requireNonNull(
                 reservationId,
-                "reservationId is required"
+                "Mã giữ chỗ tồn kho không được để trống"
         );
     }
 }

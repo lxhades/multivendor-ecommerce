@@ -16,12 +16,12 @@ public record CreateShopRequest(
         @Size(max = 100, message = "Slug không được vượt quá 100 ký tự")
         String slug,
 
-        @URL(message = "Logo URL không hợp lệ")
-        @Size(max = 255, message = "Logo URL quá dài")
+        @URL(message = "Đường dẫn logo không hợp lệ")
+        @Size(max = 255, message = "Đường dẫn logo quá dài")
         String logoUrl,
 
-        @URL(message = "Banner URL không hợp lệ")
-        @Size(max = 255, message = "Banner URL quá dài")
+        @URL(message = "Đường dẫn ảnh bìa không hợp lệ")
+        @Size(max = 255, message = "Đường dẫn ảnh bìa quá dài")
         String bannerUrl,
 
         @Size(max = 1000, message = "Mô tả không được vượt quá 1000 ký tự")

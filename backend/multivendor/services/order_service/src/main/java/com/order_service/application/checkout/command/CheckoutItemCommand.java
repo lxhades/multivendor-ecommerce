@@ -9,9 +9,9 @@ public record CheckoutItemCommand(
         int quantity
 ) {
     public CheckoutItemCommand {
-        Objects.requireNonNull(variantId, "variantId required");
+        Objects.requireNonNull(variantId, "Mã biến thể không được để trống");
         if (quantity <= 0) {
-            throw new IllegalArgumentException("Invalid quantity");
+            throw new IllegalArgumentException("Số lượng không hợp lệ");
         }
     }
 }

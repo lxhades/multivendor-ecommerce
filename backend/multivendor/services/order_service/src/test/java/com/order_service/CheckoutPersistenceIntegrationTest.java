@@ -120,7 +120,7 @@ class CheckoutPersistenceIntegrationTest {
 
         // TODO 2: Giả lập lỗi khi lưu Outbox.
         // Lỗi phát sinh sau khi Checkout và Orders đã save.
-        doThrow(new IllegalStateException("Simulated outbox failure"))
+        doThrow(new IllegalStateException("Giả lập lỗi lưu sự kiện gửi đi"))
                 .when(outboxAdapter)
                 .saveInventoryReservationRequested(any());
 
@@ -135,7 +135,7 @@ class CheckoutPersistenceIntegrationTest {
                 ? exception.getCause().getMessage()
                 : exception.getMessage();
 
-        assertEquals("Simulated outbox failure", actualMessage);
+        assertEquals("Giả lập lỗi lưu sự kiện gửi đi", actualMessage);
 
         // TODO 4: Xác nhận Checkout bị ROLLBACK.
         assertEquals(0L, count("SELECT COUNT(*) FROM checkouts WHERE id = ?", data.checkout().getId()));

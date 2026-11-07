@@ -31,7 +31,7 @@ public class ConfirmReservationUseCase {
     public StockReservation execute(
             ConfirmReservationCommand command
     ) {
-        Objects.requireNonNull(command, "command is required");
+        Objects.requireNonNull(command, "Yêu cầu xử lý không được để trống");
 
 
         StockReservation reservation = reservationRepository

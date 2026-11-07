@@ -110,7 +110,7 @@ class InventoryConcurrencyTest {
                 try {
                     if (!startUpdate.await(10, TimeUnit.SECONDS)) {
                         throw new IllegalStateException(
-                                "Timeout waiting for concurrent update"
+                                "Hết thời gian chờ cập nhật đồng thời"
                         );
                     }
                 } catch (InterruptedException e) {

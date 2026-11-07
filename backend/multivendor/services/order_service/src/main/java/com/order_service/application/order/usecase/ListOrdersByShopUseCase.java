@@ -19,7 +19,7 @@ public class ListOrdersByShopUseCase {
 
     @Transactional(readOnly = true)
     public List<OrderResult> execute(UUID shopId) {
-        Objects.requireNonNull(shopId, "shopId is required");
+        Objects.requireNonNull(shopId, "Mã cửa hàng không được để trống");
 
         return orders
                 .findByShopId(shopId)

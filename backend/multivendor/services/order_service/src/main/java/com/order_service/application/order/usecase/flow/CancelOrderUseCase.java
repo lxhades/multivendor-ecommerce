@@ -43,7 +43,7 @@ public class CancelOrderUseCase {
 
         if (order.getPaymentMethod() != PaymentMethod.COD) {
             throw new IllegalStateException(
-                    "ATM cancellation not implemented"
+                    "Chưa hỗ trợ hủy đơn thanh toán qua ATM"
             );
         }
 
@@ -55,7 +55,7 @@ public class CancelOrderUseCase {
                 order.getOrderStatus() != OrderStatus.PENDING
         ) {
             throw new IllegalStateException(
-                    "Only confirmed and pending COD orders can be cancelled"
+                    "Chỉ có thể hủy đơn thanh toán khi nhận hàng ở trạng thái đã xác nhận hoặc chờ xác nhận"
             );
         }
 

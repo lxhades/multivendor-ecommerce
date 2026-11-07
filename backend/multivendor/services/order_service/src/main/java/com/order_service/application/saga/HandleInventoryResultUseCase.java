@@ -63,7 +63,7 @@ public class HandleInventoryResultUseCase {
         Checkout checkout = checkoutRepository
                 .findById(command.checkoutId())
                 .orElseThrow(() -> new IllegalStateException(
-                        "Checkout not found: " + command.checkoutId()
+                        "Không tìm thấy phiên thanh toán: " + command.checkoutId()
                 ));
 
         // 3. Load tất cả Orders thuộc Checkout
@@ -72,7 +72,7 @@ public class HandleInventoryResultUseCase {
 
         if (orders.isEmpty()) {
             throw new IllegalStateException(
-                    "No orders found for checkout: "
+                    "Không tìm thấy đơn hàng cho phiên thanh toán: "
                             + command.checkoutId()
             );
         }
@@ -87,7 +87,7 @@ public class HandleInventoryResultUseCase {
             case "InventoryFailed" -> handleFailed(checkout, orders, now);
 
             default -> throw new IllegalArgumentException(
-                    "Unsupported eventType: " + command.eventType()
+                    "Loại sự kiện không được hỗ trợ: " + command.eventType()
             );
         }
 
@@ -101,7 +101,7 @@ public class HandleInventoryResultUseCase {
     ) {
         if (checkout.getStatus() != CheckoutStatus.PROCESSING) {
             throw new IllegalStateException(
-                    "Checkout not PROCESSING: " + checkout.getStatus()
+                    "Phiên thanh toán không ở trạng thái PROCESSING: " + checkout.getStatus()
             );
         }
 
@@ -134,7 +134,7 @@ public class HandleInventoryResultUseCase {
         }
         else {
             throw new IllegalStateException(
-                    "Unsupported payment method: "
+                    "Phương thức thanh toán không được hỗ trợ: "
                             + checkout.getPaymentMethod()
             );
         }
@@ -147,7 +147,7 @@ public class HandleInventoryResultUseCase {
     ) {
         if (checkout.getStatus() != CheckoutStatus.PROCESSING) {
             throw new IllegalStateException(
-                    "Checkout not PROCESSING: " + checkout.getStatus()
+                    "Phiên thanh toán không ở trạng thái PROCESSING: " + checkout.getStatus()
             );
         }
 

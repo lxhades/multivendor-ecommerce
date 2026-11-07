@@ -29,7 +29,7 @@ public class UpdateShopUseCase {
 
     @Transactional
     public ShopResult update(UUID id, UUID actorSellerId, UpdateShopCommand command) {
-        Objects.requireNonNull(command, "command");
+        Objects.requireNonNull(command, "Yêu cầu xử lý không được để trống");
 
         var shop = repository.findById(new ShopId(id))
                 .orElseThrow(() -> new DomainException(ErrorCode.SHOP_NOT_FOUND));

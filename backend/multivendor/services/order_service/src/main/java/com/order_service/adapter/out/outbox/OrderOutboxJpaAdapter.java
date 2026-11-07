@@ -33,15 +33,15 @@ public class OrderOutboxJpaAdapter implements OutboxPort {
             InventoryReservationRequested event
     ) {
 
-        Objects.requireNonNull(event, "Event is required");
-        Objects.requireNonNull(event.eventId(), "eventId is required");
-        Objects.requireNonNull(event.checkoutId(), "checkoutId is required");
-        Objects.requireNonNull(event.buyerId(), "buyerId is required");
+        Objects.requireNonNull(event, "Sự kiện không được để trống");
+        Objects.requireNonNull(event.eventId(), "Mã sự kiện không được để trống");
+        Objects.requireNonNull(event.checkoutId(), "Mã phiên thanh toán không được để trống");
+        Objects.requireNonNull(event.buyerId(), "Mã người mua không được để trống");
 
         // Kiểm tra danh sách Item.
         if (event.items() == null || event.items().isEmpty()) {
             throw new IllegalArgumentException(
-                    "Inventory reservation items cannot be empty"
+                    "Danh sách sản phẩm giữ chỗ tồn kho không được để trống"
             );
         }
 

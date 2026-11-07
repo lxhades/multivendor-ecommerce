@@ -17,14 +17,14 @@ public class ProductVariant {
     public ProductVariant(UUID id, String sku, BigDecimal price, String attributesJson, boolean active, long soldCount, Instant deletedAt) {
         this.id = Objects.requireNonNull(id);
         edit(sku, price, attributesJson, active);
-        if (soldCount < 0) throw new IllegalArgumentException("soldCount");
+        if (soldCount < 0) throw new IllegalArgumentException("Số lượng đã bán không được là số âm");
         this.soldCount = soldCount;
         this.deletedAt = deletedAt;
     }
 
     public void edit(String sku, BigDecimal price, String attributesJson, boolean active) {
         if (sku == null || sku.isBlank() || price == null || price.signum() < 0)
-            throw new IllegalArgumentException("Invalid variant");
+            throw new IllegalArgumentException("Thông tin biến thể không hợp lệ");
         this.sku = sku;
         this.price = price;
         this.attributesJson = attributesJson;
@@ -37,7 +37,7 @@ public class ProductVariant {
     }
 
     public void recordSale(long quantity) {
-        if (quantity <= 0) throw new IllegalArgumentException("quantity");
+        if (quantity <= 0) throw new IllegalArgumentException("Số lượng phải lớn hơn 0");
         soldCount = Math.addExact(soldCount, quantity);
     }
 

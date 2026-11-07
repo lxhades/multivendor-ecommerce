@@ -39,7 +39,7 @@ public class RedisRefreshTokenAdapter implements RefreshTokenRepository {
         ).getSeconds();
 
         if (ttlSeconds <= 0) {
-            throw new IllegalArgumentException("Refresh token must not be expired");
+            throw new IllegalArgumentException("Mã làm mới phiên đăng nhập không được hết hạn");
         }
 
         redisTemplate.opsForValue().set(

@@ -11,7 +11,7 @@ public class DomainException extends RuntimeException {
 
     public DomainException(ErrorCode errorCode) {
 
-        this.errorCode = Objects.requireNonNull(errorCode, "errorCode");
+        this.errorCode = Objects.requireNonNull(errorCode, "Mã lỗi không được để trống");
     }
 
     @Override

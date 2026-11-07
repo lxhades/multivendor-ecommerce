@@ -143,6 +143,25 @@ services:
       timeout: 5s
       retries: 5
 
+  # SHIPPING DB
+  postgres-shipping:
+    image: postgres:16
+    container_name: postgres-shipping
+    environment:
+      POSTGRES_DB: shipping_db
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5436:5432"
+    volumes:
+      - postgres_shipping_data:/var/lib/postgresql/data
+    networks:
+      - backend
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d shipping_db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
   # Redis
   redis:
     image: redis:7-alpine
@@ -171,6 +190,8 @@ volumes:
   postgres_product_data:
   postgres_inventory_data:
   postgres_order_data:
+  postgres_shipping_data:
+
   redis_data:
 
 networks:

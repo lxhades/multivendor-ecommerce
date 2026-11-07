@@ -20,6 +20,6 @@ public class GetCheckoutUseCase {
 
         return CheckoutResult.from(
                 checkouts.findById(checkoutId)
-                        .orElseThrow(() -> new IllegalArgumentException("Checkout not found")));
+                        .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy phiên thanh toán")));
     }
 }

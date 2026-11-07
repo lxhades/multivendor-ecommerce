@@ -39,7 +39,7 @@ public class StockReservation {
 
         if (quantity <= 0) {
             throw new IllegalArgumentException(
-                    "Reservation quantity must be positive"
+                    "Số lượng giữ chỗ phải lớn hơn 0"
             );
         }
 

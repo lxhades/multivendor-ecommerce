@@ -34,7 +34,7 @@ public class CreateShopUseCase {
             throw new RuntimeException(("Bạn đã có cửa hàng, không thể tạo thêm!"));
         }
 
-        Objects.requireNonNull(command, "command");
+        Objects.requireNonNull(command, "Yêu cầu xử lý không được để trống");
         Slug slug = new Slug(command.slug());
         if (repository.existsBySlug(slug, null)) throw new DomainException(ErrorCode.SHOP_SLUG_ALREADY_EXISTS);
 

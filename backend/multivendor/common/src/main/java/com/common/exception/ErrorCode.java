@@ -113,11 +113,11 @@ public enum ErrorCode {
     ),
     RESERVATION_NOT_EXPIRED(
             HttpStatus.CONFLICT,
-            "Reservation chưa hết hạn"
+            "Thời gian giữ chỗ tồn kho chưa hết hạn"
     ),
     RESERVATION_EXPIRED(
             HttpStatus.CONFLICT,
-            "Reservation đã hết hạn"
+            "Thời gian giữ chỗ tồn kho đã hết hạn"
     ),
     STOCK_RESERVATION_NOT_FOUND(
             HttpStatus.NOT_FOUND,
@@ -125,7 +125,7 @@ public enum ErrorCode {
     ),
     ProductServiceUnavailableException(
             HttpStatus.NOT_FOUND,
-            "Loi ProductServiceUnavailableException"
+            "Dịch vụ sản phẩm hiện không khả dụng"
     ),
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND,"Không tìm thấy đơn hàng ");
     private final HttpStatus httpStatus;

@@ -39,10 +39,10 @@ public class Inventory {
 
         if (onHandQuantity < 0 || reservedQuantity < 0
                 || reservedQuantity > onHandQuantity) {
-            throw new IllegalArgumentException("Invalid inventory quantities");
+            throw new IllegalArgumentException("Số lượng tồn kho không hợp lệ");
         }
         if (version != null && version < 0) {
-            throw new IllegalArgumentException("Invalid version");
+            throw new IllegalArgumentException("Phiên bản không hợp lệ");
         }
 
         this.onHandQuantity = onHandQuantity;
@@ -128,7 +128,7 @@ public class Inventory {
     }
     public void confirmStock(long quantity, Instant now) {
 
-        Objects.requireNonNull(now, "now is required");
+        Objects.requireNonNull(now, "Thời điểm xử lý không được để trống");
 
         if (quantity <= 0) {
             throw new DomainException(
@@ -138,7 +138,7 @@ public class Inventory {
 
         if (quantity > reservedQuantity) {
             throw new IllegalStateException(
-                    "Confirm quantity exceeds reserved quantity"
+                    "Số lượng xác nhận vượt quá số lượng đã giữ chỗ"
             );
         }
 
@@ -149,7 +149,7 @@ public class Inventory {
 
     public void releaseStock(long quantity, Instant now) {
 
-        Objects.requireNonNull(now, "now is required");
+        Objects.requireNonNull(now, "Thời điểm xử lý không được để trống");
 
         if (quantity <= 0) {
             throw new DomainException(
@@ -159,7 +159,7 @@ public class Inventory {
 
         if (quantity > reservedQuantity) {
             throw new IllegalStateException(
-                    "Release quantity exceeds reserved quantity"
+                    "Số lượng giải phóng vượt quá số lượng đã giữ chỗ"
             );
         }
 

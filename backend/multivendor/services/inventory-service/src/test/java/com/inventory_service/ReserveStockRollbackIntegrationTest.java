@@ -66,7 +66,7 @@ class ReserveStockRollbackIntegrationTest {
 
 
         doThrow(new RuntimeException(
-                "Simulated reservation persistence failure"
+                "Giả lập lỗi lưu bản ghi giữ chỗ"
         ))
                 .when(reservationRepository)
                 .create(any(StockReservation.class));
@@ -85,7 +85,7 @@ class ReserveStockRollbackIntegrationTest {
         );
 
         assertEquals(
-                "Simulated reservation persistence failure",
+                "Giả lập lỗi lưu bản ghi giữ chỗ",
                 exception.getMessage()
         );
 

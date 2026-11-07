@@ -29,8 +29,8 @@ public class InternalVariantController {
     }
 
     public record VerifyRequest(
-            @NotEmpty
-            @Size(max = 100)
-            List<@NotNull UUID> variantIds
+            @NotEmpty(message = "Danh sách mã biến thể không được để trống")
+            @Size(max = 100, message = "Danh sách mã biến thể không được vượt quá 100 phần tử")
+            List<@NotNull(message = "Mã biến thể không được để trống") UUID> variantIds
     ) {}
 }

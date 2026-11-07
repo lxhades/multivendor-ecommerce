@@ -9,10 +9,10 @@ public record ReserveOrderItem(
         long quantity
 ) {
     public ReserveOrderItem {
-        Objects.requireNonNull(variantId, "variantId is required");
+        Objects.requireNonNull(variantId, "Mã biến thể không được để trống");
         if (quantity <= 0) {
             throw new IllegalArgumentException(
-                    "quantity must be positive"
+                    "Số lượng phải lớn hơn 0"
             );
         }
     }

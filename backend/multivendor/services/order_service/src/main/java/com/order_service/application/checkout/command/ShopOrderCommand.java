@@ -9,6 +9,6 @@ public record ShopOrderCommand(UUID shopId, List<OrderItemCommand> items, long s
         Objects.requireNonNull(shopId);
         items = List.copyOf(Objects.requireNonNull(items));
         if (items.isEmpty() || shippingFee < 0)
-            throw new IllegalArgumentException("Invalid shop");
+            throw new IllegalArgumentException("Thông tin cửa hàng không hợp lệ");
     }
 }

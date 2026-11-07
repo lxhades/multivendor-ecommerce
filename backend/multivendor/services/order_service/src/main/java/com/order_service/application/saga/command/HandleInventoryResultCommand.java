@@ -11,25 +11,25 @@ public record HandleInventoryResultCommand(
         String reason
 ) {
     public HandleInventoryResultCommand {
-        Objects.requireNonNull(eventId, "eventId is required");
-        Objects.requireNonNull(eventType, "eventType is required");
-        Objects.requireNonNull(checkoutId, "checkoutId is required");
+        Objects.requireNonNull(eventId, "Mã sự kiện không được để trống");
+        Objects.requireNonNull(eventType, "Loại sự kiện không được để trống");
+        Objects.requireNonNull(checkoutId, "Mã phiên thanh toán không được để trống");
         Objects.requireNonNull(
                 causationEventId,
-                "causationEventId is required"
+                "Mã sự kiện nguyên nhân không được để trống"
         );
 
         if (!eventType.equals("InventoryReserved")
                 && !eventType.equals("InventoryFailed")) {
             throw new IllegalArgumentException(
-                    "Unsupported eventType: " + eventType
+                    "Loại sự kiện không được hỗ trợ: " + eventType
             );
         }
 
         if (eventType.equals("InventoryFailed")
                 && (reason == null || reason.isBlank())) {
             throw new IllegalArgumentException(
-                    "InventoryFailed requires reason"
+                    "Sự kiện InventoryFailed phải có lý do thất bại"
             );
         }
     }

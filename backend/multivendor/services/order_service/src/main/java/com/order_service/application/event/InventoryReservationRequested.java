@@ -23,30 +23,30 @@ public record InventoryReservationRequested(
 
         Objects.requireNonNull(
                 eventId,
-                "eventId is required"
+                "Mã sự kiện không được để trống"
         );
         Objects.requireNonNull(
                 checkoutId,
-                "checkoutId is required"
+                "Mã phiên thanh toán không được để trống"
         );
         Objects.requireNonNull(
                 buyerId,
-                "buyerId is required"
+                "Mã người mua không được để trống"
         );
         Objects.requireNonNull(
                 items,
-                "items is required"
+                "Danh sách sản phẩm không được để trống"
         );
         if (items.isEmpty()) {
             throw new IllegalArgumentException(
-                    "Inventory reservation items cannot be empty"
+                    "Danh sách sản phẩm giữ chỗ tồn kho không được để trống"
             );
         }
 
         //  Kiểm tra loại Event.
         if (!EVENT_TYPE.equals(eventType)) {
             throw new IllegalArgumentException(
-                    "Invalid eventType: " + eventType
+                    "Loại sự kiện không hợp lệ: " + eventType
             );
         }
 
@@ -65,7 +65,7 @@ public record InventoryReservationRequested(
 
             if (!uniqueItems.add(key)) {
                 throw new IllegalArgumentException(
-                        "Duplicate reservation item: "
+                        "Trùng mục giữ chỗ tồn kho: "
                                 + item.orderId()
                                 + " / "
                                 + item.variantId()
@@ -84,17 +84,17 @@ public record InventoryReservationRequested(
 
             Objects.requireNonNull(
                     orderId,
-                    "orderId is required"
+                    "Mã đơn hàng không được để trống"
             );
 
             Objects.requireNonNull(
                     variantId,
-                    "variantId is required"
+                    "Mã biến thể không được để trống"
             );
 
             if (quantity <= 0) {
                 throw new IllegalArgumentException(
-                        "quantity must be greater than 0"
+                        "Số lượng phải lớn hơn 0"
                 );
             }
         }

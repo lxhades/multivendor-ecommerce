@@ -21,10 +21,10 @@ public class DeliverOrderUseCase {
 
     @Transactional
     public OrderResult execute(UUID orderId) {
-        java.util.Objects.requireNonNull(orderId, "orderId is required");
+        java.util.Objects.requireNonNull(orderId, "Mã đơn hàng không được để trống");
 
         Order order = orders.findById(orderId)
-                .orElseThrow(() -> new IllegalArgumentException("Order not found"));
+                .orElseThrow(() -> new IllegalArgumentException("Không tìm thấy đơn hàng"));
         order.markDelivered(clock.instant());
 
         return OrderResult.from(orders.save(order));

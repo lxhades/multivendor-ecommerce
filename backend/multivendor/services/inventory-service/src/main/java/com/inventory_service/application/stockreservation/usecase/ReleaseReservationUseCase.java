@@ -39,7 +39,7 @@ public class ReleaseReservationUseCase {
     public StockReservation execute(
             ReleaseReservationCommand command
     ) {
-        Objects.requireNonNull(command, "command is required");
+        Objects.requireNonNull(command, "Yêu cầu xử lý không được để trống");
 
         StockReservation reservation = reservationRepository
                 .findById(command.reservationId())

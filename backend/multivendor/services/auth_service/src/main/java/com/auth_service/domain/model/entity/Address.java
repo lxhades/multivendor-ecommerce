@@ -23,25 +23,25 @@ public class Address {
     ) {
         if (receiverName == null || receiverName.isBlank()) {
             throw new IllegalArgumentException(
-                    "Receiver name must not be blank"
+                    "Tên người nhận không được để trống"
             );
         }
 
         if (location == null || location.isBlank()) {
             throw new IllegalArgumentException(
-                    "Location must not be blank"
+                    "Địa chỉ không được để trống"
             );
         }
 
         if (detail == null || detail.isBlank()) {
             throw new IllegalArgumentException(
-                    "Address detail must not be blank"
+                    "Chi tiết địa chỉ không được để trống"
             );
         }
 
         this.addressId = addressId;
         this.receiverName = receiverName;
-        this.phone = Objects.requireNonNull(phone, "Phone must not be null");
+        this.phone = Objects.requireNonNull(phone, "Số điện thoại không được để trống");
         this.location = location;
         this.detail = detail;
         this.isDefault = isDefault;
@@ -55,24 +55,24 @@ public class Address {
     ) {
         if (receiverName == null || receiverName.isBlank()) {
             throw new IllegalArgumentException(
-                    "Receiver name must not be blank"
+                    "Tên người nhận không được để trống"
             );
         }
 
         if (location == null || location.isBlank()) {
             throw new IllegalArgumentException(
-                    "Location must not be blank"
+                    "Địa chỉ không được để trống"
             );
         }
 
         if (detail == null || detail.isBlank()) {
             throw new IllegalArgumentException(
-                    "Address detail must not be blank"
+                    "Chi tiết địa chỉ không được để trống"
             );
         }
 
         this.receiverName = receiverName;
-        this.phone = Objects.requireNonNull(phone, "Phone must not be null");
+        this.phone = Objects.requireNonNull(phone, "Số điện thoại không được để trống");
         this.location = location;
         this.detail = detail;
     }

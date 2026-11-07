@@ -53,24 +53,24 @@ public final class Order {
         this.items = List.copyOf(Objects.requireNonNull(items));
 
         if (this.items.isEmpty()) {
-            throw new IllegalArgumentException("Empty order");
+            throw new IllegalArgumentException("Đơn hàng phải có ít nhất một sản phẩm");
         }
 
         Set<UUID> seenVariantIds = new HashSet<>();
 
         for (OrderItem item : this.items) {
             if (!seenVariantIds.add(item.getVariantId())) {
-                throw new IllegalArgumentException("Duplicate variantId");
+                throw new IllegalArgumentException("Mã biến thể bị trùng");
             }
         }
 
         if (shippingAddress == null || shippingAddress.isBlank()) {
-            throw new IllegalArgumentException("Shipping address required");
+            throw new IllegalArgumentException("Địa chỉ giao hàng không được để trống");
         }
         this.shippingAddress = shippingAddress;
 
         if (shippingFee < 0) {
-            throw new IllegalArgumentException("Negative shipping fee");
+            throw new IllegalArgumentException("Phí vận chuyển không được là số âm");
         }
         this.shippingFee = shippingFee;
 
@@ -91,11 +91,11 @@ public final class Order {
         this.updatedAt = Objects.requireNonNull(updatedAt);
 
         if (updatedAt.isBefore(createdAt)) {
-            throw new IllegalArgumentException("Invalid timestamps");
+            throw new IllegalArgumentException("Các mốc thời gian không hợp lệ");
         }
 
         if (version != null && version < 0) {
-            throw new IllegalArgumentException("Negative version");
+            throw new IllegalArgumentException("Phiên bản không được là số âm");
         }
 
         this.version = version;
@@ -167,7 +167,7 @@ public final class Order {
         Objects.requireNonNull(now);
 
         if (now.isBefore(updatedAt)) {
-            throw new IllegalArgumentException("Time went backwards");
+            throw new IllegalArgumentException("Thời điểm xử lý không được trước thời điểm cập nhật gần nhất");
         }
     }
 
@@ -179,11 +179,11 @@ public final class Order {
         }
 
         if (paymentMethod == PaymentMethod.COD) {
-            throw new IllegalStateException("COD cannot use online paid flow");
+            throw new IllegalStateException("Đơn thanh toán khi nhận hàng không thể sử dụng quy trình thanh toán trực tuyến");
         }
 
         if (orderStatus != OrderStatus.PENDING_PAYMENT) {
-            throw new IllegalStateException("Not pending payment");
+            throw new IllegalStateException("Đơn hàng không ở trạng thái chờ thanh toán");
         }
 
         paymentStatus = PaymentStatus.PAID;
@@ -195,7 +195,7 @@ public final class Order {
         validateTime(now);
 
         if (paymentMethod != PaymentMethod.COD) {
-            throw new IllegalStateException("Not COD");
+            throw new IllegalStateException("Đơn hàng không sử dụng phương thức thanh toán khi nhận hàng");
         }
 
         if (orderStatus == OrderStatus.CONFIRMED) {
@@ -204,7 +204,7 @@ public final class Order {
 
         if (orderStatus != OrderStatus.PENDING) {
             throw new IllegalStateException(
-                    "Cannot confirm COD from " + orderStatus
+                    "Không thể xác nhận đơn thanh toán khi nhận hàng từ trạng thái " + orderStatus
             );
         }
 
@@ -225,7 +225,7 @@ public final class Order {
 
         if (orderStatus != expectedStatus) {
             throw new IllegalStateException(
-                    "Invalid transition: " + orderStatus + " -> " + targetStatus
+                    "Chuyển trạng thái không hợp lệ: " + orderStatus + " -> " + targetStatus
             );
         }
 
@@ -259,11 +259,11 @@ public final class Order {
                 && orderStatus != OrderStatus.PENDING
                 && orderStatus != OrderStatus.CONFIRMED
         ) {
-            throw new IllegalStateException("Cannot cancel");
+            throw new IllegalStateException("Không thể hủy đơn hàng");
         }
 
         if (paymentStatus == PaymentStatus.PAID) {
-            throw new IllegalStateException("Refund flow not implemented");
+            throw new IllegalStateException("Chưa hỗ trợ quy trình hoàn tiền");
         }
 
         orderStatus = OrderStatus.CANCELLED;

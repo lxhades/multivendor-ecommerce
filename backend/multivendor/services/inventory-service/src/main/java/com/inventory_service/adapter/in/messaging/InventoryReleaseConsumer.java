@@ -34,7 +34,7 @@ public class InventoryReleaseConsumer {
         if (!"InventoryReleaseRequested".equals(event.eventType())
                 || event.eventId() == null
                 || event.orderId() == null) {
-            throw new IllegalArgumentException("Invalid release event");
+            throw new IllegalArgumentException("Sự kiện giải phóng giữ chỗ không hợp lệ");
         }
 
         releaseOrderReservationsUseCase.execute(event.eventId(), event.orderId());

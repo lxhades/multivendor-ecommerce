@@ -11,13 +11,13 @@ public record ReserveOrderStockCommand(
         List<ReserveOrderItem> items
 ) {
     public ReserveOrderStockCommand {
-        Objects.requireNonNull(orderId, "orderId is required");
-        Objects.requireNonNull(items, "items are required");
+        Objects.requireNonNull(orderId, "Mã đơn hàng không được để trống");
+        Objects.requireNonNull(items, "Danh sách sản phẩm không được để trống");
 
         items = List.copyOf(items);
 
         if (items.isEmpty()) {
-            throw new IllegalArgumentException("items cannot be empty");
+            throw new IllegalArgumentException("Danh sách sản phẩm không được để trống");
         }
 
         if (items.stream()
@@ -26,7 +26,7 @@ public record ReserveOrderStockCommand(
                         Collectors.counting()))
                 .values().stream().anyMatch(count -> count > 1)) {
             throw new IllegalArgumentException(
-                    "Duplicate variantId in order"
+                    "Mã biến thể bị trùng trong đơn hàng"
             );
         }
     }

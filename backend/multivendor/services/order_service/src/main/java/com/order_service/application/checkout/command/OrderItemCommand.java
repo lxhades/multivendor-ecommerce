@@ -8,6 +8,6 @@ public record OrderItemCommand(UUID productId, UUID variantId, String productNam
         Objects.requireNonNull(productId);
         Objects.requireNonNull(variantId);
         if (productName == null || productName.isBlank() || unitPrice < 0 || quantity <= 0)
-            throw new IllegalArgumentException("Invalid item");
+            throw new IllegalArgumentException("Thông tin sản phẩm trong đơn hàng không hợp lệ");
     }
 }

@@ -42,7 +42,7 @@ public class ReserveStockUseCase {
     @Transactional
     public StockReservation execute(ReserveStockCommand command) {
 
-        Objects.requireNonNull(command, "command is required");
+        Objects.requireNonNull(command, "Yêu cầu xử lý không được để trống");
 
         Inventory inventory = inventoryRepository
                 .findByVariantId(command.variantId())
@@ -61,7 +61,7 @@ public class ReserveStockUseCase {
 
             if (reservation.getQuantity() != command.quantity()) {
                 throw new IllegalStateException(
-                        "Reservation already exists with different quantity"
+                        "Đã có bản ghi giữ chỗ với số lượng khác"
                 );
             }
 
