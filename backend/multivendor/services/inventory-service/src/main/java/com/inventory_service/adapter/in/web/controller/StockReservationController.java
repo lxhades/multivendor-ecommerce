@@ -16,8 +16,9 @@ import java.util.List;
 import java.util.UUID;
 
 @RestController
+
 @AllArgsConstructor
-@RequestMapping("/api/reservations")
+@RequestMapping("/api/reservations/admin")
 public class StockReservationController {
     private final ReserveStockUseCase reserve;
     private final ConfirmReservationUseCase confirm;

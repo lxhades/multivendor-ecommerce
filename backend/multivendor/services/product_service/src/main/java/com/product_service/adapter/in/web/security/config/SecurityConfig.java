@@ -5,6 +5,7 @@ import com.product_service.adapter.in.web.security.handler.JwtAuthenticationEntr
 import com.product_service.adapter.in.web.security.jwt.JwtAuthenticationConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -43,12 +44,15 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
 
                                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/swagger-ui.html").permitAll()
-
-//                        .requestMatchers(HttpMethod.GET, "/shops/**").permitAll()
-//                        .requestMatchers(HttpMethod.POST, "/shops").hasAnyRole("SELLER", "ADMIN")
-//                        .requestMatchers(HttpMethod.PUT, "/shops/**").hasAnyRole("SELLER", "ADMIN")
-
-                                .anyRequest().permitAll()
+                                .requestMatchers("/api/shops/admin", "/api/shops/admin/**",
+                                        "/api/categories/admin", "/api/categories/admin/**",
+                                        "/api/products/admin", "/api/products/admin/**").hasRole("ADMIN")
+                                .requestMatchers("/api/shops/seller", "/api/shops/seller/**",
+                                        "/api/products/seller", "/api/products/seller/**").hasRole("SELLER")
+                                .requestMatchers(HttpMethod.GET, "/shops", "/shops/**", "/categories",
+                                        "/categories/**", "/api/products", "/api/products/**").permitAll()
+                                .requestMatchers(HttpMethod.POST, "/internal/products/variants/verify").hasRole("BUYER")
+                                .anyRequest().denyAll()
                 )
 
 

@@ -1,93 +1,51 @@
 package com.order_service.adapter.in.web.controller;
 
 import com.common.dto.response.ApiResponse;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
+import com.order_service.application.order.OrderRole;
 import com.order_service.application.order.dto.OrderResult;
-import com.order_service.application.order.usecase.GetOrderUseCase;
-import com.order_service.application.order.usecase.ListOrdersByBuyerUseCase;
-import com.order_service.application.order.usecase.ListOrdersByCheckoutUseCase;
-import com.order_service.application.order.usecase.ListOrdersByShopUseCase;
+import com.order_service.application.order.usecase.*;
 import com.order_service.application.order.usecase.flow.*;
-import lombok.AllArgsConstructor;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@AllArgsConstructor
+@RequiredArgsConstructor
 @RequestMapping("/api/orders")
+
 public class OrderController {
-
-    private final GetOrderUseCase getOrderUseCase;
-    private final ListOrdersByBuyerUseCase listOrdersByBuyerUseCase;
-    private final ListOrdersByShopUseCase listOrdersByShopUseCase;
-    private final ListOrdersByCheckoutUseCase listOrdersByCheckoutUseCase;
-    private final CancelOrderUseCase cancelOrderUseCase;
-    private final ConfirmCodOrderUseCase confirmCodOrderUseCase;
-    private final StartProcessingOrderUseCase startProcessingOrderUseCase;
-    private final ShipOrderUseCase shipOrderUseCase;
-    private final DeliverOrderUseCase deliverOrderUseCase;
-
+    private final GetOrderUseCase getOrder;
+    private final ListOrdersByCheckoutUseCase listByCheckout;
+    private final CancelOrderUseCase cancelOrder;
+    private final ListOrdersByBuyerUseCase listByBuyer;
 
     @GetMapping("/{id}")
-    public ApiResponse<OrderResult> getById(@PathVariable UUID id) {
-        return ApiResponse.success(
-                "Lấy thông tin đơn hàng thành công",
-                getOrderUseCase.execute(id)
-        );
-    }
-
-    @GetMapping(params = "buyerId")
-    public ApiResponse<List<OrderResult>> listByBuyer(@RequestParam UUID buyerId) {
-        return ApiResponse.success(
-                "Lấy danh sách đơn hàng theo người mua thành công",
-                listOrdersByBuyerUseCase.execute(buyerId)
-        );
-    }
-
-    @GetMapping(params = "shopId")
-    public ApiResponse<List<OrderResult>> listByShop(@RequestParam UUID shopId) {
-        return ApiResponse.success(
-                "Lấy danh sách đơn hàng theo shop thành công",
-                listOrdersByShopUseCase.execute(shopId)
-        );
+    public ApiResponse<OrderResult> get(@PathVariable UUID id, Authentication actor) {
+        return ApiResponse.success(getOrder.execute(id, UUID.fromString(actor.getName()), OrderRole.BUYER));
     }
 
     @GetMapping(params = "checkoutId")
-    public ApiResponse<List<OrderResult>> listByCheckout(@RequestParam UUID checkoutId) {
-        return ApiResponse.success(
-                "Lấy danh sách đơn hàng theo checkout thành công",
-                listOrdersByCheckoutUseCase.execute(checkoutId)
-        );
+    public ApiResponse<List<OrderResult>> listByCheckout(@RequestParam UUID checkoutId, Authentication actor) {
+        return ApiResponse.success(listByCheckout.execute(checkoutId, UUID.fromString(actor.getName()), OrderRole.BUYER));
     }
 
     @PostMapping("/{id}/cancel")
-    public ApiResponse<OrderResult> cancel(@PathVariable("id") UUID orderId,
-                                           @AuthenticationPrincipal Jwt jwt
-    ) {
-        UUID buyerId = UUID.fromString(jwt.getSubject());
-        return ApiResponse.success(
-                "Hủy đơn hàng thành công",
-                cancelOrderUseCase.execute(buyerId, orderId)
-        );
+    public ApiResponse<OrderResult> cancel(@PathVariable UUID id, Authentication actor) {
+        return ApiResponse.success("Hủy đơn hàng thành công",
+                cancelOrder.execute(UUID.fromString(actor.getName()), id, OrderRole.BUYER));
     }
 
-    @PostMapping("/{id}/ship")
-    @PreAuthorize("hasRole('SELLER')")
-    public ApiResponse<OrderResult> ship(
-            @PathVariable UUID id,
-            @AuthenticationPrincipal Jwt jwt
-    ) {
-        UUID sellerId = UUID.fromString(jwt.getSubject());
-
-        return ApiResponse.success(
-                "Đã gửi đơn hàng cho Bên Ship",
-                shipOrderUseCase.execute(id, sellerId)
-        );
+    @GetMapping
+    public ApiResponse<List<OrderResult>> list(@RequestParam(required = false) UUID buyerId, Authentication actor) {
+        UUID currentBuyer = UUID.fromString(actor.getName());
+        if (buyerId != null && !buyerId.equals(currentBuyer)) {
+            throw new DomainException(ErrorCode.ACCESS_DENIED);
+        }
+        return ApiResponse.success(listByBuyer.execute(currentBuyer));
     }
-
-
 }

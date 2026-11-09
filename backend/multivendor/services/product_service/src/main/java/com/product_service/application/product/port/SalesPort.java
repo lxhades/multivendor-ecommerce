@@ -11,30 +11,5 @@ public interface SalesPort {
 
     void incrementSoldCount(UUID shopId, UUID productId, UUID variantId, long quantity);
 
-    record Summary(
-            long sold,
-            long refunded,
-            BigDecimal gross,
-            BigDecimal refunds,
-            BigDecimal net
-    ) {
-    }
 
-    Summary stats(
-            UUID shopId,
-            UUID productId,
-            LocalDate from,
-            LocalDate to
-    );
-
-    boolean apply(
-            UUID eventId,
-            String type,
-            UUID orderItemId,
-            UUID productId,
-            UUID variantId,
-            long quantity,
-            BigDecimal amount,
-            Instant occurredAt
-    );
 }

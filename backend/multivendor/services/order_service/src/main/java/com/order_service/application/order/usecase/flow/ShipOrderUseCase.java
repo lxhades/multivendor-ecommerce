@@ -1,6 +1,9 @@
 package com.order_service.application.order.usecase.flow;
 
 
+import com.order_service.application.order.OrderRole;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.order_service.application.checkout.port.OutboxPort;
 import com.order_service.application.checkout.port.ShopOwnershipPort;
 import com.order_service.application.event.OrderShipped;
@@ -40,7 +43,7 @@ public class ShipOrderUseCase {
     }
 
     @Transactional
-    public OrderResult execute(UUID orderId, UUID sellerId) {
+    public OrderResult execute(UUID orderId, UUID sellerId, OrderRole role) {
 
         Objects.requireNonNull(orderId, "Mã đơn hàng không được để trống");
         Objects.requireNonNull(sellerId, "Mã người bán không được để trống");
@@ -50,14 +53,9 @@ public class ShipOrderUseCase {
                         new IllegalArgumentException("Không tìm thấy đơn hàng")
                 );
 
-        if (!shopOwnershipPort.isOwner(
-                sellerId,
-                order.getShopId()
-        )) {
-            throw new org.springframework.security.access
-                    .AccessDeniedException(
-                    "Seller does not own this shop"
-            );
+        if (role != OrderRole.ADMIN
+                && (role != OrderRole.SELLER || !shopOwnershipPort.isOwner(sellerId, order.getShopId()))) {
+            throw new DomainException(ErrorCode.ACCESS_DENIED);
         }
 
         if (order.getOrderStatus() == OrderStatus.SHIPPED) {

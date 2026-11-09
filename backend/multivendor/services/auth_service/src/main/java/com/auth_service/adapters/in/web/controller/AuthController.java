@@ -8,18 +8,20 @@ import com.auth_service.application.port.in.LoginUserResult;
 import com.auth_service.application.port.in.RefreshTokenResult;
 import com.auth_service.application.port.in.RegisterUserResult;
 import com.auth_service.application.usecase.*;
+import com.auth_service.domain.model.aggregate.User;
 import com.common.dto.response.ApiResponse;
 import jakarta.validation.Valid;
+import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
 @RequestMapping("/auth")
+@AllArgsConstructor
 public class AuthController {
 
     private final RegisterUserUseCase registerUserUseCase;
@@ -30,24 +32,8 @@ public class AuthController {
     private final LogoutUseCase logoutUseCase;
     private final GetCurrentUserUseCase getCurrentUserUseCase;
     private final RegisterSellerUseCase registerSellerUseCase;
+    private final RegisterAdminUseCase  registerAdminUseCase;
 
-    public AuthController(RegisterUserUseCase registerUserUseCase,
-                          LoginUserUseCase loginUserUseCase,
-                          ForgotPasswordUseCase forgotPasswordUseCase,
-                          ChangePasswordUseCase changePasswordUseCase,
-                          RefreshTokenUseCase refreshTokenUseCase,
-                          LogoutUseCase logoutUseCase,
-                          GetCurrentUserUseCase getCurrentUserUseCase,
-                          RegisterSellerUseCase registerSellerUseCase) {
-        this.registerUserUseCase = registerUserUseCase;
-        this.loginUserUseCase = loginUserUseCase;
-        this.forgotPasswordUseCase = forgotPasswordUseCase;
-        this.changePasswordUseCase = changePasswordUseCase;
-        this.refreshTokenUseCase = refreshTokenUseCase;
-        this.logoutUseCase = logoutUseCase;
-        this.getCurrentUserUseCase = getCurrentUserUseCase;
-        this.registerSellerUseCase = registerSellerUseCase;
-    }
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegisterUserResult>> register(
@@ -65,7 +51,13 @@ public class AuthController {
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success("Đăng ký thành công", result));
     }
+    @PostMapping("/registerAdmin")
+    public ResponseEntity<ApiResponse<Void>> registerAdmin(
+            @RequestParam("userId") UUID userId) {
 
+        registerAdminUseCase.execute(userId);
+        return ResponseEntity.ok(ApiResponse.success("Cấp quyền quản trị thành công", null));
+    }
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginUserResult>> login(
             @Valid @RequestBody LoginRequest request) {
@@ -83,9 +75,9 @@ public class AuthController {
 
     @GetMapping("/me")
     public ResponseEntity<ApiResponse<CurrentUserResult>> me(
-            @AuthenticationPrincipal Jwt jwt
+            Authentication actor
     ) {
-        CurrentUserResult result = getCurrentUserUseCase.execute(jwt.getSubject());
+        CurrentUserResult result = getCurrentUserUseCase.execute(actor.getName());
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 
@@ -106,11 +98,11 @@ public class AuthController {
 
     @PutMapping("/changepassword")
     public ResponseEntity<ApiResponse<Void>> changePassword(
-            @AuthenticationPrincipal Jwt jwt,
+            Authentication actor,
             @Valid @RequestBody ChangePasswordRequest changePasswordRequest) {
 
         ChangePasswordCommand command = new ChangePasswordCommand(
-                jwt.getSubject(),
+                actor.getName(),
                 changePasswordRequest.getOldPassword(),
                 changePasswordRequest.getNewPassword()
         );
@@ -154,9 +146,9 @@ public class AuthController {
     }
 
     @PostMapping("/me/register-seller")
-    public ResponseEntity<ApiResponse<Void>> registerSeller(@AuthenticationPrincipal Jwt jwt) {
+    public ResponseEntity<ApiResponse<Void>> registerSeller(Authentication actor) {
 
-        UUID userId = UUID.fromString(jwt.getSubject());
+        UUID userId = UUID.fromString(actor.getName());
 
 
         registerSellerUseCase.RegisterSeller(userId);

@@ -36,14 +36,9 @@ public class UserEntity {
     @Column(nullable = false)
     private UserStatus status;
 
-    @ElementCollection(fetch = FetchType.EAGER)
-    @CollectionTable(
-            name = "user_roles",
-            joinColumns = @JoinColumn(name = "user_id")
-    )
     @Enumerated(EnumType.STRING)
-    @Column(name = "role", nullable = false)
-    private Set<Role> roles = new HashSet<>();
+    @Column(name = "role", nullable = false, length = 20, updatable = false)
+    private Role role;
 
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)

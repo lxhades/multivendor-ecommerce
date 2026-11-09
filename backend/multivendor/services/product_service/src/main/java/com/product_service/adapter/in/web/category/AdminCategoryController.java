@@ -20,7 +20,8 @@ import java.net.URI;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/admin/categories")
+
+@RequestMapping("/api/categories/admin")
 @RequiredArgsConstructor
 public class AdminCategoryController {
 

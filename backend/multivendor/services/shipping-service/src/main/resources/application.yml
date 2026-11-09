@@ -1,6 +1,12 @@
 server:
   port: ${SERVER_PORT:8086}
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER:auth-service}
+          jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8081/oauth2/jwks}
   application:
     name: shipping-service
   datasource:

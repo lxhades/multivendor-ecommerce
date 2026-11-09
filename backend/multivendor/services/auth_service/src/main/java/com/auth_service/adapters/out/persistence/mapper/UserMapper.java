@@ -10,7 +10,6 @@ import com.auth_service.domain.model.vo.UserId;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 @Component
 public class UserMapper {
@@ -32,7 +31,7 @@ public class UserMapper {
         entity.setPhone(user.getPhone().value());
         entity.setPasswordHash(user.getPasswordHash().value());
         entity.setStatus(user.getStatus());
-        entity.setRoles(new HashSet<>(user.getRoles()));
+        entity.setRole(user.getRole());
         entity.setCreatedAt(user.getCreatedAt());
         entity.setUpdatedAt(user.getUpdatedAt());
 
@@ -58,7 +57,7 @@ public class UserMapper {
                 new Phone(entity.getPhone()),
                 new PasswordHash(entity.getPasswordHash()),
                 entity.getStatus(),
-                new HashSet<>(entity.getRoles()),
+                entity.getRole(),
                 entity.getAddresses().stream()
                         .map(addressMapper::toDomain)
                         .toList(),

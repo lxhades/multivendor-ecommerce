@@ -1,4 +1,10 @@
 spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${JWT_ISSUER:auth-service}
+          jwk-set-uri: ${JWT_JWK_SET_URI:http://localhost:8081/oauth2/jwks}
   application:
     name: inventory-service
 
@@ -45,6 +51,7 @@ logging:
     com.inventory_service: INFO
 
 inventory:
+  product-base-url: ${PRODUCT_SERVICE_URL:http://localhost:8082}
   kafka:
     product-topic: product.inventory-init.v1
     reserve-topic: inventory.reserve.requested.v1

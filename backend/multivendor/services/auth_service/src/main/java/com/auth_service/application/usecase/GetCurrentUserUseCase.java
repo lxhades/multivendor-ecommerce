@@ -32,7 +32,7 @@ public class GetCurrentUserUseCase {
                 user.getEmail().getValue(),
                 user.getPhone().value(),
                 user.getStatus(),
-                user.getRoles().stream().map(Enum::name).toList()
+                user.getRole()
         );
     }
 }

@@ -3,7 +3,6 @@ package com.auth_service.application.usecase;
 import com.common.exception.DomainException;
 import com.common.exception.ErrorCode;
 import com.auth_service.application.port.out.UserRepository;
-import com.auth_service.domain.model.aggregate.User;
 import com.auth_service.domain.model.enumtype.Role;
 import com.auth_service.domain.model.vo.UserId;
 import org.springframework.stereotype.Service;
@@ -22,10 +21,14 @@ public class RegisterSellerUseCase {
     @Transactional
     public void RegisterSeller(UUID userId) {
 
-        User user = userRepository.findById(
-                        UserId.of(userId))
+        UserId id = UserId.of(userId);
+        Role role = userRepository.findRoleForUpdate(id)
                 .orElseThrow(() -> new DomainException(ErrorCode.USER_NOT_FOUND));
-        user.assignRole(Role.SELLER);
-        userRepository.save(user);
+        if (role == Role.ADMIN) {
+            throw new DomainException(ErrorCode.ACCESS_DENIED);
+        }
+        if (role == Role.BUYER) {
+            userRepository.changeRole(id, Role.SELLER);
+        }
     }
 }

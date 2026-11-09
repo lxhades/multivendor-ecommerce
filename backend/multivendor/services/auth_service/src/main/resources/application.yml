@@ -59,6 +59,9 @@ server:
 security:
   jwt:
     issuer: ${JWT_ISSUER:auth-service}
+    key-id: ${JWT_KEY_ID:auth-service-key-1}
+    private-key-location: ${JWT_PRIVATE_KEY_LOCATION:classpath:certs/private_key.pem}
+    public-key-location: ${JWT_PUBLIC_KEY_LOCATION:classpath:certs/public_key.pem}
 
 auth:
   access-token:

@@ -1,6 +1,8 @@
 package com.order_service.adapter.in.web.controller;
 
 import com.common.dto.response.ApiResponse;
+import com.common.exception.DomainException;
+import com.common.exception.ErrorCode;
 import com.order_service.adapter.in.web.request.CreateCheckoutRequest;
 import com.order_service.application.checkout.dto.CheckoutResult;
 import com.order_service.application.checkout.dto.CreateCheckoutResult;
@@ -9,8 +11,7 @@ import com.order_service.application.checkout.usecase.GetCheckoutUseCase;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -31,13 +32,13 @@ public class CheckoutController {
     }
 
     @PostMapping
+
     public ResponseEntity<ApiResponse<CreateCheckoutResult>> create(
             @Valid @RequestBody CreateCheckoutRequest request,
             @RequestHeader("Idempotency-Key") String idempotencyKey,
-            @AuthenticationPrincipal Jwt jwt
+            Authentication actor
     ) {
-        UUID buyerId = UUID.fromString(jwt.getSubject());
-
+        UUID buyerId = UUID.fromString(actor.getName());
         CreateCheckoutResult result = createCheckoutUseCase.execute(
                 request.toCommand(buyerId, idempotencyKey)
         );
@@ -50,10 +51,17 @@ public class CheckoutController {
 
 
     @GetMapping("/{id}")
-    public ApiResponse<CheckoutResult> getById(@PathVariable UUID id) {
+
+    public ApiResponse<CheckoutResult> getById(@PathVariable UUID id, Authentication actor) {
+        CheckoutResult result = getCheckoutUseCase.execute(id);
+        boolean admin = actor.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+        if (!admin && !result.buyerId().equals(UUID.fromString(actor.getName()))) {
+            throw new DomainException(ErrorCode.ACCESS_DENIED);
+        }
         return ApiResponse.success(
                 "Lấy thông tin checkout thành công",
-                getCheckoutUseCase.execute(id)
+                result
         );
     }
 }

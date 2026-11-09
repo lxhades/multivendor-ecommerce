@@ -9,7 +9,6 @@ import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
-import java.util.List;
 
 @Component
 public class JwtTokenProvider implements TokenProvider {
@@ -29,14 +28,9 @@ public class JwtTokenProvider implements TokenProvider {
     }
 
     @Override
-    public String generateAccessToken(User user) {
+    public String   generateAccessToken(User user) {
 
         Instant now = Instant.now();
-
-        List<String> roles = user.getRoles()
-                .stream()
-                .map(Enum::name)
-                .toList();
 
         JwtClaimsSet claims = JwtClaimsSet.builder()
                 .issuer(issuer)
@@ -44,7 +38,7 @@ public class JwtTokenProvider implements TokenProvider {
                 .issuedAt(now)
                 .expiresAt(now.plusSeconds(accessTokenExpiration))
                 .claim("email", user.getEmail().getValue())
-                .claim("roles", roles)
+                .claim("roles", user.getRole().effectiveRoles())
                 .build();
 
         return jwtEncoder

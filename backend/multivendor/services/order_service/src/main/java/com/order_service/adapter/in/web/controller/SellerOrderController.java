@@ -4,9 +4,7 @@ import com.common.dto.response.ApiResponse;
 import com.order_service.application.order.usecase.ListSellerOrdersUseCase;
 import com.order_service.domain.model.enums.OrderStatus;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,8 +15,8 @@ import java.time.LocalDate;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/seller/shops/{shopId}/orders")
-@PreAuthorize("hasRole('SELLER')")
+@RequestMapping("/api/orders/seller/shops/{shopId}")
+
 public class SellerOrderController {
     private final ListSellerOrdersUseCase listOrders;
 
@@ -28,7 +26,7 @@ public class SellerOrderController {
 
     @GetMapping
     public ApiResponse<ListSellerOrdersUseCase.Result> list(
-            @AuthenticationPrincipal Jwt jwt,
+            Authentication actor,
             @PathVariable UUID shopId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "20") int size,
@@ -37,6 +35,6 @@ public class SellerOrderController {
             @RequestParam(required = false) OrderStatus status
     ) {
         return ApiResponse.success("Lấy danh sách đơn hàng thành công",
-                listOrders.execute(UUID.fromString(jwt.getSubject()), shopId, page, size, from, to, status));
+                listOrders.execute(UUID.fromString(actor.getName()), shopId, page, size, from, to, status));
     }
 }

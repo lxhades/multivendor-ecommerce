@@ -19,7 +19,7 @@ public class User {
     private Phone phone;
     private PasswordHash passwordHash;
     private UserStatus status;
-    private final Set<Role> roles;
+    private Role role;
     private final List<Address> addresses;
     private Instant createdAt;
     private Instant updatedAt;
@@ -30,8 +30,7 @@ public class User {
         this.phone = Objects.requireNonNull(phone, "Số điện thoại không được để trống");
         this.passwordHash = Objects.requireNonNull(passwordHash, "Mã băm mật khẩu không được để trống");
         this.status = UserStatus.ACTIVE;
-        this.roles = new HashSet<>();
-        this.roles.add(Role.BUYER);
+        this.role = Role.BUYER;
 
         this.addresses = new ArrayList<>();
         this.createdAt = Instant.now();
@@ -48,7 +47,7 @@ public class User {
                                     Phone phone,
                                     PasswordHash passwordHash,
                                     UserStatus status,
-                                    Set<Role> roles,
+                                    Role role,
                                     List<Address> addresses,
                                     Instant createdAt,
                                     Instant updatedAt) {
@@ -57,11 +56,7 @@ public class User {
 
         user.status = Objects.requireNonNull(status, "Trạng thái không được để trống");
 
-        user.roles.clear();
-        user.roles.addAll(Objects.requireNonNull(roles, "Danh sách vai trò không được để trống"));
-        if (user.roles.isEmpty()) {
-            throw new IllegalArgumentException("Người dùng phải có ít nhất một vai trò");
-        }
+        user.role = Objects.requireNonNull(role, "Vai trò không được để trống");
 
         user.addresses.clear();
         user.addresses.addAll(Objects.requireNonNull(addresses, "Danh sách địa chỉ không được để trống"));
@@ -76,7 +71,6 @@ public class User {
         this.passwordHash = Objects.requireNonNull(newPasswordHash, "Mã băm mật khẩu không được để trống");
         this.updatedAt = Instant.now();
     }
-
 
     public void addAddress(Address address) {
         Objects.requireNonNull(address, "Địa chỉ không được để trống");
@@ -110,20 +104,6 @@ public class User {
                 .findFirst()
                 .orElseThrow(() -> new DomainException(ErrorCode.ADDRESS_NOT_FOUND));
         this.addresses.remove(address);
-        this.updatedAt = Instant.now();
-    }
-
-    public void assignRole(Role role) {
-        Objects.requireNonNull(role, "Vai trò không được để trống");
-        this.roles.add(role);
-        this.updatedAt = Instant.now();
-    }
-
-    public void revokeRole(Role role) {
-        if (this.roles.size() == 1 && this.roles.contains(role)) {
-            throw new IllegalStateException("Người dùng phải có ít nhất một vai trò");
-        }
-        this.roles.remove(role);
         this.updatedAt = Instant.now();
     }
 
@@ -163,8 +143,8 @@ public class User {
         return status;
     }
 
-    public Set<Role> getRoles() {
-        return Collections.unmodifiableSet(roles);
+    public Role getRole() {
+        return role;
     }
 
     public List<Address> getAddresses() {
@@ -201,7 +181,7 @@ public class User {
                 ", phone=" + phone +
                 ", passwordHash=" + passwordHash +
                 ", status=" + status +
-                ", roles=" + roles +
+                ", role=" + role +
                 ", addresses=" + addresses +
                 ", createdAt=" + createdAt +
                 ", updatedAt=" + updatedAt +

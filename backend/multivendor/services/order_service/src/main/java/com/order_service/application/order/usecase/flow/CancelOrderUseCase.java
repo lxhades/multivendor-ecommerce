@@ -1,9 +1,11 @@
 package com.order_service.application.order.usecase.flow;
 
+import com.order_service.application.order.OrderRole;
 import com.common.exception.DomainException;
 import com.common.exception.ErrorCode;
 import com.order_service.application.checkout.port.OutboxPort;
 import com.order_service.application.event.InventoryReleaseRequested;
+import com.order_service.application.checkout.port.ShopOwnershipPort;
 import com.order_service.application.order.dto.OrderResult;
 
 import com.order_service.domain.model.aggregate.Order;
@@ -23,27 +25,32 @@ import java.util.UUID;
 public class CancelOrderUseCase {
 
     private final OrderRepository orders;
+    private final ShopOwnershipPort ownership;
     private final OutboxPort outbox;
     private final Clock clock;
 
     public CancelOrderUseCase(
             OrderRepository orders,
+            ShopOwnershipPort ownership,
             OutboxPort outbox,
             Clock clock
     ) {
         this.orders = orders;
+        this.ownership = ownership;
         this.outbox = outbox;
         this.clock = clock;
     }
 
     @Transactional
-    public OrderResult execute(UUID buyerId, UUID orderId) {
+    public OrderResult execute(UUID actorId, UUID orderId, OrderRole role) {
 
         Order order = orders.findById(orderId)
                 .orElseThrow(() ->
                         new DomainException(ErrorCode.ORDER_NOT_FOUND));
 
-        if (!order.getBuyerId().equals(buyerId)) {
+        if (role != OrderRole.ADMIN
+                && !(role == OrderRole.BUYER && order.getBuyerId().equals(actorId))
+                && !(role == OrderRole.SELLER && ownership.isOwner(actorId, order.getShopId()))) {
             throw new DomainException(ErrorCode.ACCESS_DENIED);
         }
 

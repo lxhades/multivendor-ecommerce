@@ -6,16 +6,15 @@ import com.product_service.application.product.dto.ProductDtos.Seller;
 import com.product_service.application.product.usecase.AdminProductUseCase;
 import com.product_service.domain.model.enumtype.ApprovalStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/admin/products")
-// @PreAuthorize("hasRole('ADMIN')")
+
+@RequestMapping("/api/products/admin")
 public class AdminProductController {
 
     private final AdminProductUseCase usecase;
@@ -24,8 +23,8 @@ public class AdminProductController {
         this.usecase = usecase;
     }
 
-    private UUID currentUserId(Jwt jwt) {
-        String sub = jwt.getSubject();
+    private UUID currentUserId(Authentication actor) {
+        String sub = actor.getName();
         if (sub == null || sub.isBlank()) {
             throw new IllegalStateException("JWT không có subject");
         }
@@ -46,12 +45,12 @@ public class AdminProductController {
 
     @PostMapping("/{id}/approve")
     public ResponseEntity<ApiResponse<Seller>> approve(
-            @AuthenticationPrincipal Jwt jwt,
+            Authentication actor,
             @PathVariable UUID id,
             @RequestBody(required = false) DecisionInput in) {
 
         Seller result = usecase.decide(
-                currentUserId(jwt),
+                currentUserId(actor),
                 id,
                 ApprovalStatus.APPROVED,
                 in == null ? null : in.reason()
@@ -62,12 +61,12 @@ public class AdminProductController {
 
     @PostMapping("/{id}/reject")
     public ResponseEntity<ApiResponse<Seller>> reject(
-            @AuthenticationPrincipal Jwt jwt,
+            Authentication actor,
             @PathVariable UUID id,
             @RequestBody DecisionInput in) {
 
         Seller result = usecase.decide(
-                currentUserId(jwt),
+                currentUserId(actor),
                 id,
                 ApprovalStatus.REJECTED,
                 in.reason()

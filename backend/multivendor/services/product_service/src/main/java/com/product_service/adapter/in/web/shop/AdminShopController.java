@@ -12,14 +12,14 @@ import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/admin/shops")
+
+@RequestMapping("/api/shops/admin")
 @AllArgsConstructor
 public class AdminShopController {
 
@@ -50,10 +50,10 @@ public class AdminShopController {
     @PatchMapping("/{shopId}/status")
     public ResponseEntity<ApiResponse<ShopResult>> changeStatus(
             @PathVariable UUID shopId,
-            @AuthenticationPrincipal Jwt jwt,
+            Authentication actor,
             @RequestParam ShopStatus shopStatus) {
 
-        UUID actorAdminId = Helper.currentUserId(jwt);
+        UUID actorAdminId = Helper.currentUserId(actor);
         ShopResult updatedShopResult = changeShopStatusUseCase.change(shopId, actorAdminId, shopStatus,true);
 
         return ResponseEntity.ok(
@@ -65,9 +65,9 @@ public class AdminShopController {
     @DeleteMapping("/{shopId}")
     public ResponseEntity<ApiResponse<Void>> close(
             @PathVariable UUID shopId,
-            @AuthenticationPrincipal Jwt jwt) {
+            Authentication actor) {
 
-        UUID actorAdminId = Helper.currentUserId(jwt);
+        UUID actorAdminId = Helper.currentUserId(actor);
         closeShopUseCase.close(shopId, actorAdminId);
 
         return ResponseEntity.ok(ApiResponse.success("Admin đã đóng cửa hàng thành công", null));

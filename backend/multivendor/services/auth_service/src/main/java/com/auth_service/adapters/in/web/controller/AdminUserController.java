@@ -10,24 +10,21 @@ import com.auth_service.application.usecase.DeleteUserUseCase;
 import com.auth_service.application.usecase.GetUserUseCase;
 import com.auth_service.application.usecase.ListUsersUseCase;
 import com.common.dto.response.ApiResponse;
+import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/admin/users")
+
+@RequestMapping("/api/users/admin")
+@AllArgsConstructor
 public class AdminUserController {
 
     private final GetUserUseCase getUserUseCase;
     private final ListUsersUseCase listUsersUseCase;
     private final DeleteUserUseCase deleteUserUseCase;
 
-    public AdminUserController(GetUserUseCase getUserUseCase,
-                               ListUsersUseCase listUsersUseCase,
-                               DeleteUserUseCase deleteUserUseCase) {
-        this.getUserUseCase = getUserUseCase;
-        this.listUsersUseCase = listUsersUseCase;
-        this.deleteUserUseCase = deleteUserUseCase;
-    }
+
 
     @GetMapping("/{userId}")
     public ResponseEntity<ApiResponse<AdminUserResult>> get(@PathVariable String userId) {

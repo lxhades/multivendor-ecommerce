@@ -12,16 +12,15 @@ import com.product_service.domain.model.enumtype.ShopStatus;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URI;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/seller/shops")
+@RequestMapping("/api/shops/seller")
+
 @RequiredArgsConstructor
 public class SellerShopController {
 
@@ -32,9 +31,36 @@ public class SellerShopController {
     private final ChangeShopStatusUseCase changeShopStatusUseCase;
 
     // Seller xem chi tiết shop của  mình
+    private final CreateShopUseCase createShopUseCase;
+
+    // Seller tạo cửa hàng
+    @PostMapping
+    public ResponseEntity<ApiResponse<ShopResult>> create(
+            Authentication actor,
+            @Valid @RequestBody CreateShopRequest createShopRequest) {
+
+        UUID userId = Helper.currentUserId(actor);
+
+        CreateShopCommand createShopCommand = new CreateShopCommand(
+                createShopRequest.name(),
+                createShopRequest.slug(),
+                createShopRequest.logoUrl(),
+                createShopRequest.bannerUrl(),
+                createShopRequest.description(),
+                createShopRequest.address(),
+                createShopRequest.bankDetails()
+        );
+
+        ShopResult createdShopResult = createShopUseCase.create(userId, createShopCommand);
+
+        return ResponseEntity
+                .created(URI.create("/shops/" + createdShopResult.id()))
+                .body(ApiResponse.success("Tạo cửa hàng thành công", createdShopResult));
+    }
+
     @GetMapping("/my-shop")
-    public ResponseEntity<ApiResponse<ShopResult>> myShopDetail(@AuthenticationPrincipal Jwt jwt) {
-        UUID userId = Helper.currentUserId(jwt);
+    public ResponseEntity<ApiResponse<ShopResult>> myShopDetail(Authentication actor) {
+        UUID userId = Helper.currentUserId(actor);
         ShopResult result = findShopBySellerUseCase.get(userId);
         return ResponseEntity.ok(ApiResponse.success(result));
     }
@@ -43,10 +69,10 @@ public class SellerShopController {
     @PutMapping("/{shopId}")
     public ResponseEntity<ApiResponse<ShopResult>> update(
             @PathVariable UUID shopId,
-            @AuthenticationPrincipal Jwt jwt,
+            Authentication actor,
             @Valid @RequestBody UpdateShopRequest updateShopRequest) {
 
-        UUID actorSellerId = Helper.currentUserId(jwt);
+        UUID actorSellerId = Helper.currentUserId(actor);
 
         UpdateShopCommand updateShopCommand = new UpdateShopCommand(
                 updateShopRequest.name(),
@@ -67,9 +93,9 @@ public class SellerShopController {
     @DeleteMapping("/{shopId}")
     public ResponseEntity<ApiResponse<Void>> close(
             @PathVariable UUID shopId,
-            @AuthenticationPrincipal Jwt jwt) {
+            Authentication actor) {
 
-        UUID actorSellerId = Helper.currentUserId(jwt);
+        UUID actorSellerId = Helper.currentUserId(actor);
         closeShopUseCase.close(shopId, actorSellerId);
 
         return ResponseEntity.ok(ApiResponse.success("Đóng cửa hàng thành công", null));
@@ -78,9 +104,9 @@ public class SellerShopController {
     @PatchMapping("/{shopId}")
     public ResponseEntity<ApiResponse<Void>> open(
             @PathVariable UUID shopId,
-            @AuthenticationPrincipal Jwt jwt) {
+            Authentication actor) {
 
-        UUID actorSellerId = Helper.currentUserId(jwt);
+        UUID actorSellerId = Helper.currentUserId(actor);
         changeShopStatusUseCase.change(shopId, actorSellerId, ShopStatus.ACTIVE,false);
 
         return ResponseEntity.ok(ApiResponse.success("Mở lại cửa hàng thành công", null));

@@ -9,7 +9,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/api/shipments")
+
+@RequestMapping("/api/shipments/admin")
 public class ShipmentController {
     private final ShipmentService service;
 

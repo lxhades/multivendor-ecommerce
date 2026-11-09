@@ -5,6 +5,8 @@ import com.order_service.application.shipping.port.ShippingPort;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -22,7 +24,14 @@ public class ShippingHttpAdapter implements ShippingPort {
             @Value("${services.shipping.base-url}") String baseUrl
     ) {
         this.client = builder
+                .clone()
                 .baseUrl(baseUrl)
+                .requestInterceptor((request, body, execution) -> {
+                    if (SecurityContextHolder.getContext().getAuthentication() instanceof JwtAuthenticationToken jwt) {
+                        request.getHeaders().setBearerAuth(jwt.getToken().getTokenValue());
+                    }
+                    return execution.execute(request, body);
+                })
                 .build();
     }
 
@@ -41,7 +50,7 @@ public class ShippingHttpAdapter implements ShippingPort {
 
         try {
             ShipmentResult response = client.post()
-                    .uri("/api/shipments")
+                    .uri("/api/shipments/admin")
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(new CreateShipmentRequest(
                             orderId,
@@ -71,7 +80,7 @@ public class ShippingHttpAdapter implements ShippingPort {
 
         try {
             ShipmentResult response = client.get()
-                    .uri("/api/shipments/{trackingCode}", trackingCode)
+                    .uri("/api/shipments/admin/{trackingCode}", trackingCode)
                     .retrieve()
                     .body(ShipmentResult.class);
 
@@ -93,7 +102,7 @@ public class ShippingHttpAdapter implements ShippingPort {
         try {
             ShipmentResult response = client.get()
                     .uri(uriBuilder -> uriBuilder
-                            .path("/api/shipments")
+                            .path("/api/shipments/admin")
                             .queryParam("orderId", orderId)
                             .build())
                     .retrieve()

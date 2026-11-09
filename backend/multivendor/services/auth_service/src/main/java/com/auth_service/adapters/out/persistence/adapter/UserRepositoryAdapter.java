@@ -5,11 +5,13 @@ import com.auth_service.adapters.out.persistence.mapper.UserMapper;
 import com.auth_service.adapters.out.persistence.repository.UserJpaRepository;
 import com.auth_service.application.port.out.UserRepository;
 import com.auth_service.domain.model.aggregate.User;
+import com.auth_service.domain.model.enumtype.Role;
 import com.auth_service.domain.model.vo.Email;
 import com.auth_service.domain.model.vo.UserId;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -30,6 +32,18 @@ public class UserRepositoryAdapter implements UserRepository {
         UserEntity entity = userMapper.toEntity(user);
         UserEntity savedEntity = userJpaRepository.save(entity);
         return userMapper.toDomain(savedEntity);
+    }
+
+    @Override
+    @Transactional
+    public boolean changeRole(UserId userId, Role newRole) {
+        return userJpaRepository.changeRole(
+                userId.value(), newRole, Instant.now()) == 1;
+    }
+
+    @Override
+    public Optional<Role> findRoleForUpdate(UserId userId) {
+        return userJpaRepository.findRoleForUpdate(userId.value()).map(Role::valueOf);
     }
 
     @Override

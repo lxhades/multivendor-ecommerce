@@ -1,6 +1,7 @@
 package com.auth_service.application.port.out;
 
 import com.auth_service.domain.model.aggregate.User;
+import com.auth_service.domain.model.enumtype.Role;
 import com.auth_service.domain.model.vo.Email;
 import com.auth_service.domain.model.vo.UserId;
 
@@ -13,6 +14,10 @@ public interface UserRepository {
     Optional<User> findByEmail(Email email);
 
     User save(User user);
+
+    boolean changeRole(UserId userId, Role newRole);
+
+    Optional<Role> findRoleForUpdate(UserId userId);
 
     boolean existsById(UserId userId);
 

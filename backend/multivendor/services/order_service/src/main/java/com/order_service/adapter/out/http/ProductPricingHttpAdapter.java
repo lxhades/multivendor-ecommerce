@@ -3,6 +3,8 @@ package com.order_service.adapter.out.http;
 import com.order_service.application.checkout.port.ProductPricingPort;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
@@ -17,12 +19,10 @@ public class ProductPricingHttpAdapter implements ProductPricingPort {
 
     public ProductPricingHttpAdapter(
             RestClient.Builder builder,
-            @Value("${services.product.base-url}") String baseUrl,
-            @Value("${services.product.internal-token}") String token
+            @Value("${services.product.base-url}") String baseUrl
     ) {
         this.client = builder
                 .baseUrl(baseUrl)
-//                .defaultHeader("Authorization", "Bearer " + token)
                 .build();
     }
 
@@ -33,9 +33,14 @@ public class ProductPricingHttpAdapter implements ProductPricingPort {
             throw new IllegalArgumentException("Danh sách biến thể không được để trống");
         }
 
+        if (!(SecurityContextHolder.getContext().getAuthentication() instanceof JwtAuthenticationToken buyer)) {
+            throw new IllegalStateException("Thiếu thông tin xác thực để kiểm tra biến thể");
+        }
+
         try {
             VerifiedVariant[] response = client.post()
                     .uri("/internal/products/variants/verify")
+                    .headers(headers -> headers.setBearerAuth(buyer.getToken().getTokenValue()))
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(new VerifyRequest(variantIds))
                     .retrieve()
