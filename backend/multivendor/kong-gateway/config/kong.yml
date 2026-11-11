@@ -1,49 +1,61 @@
 _format_version: "3.0"
 
-# CẤU HÌNH ĐỊNH TUYẾN (ROUTING)
 services:
-  # 1. Service cho Auth
   - name: auth-service
-    # Vì bạn chạy Java trên IntelliJ (ngoài Docker), dùng host.docker.internal để Kong gọi ra ngoài
     url: http://host.docker.internal:8081
     routes:
-      - name: auth-route
+      - name: auth-api
         paths:
-          - /auth
-        strip_path: false # Giữ nguyên tiền tố /auth khi gửi xuống service
+          - '~/auth(?:/|$)'
+          - '~/api/users/admin(?:/|$)'
+          - '~/oauth2/jwks$'
+        strip_path: false
 
-  # 2. Service cho Product
   - name: product-service
     url: http://host.docker.internal:8082
     routes:
-      - name: product-routes
+      - name: product-api
         paths:
-          - /shops
-          - /categories
-        strip_path: false # Giữ nguyên tiền tố /shops, /categories
+          - '~/shops(?:/|$)'
+          - '~/categories(?:/|$)'
+          - '~/api/products(?:/|$)'
+          - '~/api/shops(?:/|$)'
+          - '~/api/categories(?:/|$)'
+          - '~/internal/products/variants(?:/|$)'
+        strip_path: false
 
-# ==========================================
-# CẤU HÌNH XÁC THỰC JWT (NÂNG CAO - BỎ COMMENT ĐỂ DÙNG)
-# ==========================================
-# Lưu ý: Để Kong xác thực JWT, Kong cần biết Public Key để verify chữ ký.
-# Vì bạn đang chạy Kong ở chế độ DB-less (KONG_DATABASE: "off"),
-# bạn phải khai báo Public Key tĩnh hoặc dùng plugin phức tạp hơn.
-# Dưới đây là cấu hình mẫu để Kong bắt buộc phải có JWT hợp lệ khi gọi API.
+  - name: order-service
+    url: http://host.docker.internal:8084
+    routes:
+      - name: order-api
+        paths:
+          - '~/api/checkouts(?:/|$)'
+          - '~/api/orders(?:/|$)'
+        strip_path: false
 
-# plugins:
-#   - name: jwt
-#     route: product-routes
-#     config:
-#       claims_to_verify:
-#         - exp
-#       # Bạn cần cấu hình thêm consumer và key ở đây để Kong biết verify với key nào.
-#       # Tuy nhiên, cách đơn giản nhất để test trong giai đoạn này là để Spring Boot tự verify.
-#       # Kong chỉ làm nhiệm vụ Routing.
+  - name: inventory-service
+    url: http://host.docker.internal:8085
+    routes:
+      - name: inventory-api
+        paths:
+          - '~/api/inventories(?:/|$)'
+          - '~/api/reservations(?:/|$)'
+        strip_path: false
+
+  - name: shipping-service
+    url: http://host.docker.internal:8086
+    routes:
+      - name: shipping-api
+        paths:
+          - '~/api/shipments(?:/|$)'
+        strip_path: false
+
 plugins:
   - name: cors
     config:
       origins:
         - "http://localhost:3000"
+        - "http://localhost:5173"
       methods:
         - GET
         - POST
@@ -55,14 +67,12 @@ plugins:
         - Accept
         - Authorization
         - Content-Type
-      exposed_headers:
-        - X-User-Id
-        - X-User-Roles
+        - Idempotency-Key
       credentials: true
       max_age: 3600
+
   - name: rate-limiting
-    route: auth-route # Chỉ áp dụng cho API auth
     config:
-      minute: 5 # Tối đa 5 request / 1 phút
+      minute: 100
       policy: local
-      fault_tolerant: true
+      limit_by: ip
