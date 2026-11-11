@@ -41,6 +41,8 @@ public final class OrderJpaMapper {
             child.productId = i.getProductId();
             child.variantId = i.getVariantId();
             child.productName = i.getProductName();
+            child.variantName = i.getVariantName();
+            child.variantImageUrl = i.getVariantImageUrl();
             child.unitPrice = i.getUnitPrice();
             child.quantity = i.getQuantity();
             child.subtotal = i.subtotal();
@@ -58,6 +60,8 @@ public final class OrderJpaMapper {
                         i.productId,
                         i.variantId,
                         i.productName,
+                        i.variantName,
+                        i.variantImageUrl,
                         i.unitPrice,
                         i.quantity
                 ))

@@ -248,18 +248,18 @@ class CheckoutPersistenceIntegrationTest {
         // TODO 2: Tạo 2 sản phẩm cho Shop A.
         OrderItem itemA1 = OrderItem.create(
                 UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(),
-                "Keyboard", 500_000L, 2
+                "Keyboard", null, null, 500_000L, 2
         );
 
         OrderItem itemA2 = OrderItem.create(
                 UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(),
-                "Mouse", 200_000L, 1
+                "Mouse", null, null, 200_000L, 1
         );
 
         // TODO 3: Tạo 1 sản phẩm cho Shop B.
         OrderItem itemB1 = OrderItem.create(
                 UUID.randomUUID(), UUID.randomUUID(), UUID.randomUUID(),
-                "Monitor", 3_000_000L, 1
+                "Monitor", null, null, 3_000_000L, 1
         );
 
         // TODO 4: Tạo Order cho Shop A.

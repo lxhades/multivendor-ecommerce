@@ -23,6 +23,12 @@ public class OrderItemJpaEntity {
     @Column(name = "product_name", nullable = false)
     public String productName;
 
+    @Column(name = "variant_name", columnDefinition = "text")
+    public String variantName;
+
+    @Column(name = "variant_image_url", columnDefinition = "text")
+    public String variantImageUrl;
+
     @Column(name = "unit_price", nullable = false)
     public long unitPrice;
 

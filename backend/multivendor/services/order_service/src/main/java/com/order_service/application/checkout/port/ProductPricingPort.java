@@ -13,6 +13,8 @@ public interface ProductPricingPort {
             UUID variantId,
             UUID shopId,
             String productName,
+            String variantName,
+            String variantImageUrl,
             long unitPrice,
             boolean available
     ) {}

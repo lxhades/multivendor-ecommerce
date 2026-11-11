@@ -9,6 +9,8 @@ public class OrderItem {
     private final UUID productId;
     private final UUID variantId;
     private final String productName;
+    private final String variantName;
+    private final String variantImageUrl;
     private final long unitPrice;
     private final int quantity;
 
@@ -17,6 +19,8 @@ public class OrderItem {
             UUID productId,
             UUID variantId,
             String productName,
+            String variantName,
+            String variantImageUrl,
             long unitPrice,
             int quantity
     ) {
@@ -24,6 +28,8 @@ public class OrderItem {
         this.productId = Objects.requireNonNull(productId);
         this.variantId = Objects.requireNonNull(variantId);
         this.productName = Objects.requireNonNull(productName);
+        this.variantName = variantName;
+        this.variantImageUrl = variantImageUrl;
 
         if (productName.isBlank()) {
             throw new IllegalArgumentException(
@@ -52,12 +58,15 @@ public class OrderItem {
             UUID productId,
             UUID variantId,
             String productName,
+            String variantName,
+            String variantImageUrl,
             long unitPrice,
             int quantity
     ) {
         return new OrderItem(
                 id, productId, variantId,
-                productName, unitPrice, quantity
+                productName, variantName, variantImageUrl,
+                unitPrice, quantity
         );
     }
 
@@ -66,12 +75,15 @@ public class OrderItem {
             UUID productId,
             UUID variantId,
             String productName,
+            String variantName,
+            String variantImageUrl,
             long unitPrice,
             int quantity
     ) {
         return new OrderItem(
                 id, productId, variantId,
-                productName, unitPrice, quantity
+                productName, variantName, variantImageUrl,
+                unitPrice, quantity
         );
     }
 
@@ -93,6 +105,14 @@ public class OrderItem {
 
     public String getProductName() {
         return productName;
+    }
+
+    public String getVariantName() {
+        return variantName;
+    }
+
+    public String getVariantImageUrl() {
+        return variantImageUrl;
     }
 
     public long getUnitPrice() {

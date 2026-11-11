@@ -39,4 +39,5 @@ public class GetOrderUseCase {
 
         return OrderResult.from(order);
     }
+
 }

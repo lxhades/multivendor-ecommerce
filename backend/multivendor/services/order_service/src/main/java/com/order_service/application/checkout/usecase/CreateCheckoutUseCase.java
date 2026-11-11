@@ -129,6 +129,8 @@ public class CreateCheckoutUseCase {
                     variant.productId(),
                     variant.variantId(),
                     variant.productName(),
+                    variant.variantName(),
+                    variant.variantImageUrl(),
                     variant.unitPrice(),
                     item.quantity()
             );
