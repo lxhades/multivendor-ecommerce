@@ -25,11 +25,10 @@ public class GetCategoriesByParentIdUseCase {
     @Transactional(readOnly = true)
     public List<CreateCategoryResult> get(UUID id) {
         CategoryId parentId = new CategoryId(id);
-        if (!repository.existsById(parentId)) {
-            throw new DomainException(ErrorCode.CATEGORY_NOT_FOUND);
-        }
+        var parent = repository.findById(parentId)
+                .orElseThrow(() -> new DomainException(ErrorCode.CATEGORY_NOT_FOUND));
         return repository.findByParentId(parentId).stream()
-                .map(CategoryMapper::toResult)
+                .map(category -> CategoryMapper.toResult(category, parent.getName()))
                 .toList();
     }
 }

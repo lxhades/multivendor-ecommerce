@@ -62,14 +62,15 @@ public class CreateCategoryUseCase {
             throw new DomainException(ErrorCode.CATEGORY_SLUG_ALREADY_EXISTS);
         }
 
+        String parentName = null;
         if (parentId != null) {
-            categoryRepository.findById(parentId)
+            parentName = categoryRepository.findById(parentId)
                     .orElseThrow(() ->
-                            new DomainException(ErrorCode.CATEGORY_NOT_FOUND));
+                            new DomainException(ErrorCode.CATEGORY_NOT_FOUND)).getName();
         }
 
         Category savedCategory = categoryRepository.save(category);
-        return CategoryMapper.toResult(savedCategory);
+        return CategoryMapper.toResult(savedCategory, parentName);
 
     }
 

@@ -4,6 +4,7 @@ import com.common.exception.DomainException;
 import com.common.exception.ErrorCode;
 import com.product_service.application.category.mapper.CategoryMapper;
 import com.product_service.application.category.result.CreateCategoryResult;
+import com.product_service.domain.model.aggregate.Category;
 import com.product_service.domain.model.enumtype.CategoryStatus;
 import com.product_service.domain.model.vo.CategoryId;
 import com.product_service.domain.repository.CategoryRepository;
@@ -30,6 +31,8 @@ public class ChangeCategoryStatusUseCase {
                 .orElseThrow(() -> new DomainException(ErrorCode.CATEGORY_NOT_FOUND));
 
         category.changeStatus(categoryStatus, clock.instant());
-        return CategoryMapper.toResult(repository.save(category));
+        String parentName = category.getParentId() == null ? null
+                : repository.findById(category.getParentId()).map(Category::getName).orElse(null);
+        return CategoryMapper.toResult(repository.save(category), parentName);
     }
 }

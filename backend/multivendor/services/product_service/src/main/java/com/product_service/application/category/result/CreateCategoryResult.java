@@ -13,6 +13,7 @@ public record CreateCategoryResult(
         String status,
         int displayOrder,
         Instant createdAt,
-        Instant updatedAt
+        Instant updatedAt,
+        String parentName
 ) {
 }

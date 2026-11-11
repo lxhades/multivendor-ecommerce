@@ -37,10 +37,11 @@ public class UpdateCategoryUseCase {
         Slug slug = new Slug(command.slug());
         if (repository.existsBySlug(slug, categoryId)) throw new DomainException(ErrorCode.CATEGORY_SLUG_ALREADY_EXISTS);
         CategoryId parentId = command.parentId() == null ? null : new CategoryId(command.parentId());
+        String parentName = null;
         if (parentId != null) {
             Checks.rule(!parentId.equals(categoryId), "Category cannot be its own parent");
-            repository.findById(parentId).
-                    orElseThrow(() -> new DomainException(ErrorCode.CATEGORY_NOT_FOUND));
+            parentName = repository.findById(parentId)
+                    .orElseThrow(() -> new DomainException(ErrorCode.CATEGORY_NOT_FOUND)).getName();
             Checks.rule(!repository.isDescendant(parentId, categoryId), "Category hierarchy cannot contain a cycle");
         }
 
@@ -51,6 +52,6 @@ public class UpdateCategoryUseCase {
                 command.imageUrl(),
                 command.displayOrder(),
                 clock.instant());
-        return CategoryMapper.toResult(repository.save(category));
+        return CategoryMapper.toResult(repository.save(category), parentName);
     }
 }

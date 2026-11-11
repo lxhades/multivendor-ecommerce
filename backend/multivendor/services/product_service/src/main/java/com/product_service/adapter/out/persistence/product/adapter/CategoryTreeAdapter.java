@@ -26,7 +26,7 @@ public class CategoryTreeAdapter implements CategoryTreePort {
                 WITH RECURSIVE tree AS (
                     SELECT id FROM categories WHERE id = ?
                 
-                    UNION ALL
+                    UNION
                 
                     SELECT c.id 
                     FROM categories c 

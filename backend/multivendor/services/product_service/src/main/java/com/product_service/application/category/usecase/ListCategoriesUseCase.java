@@ -7,6 +7,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
+import com.product_service.domain.model.aggregate.Category;
 
 @Service
 public class ListCategoriesUseCase {
@@ -18,6 +21,11 @@ public class ListCategoriesUseCase {
 
     @Transactional(readOnly = true)
     public List<CreateCategoryResult> list() {
-        return repository.findAll().stream().map(CategoryMapper::toResult).toList();
+        var categories = repository.findAll();
+        var names = categories.stream().collect(Collectors.toMap(Category::getId, Category::getName));
+        return categories.stream()
+                .map(category -> CategoryMapper.toResult(category,
+                        category.getParentId() == null ? null : names.get(category.getParentId())))
+                .toList();
     }
 }
