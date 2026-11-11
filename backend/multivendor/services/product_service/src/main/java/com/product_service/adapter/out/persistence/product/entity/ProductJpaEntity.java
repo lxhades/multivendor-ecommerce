@@ -21,7 +21,7 @@ public class ProductJpaEntity {
     public UUID categoryId;
     public String name, slug;
     public String description;
-    @Column(name = "media_json")
+    @Column(name = "media_json", columnDefinition = "text")
     public String mediaJson;
     @Enumerated(EnumType.STRING)
     public ProductStatus status;

@@ -22,7 +22,15 @@ services:
           - '~/api/shops(?:/|$)'
           - '~/api/categories(?:/|$)'
           - '~/internal/products/variants(?:/|$)'
+          - '~/api/media(?:/|$)'
         strip_path: false
+
+      - name: product-media-route
+        paths:
+          - /media
+        strip_path: false
+        methods:
+          - GET
 
   - name: order-service
     url: http://host.docker.internal:8084
@@ -49,6 +57,7 @@ services:
         paths:
           - '~/api/shipments(?:/|$)'
         strip_path: false
+
 
 plugins:
   - name: cors
