@@ -98,9 +98,9 @@ public class OrderPersistenceAdapter implements OrderRepository {
             // Bắt buộc: Lọc theo cửa hàng
             filters.add(cb.equal(root.get("shopId"), shopId));
 
-            // Tùy chọn: Lọc theo trạng thái đơn hàng (Truyền trực tiếp Enum)
+            // Tùy chọn: Lọc theo trạng thái đơn hàng
             if (status != null) {
-                filters.add(cb.equal(root.get("orderStatus"), status));
+                filters.add(cb.equal(root.<String>get("orderStatus"), status.name()));
             }
 
             // Tùy chọn: Lọc theo khoảng thời gian (Từ ngày)
