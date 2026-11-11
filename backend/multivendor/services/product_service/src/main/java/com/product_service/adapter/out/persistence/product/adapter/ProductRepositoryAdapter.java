@@ -25,7 +25,7 @@ public class ProductRepositoryAdapter implements ProductRepository {
     private Product map(ProductJpaEntity e) {
         List<ProductVariant> domainVariants = e.variants.stream()
                 .map(v -> new ProductVariant(
-                        v.id, v.sku, v.price, v.attributesJson, v.active, v.soldCount, v.deletedAt
+                        v.id, v.sku, v.price, v.attributesJson, v.active, v.soldCount, v.deletedAt, v.imageUrl
                 ))
                 .toList();
 
@@ -85,6 +85,7 @@ public class ProductRepositoryAdapter implements ProductRepository {
             row.sku = v.sku();
             row.price = v.price();
             row.attributesJson = v.attributesJson();
+            row.imageUrl = v.imageUrl();
             row.active = v.active();
             row.deletedAt = v.deletedAt();
             row.updatedAt = p.updatedAt();

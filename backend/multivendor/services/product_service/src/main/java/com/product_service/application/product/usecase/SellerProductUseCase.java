@@ -48,7 +48,7 @@ public class SellerProductUseCase {
             for (VariantInput v : in.variants()) {
                 p.addVariant(new ProductVariant(
                         UUID.randomUUID(), v.sku(), v.price(),
-                        v.attributesJson(), v.active(), 0, null
+                        v.attributesJson(), v.active(), 0, null, v.imageUrl()
                 ), clock.instant());
             }
         }
@@ -131,7 +131,7 @@ public class SellerProductUseCase {
 
         p.addVariant(new ProductVariant(
                 UUID.randomUUID(), in.sku(), in.price(),
-                in.attributesJson(), in.active(), 0, null
+                in.attributesJson(), in.active(), 0, null, in.imageUrl()
         ), clock.instant());
 
         return Seller.of(repo.save(p));
@@ -147,6 +147,8 @@ public class SellerProductUseCase {
                 .orElseThrow(() -> new NoSuchElementException("Không tìm thấy sản phẩm"));
 
         p.editVariant(variantId, in.sku(), in.price(), in.attributesJson(), in.active(), clock.instant());
+        p.variants().stream().filter(v -> v.id().equals(variantId)).findFirst().orElseThrow()
+                .changeImageUrl(in.imageUrl());
         return Seller.of(repo.save(p));
     }
 

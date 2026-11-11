@@ -18,6 +18,8 @@ public class ProductVariantJpaEntity {
     public BigDecimal price;
     @Column(name = "attributes_json")
     public String attributesJson;
+    @Column(name = "image_url", columnDefinition = "text")
+    public String imageUrl;
     public boolean active;
     @Column(name = "sold_count", updatable = false)
     public long soldCount;

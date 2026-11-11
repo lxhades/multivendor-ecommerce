@@ -107,6 +107,8 @@ public class VerifyVariantsUseCase {
                     v.id,
                     p.shopId,
                     p.name,
+                    ProductDtos.Variant.nameFromAttributes(v.attributesJson),
+                    v.imageUrl,
                     price,
                     available
             ));
@@ -123,6 +125,8 @@ public class VerifyVariantsUseCase {
             UUID variantId,
             UUID shopId,
             String productName,
+            String variantName,
+            String variantImageUrl,
             long unitPrice,
             boolean available
     ) {}

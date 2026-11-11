@@ -10,6 +10,15 @@ public class ProductVariant {
     private String sku;
     private BigDecimal price;
     private String attributesJson;
+    private String imageUrl;
+
+    public String imageUrl() { return imageUrl; }
+    public void changeImageUrl(String imageUrl) { this.imageUrl = imageUrl; }
+
+    public ProductVariant(UUID id, String sku, BigDecimal price, String attributesJson, boolean active, long soldCount, Instant deletedAt, String imageUrl) {
+        this(id, sku, price, attributesJson, active, soldCount, deletedAt);
+        this.imageUrl = imageUrl;
+    }
     private boolean active;
     private long soldCount;
     private Instant deletedAt;

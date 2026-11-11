@@ -6,9 +6,13 @@ import com.product_service.domain.model.entity.ProductVariant;
 import com.product_service.domain.model.enumtype.ApprovalStatus;
 import com.product_service.domain.model.enumtype.ProductStatus;
 
+import tools.jackson.databind.ObjectMapper;
+
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 import java.util.UUID;
 
 public final class ProductDtos {
@@ -24,8 +28,11 @@ public final class ProductDtos {
             String attributesJson,
             boolean active,
             long soldCount,
-            Instant deletedAt
+            Instant deletedAt,
+            String variantName,
+            String imageUrl
     ) {
+        private static final ObjectMapper JSON = new ObjectMapper();
         // Chuyển đổi từ Domain Entity sang DTO
         public static Variant of(ProductVariant v) {
             return new Variant(
@@ -35,8 +42,30 @@ public final class ProductDtos {
                     v.attributesJson(),
                     v.active(),
                     v.soldCount(),
-                    v.deletedAt()
+                    v.deletedAt(),
+                    nameFromAttributes(v.attributesJson()),
+                    v.imageUrl()
             );
+        }
+
+        public static String nameFromAttributes(String attributesJson) {
+            if (attributesJson == null || attributesJson.isBlank()) {
+                return null;
+            }
+            try {
+                Map<?, ?> attributes = JSON.readValue(attributesJson, Map.class);
+                if (attributes == null) {
+                    return null;
+                }
+                String label = attributes.values().stream()
+                        .filter(value -> value instanceof String || value instanceof Number || value instanceof Boolean)
+                        .map(Object::toString)
+                        .filter(value -> !value.isBlank())
+                        .collect(Collectors.joining(" - "));
+                return label.isEmpty() ? null : label;
+            } catch (tools.jackson.core.JacksonException e) {
+                return null;
+            }
         }
     }
 
@@ -136,7 +165,8 @@ public final class ProductDtos {
             String sku,
             BigDecimal price,
             String attributesJson,
-            boolean active
+            boolean active,
+            String imageUrl
     ) {
     }
 

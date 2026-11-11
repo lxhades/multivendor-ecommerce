@@ -1,7 +1,7 @@
 package com.product_service.adapter.in.web.shop;
 
 import com.common.dto.response.ApiResponse;
-import com.product_service.application.shop.result.ShopResult;
+import com.product_service.application.shop.result.PublicShopResult;
 import com.product_service.application.shop.usecase.GetShopUseCase;
 import com.product_service.application.shop.usecase.ListShopsUseCase;
 import lombok.RequiredArgsConstructor;
@@ -22,15 +22,15 @@ public class PublicShopController {
 
     // Xem danh sách cửa hàng (Phân trang)
     @GetMapping
-    public ResponseEntity<ApiResponse<Page<ShopResult>>> list(Pageable pageable) {
-        Page<ShopResult> shopResultPage = listShopsUseCase.list(pageable);
+    public ResponseEntity<ApiResponse<Page<PublicShopResult>>> list(Pageable pageable) {
+        Page<PublicShopResult> shopResultPage = listShopsUseCase.list(pageable).map(PublicShopResult::from);
         return ResponseEntity.ok(ApiResponse.success(shopResultPage));
     }
 
     // Xem chi tiết cửa hàng theo ID
     @GetMapping("/{shopId}")
-    public ResponseEntity<ApiResponse<ShopResult>> findById(@PathVariable UUID shopId) {
-        ShopResult result = getShopUseCase.get(shopId);
+    public ResponseEntity<ApiResponse<PublicShopResult>> findById(@PathVariable UUID shopId) {
+        PublicShopResult result = PublicShopResult.from(getShopUseCase.get(shopId));
         return ResponseEntity.ok(ApiResponse.success(result));
     }
 }

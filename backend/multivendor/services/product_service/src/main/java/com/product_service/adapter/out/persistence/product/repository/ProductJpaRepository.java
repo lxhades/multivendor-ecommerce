@@ -28,6 +28,7 @@ public interface ProductJpaRepository extends JpaRepository<ProductJpaEntity, UU
               AND p.deletedAt IS NULL 
               AND p.status = ProductStatus.ACTIVE 
               AND p.approvalStatus = ApprovalStatus.APPROVED
+              AND EXISTS (SELECT 1 FROM ShopJpaEntity s WHERE s.id = p.shopId AND s.status = ShopStatus.ACTIVE)
             """)
     Optional<ProductJpaEntity> visibleById(@Param("id") UUID id);
 
@@ -36,7 +37,8 @@ public interface ProductJpaRepository extends JpaRepository<ProductJpaEntity, UU
             SELECT p FROM ProductJpaEntity p 
             WHERE p.deletedAt IS NULL 
               AND p.status = ProductStatus.ACTIVE 
-              AND p.approvalStatus = ApprovalStatus.APPROVED 
+              AND p.approvalStatus = ApprovalStatus.APPROVED
+              AND EXISTS (SELECT 1 FROM ShopJpaEntity s WHERE s.id = p.shopId AND s.status = ShopStatus.ACTIVE)
             ORDER BY p.createdAt DESC
             """)
     List<ProductJpaEntity> visibleAll();
@@ -46,7 +48,8 @@ public interface ProductJpaRepository extends JpaRepository<ProductJpaEntity, UU
             SELECT p FROM ProductJpaEntity p 
             WHERE p.deletedAt IS NULL 
               AND p.status = ProductStatus.ACTIVE 
-              AND p.approvalStatus = ApprovalStatus.APPROVED 
+              AND p.approvalStatus = ApprovalStatus.APPROVED
+              AND EXISTS (SELECT 1 FROM ShopJpaEntity s WHERE s.id = p.shopId AND s.status = ShopStatus.ACTIVE)
               AND p.shopId = :shop 
             ORDER BY p.createdAt DESC
             """)
@@ -57,7 +60,8 @@ public interface ProductJpaRepository extends JpaRepository<ProductJpaEntity, UU
             SELECT p FROM ProductJpaEntity p 
             WHERE p.deletedAt IS NULL 
               AND p.status = ProductStatus.ACTIVE 
-              AND p.approvalStatus = ApprovalStatus.APPROVED 
+              AND p.approvalStatus = ApprovalStatus.APPROVED
+              AND EXISTS (SELECT 1 FROM ShopJpaEntity s WHERE s.id = p.shopId AND s.status = ShopStatus.ACTIVE)
               AND p.categoryId IN :categoryIds 
             ORDER BY p.createdAt DESC
             """)
@@ -68,7 +72,8 @@ public interface ProductJpaRepository extends JpaRepository<ProductJpaEntity, UU
             SELECT p FROM ProductJpaEntity p 
             WHERE p.deletedAt IS NULL 
               AND p.status = ProductStatus.ACTIVE 
-              AND p.approvalStatus = ApprovalStatus.APPROVED 
+              AND p.approvalStatus = ApprovalStatus.APPROVED
+              AND EXISTS (SELECT 1 FROM ShopJpaEntity s WHERE s.id = p.shopId AND s.status = ShopStatus.ACTIVE)
               AND p.shopId = :shop 
               AND p.categoryId IN :categoryIds 
             ORDER BY p.createdAt DESC
