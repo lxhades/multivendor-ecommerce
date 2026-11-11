@@ -39,6 +39,7 @@ services:
         paths:
           - '~/api/checkouts(?:/|$)'
           - '~/api/orders(?:/|$)'
+          - '~/api/reviews(?:/|$)'
         strip_path: false
 
   - name: inventory-service
