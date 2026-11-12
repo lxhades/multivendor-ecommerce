@@ -1,0 +1,11 @@
+CREATE INDEX idx_checkouts_status_expiry ON public.checkouts(status, expires_at);
+CREATE INDEX idx_orders_buyer_created ON public.orders(buyer_id, created_at DESC, id);
+CREATE INDEX idx_orders_shop_created_at ON public.orders(shop_id, created_at);
+CREATE INDEX idx_orders_shop_status_updated_at ON public.orders(shop_id, order_status, updated_at);
+CREATE INDEX idx_order_items_order_id ON public.order_items(order_id);
+CREATE INDEX idx_order_items_product_id ON public.order_items(product_id);
+CREATE INDEX idx_product_reviews_product_created ON public.product_reviews(product_id, created_at, id);
+CREATE INDEX idx_product_reviews_buyer ON public.product_reviews(buyer_id);
+CREATE INDEX idx_outbox_status_created ON public.order_outbox_events(status, created_at);
+CREATE INDEX idx_order_outbox_retry ON public.order_outbox_events(status, next_retry_at, created_at);
+CREATE INDEX idx_order_inbox_processed_at ON public.kafka_inbox_events(processed_at);

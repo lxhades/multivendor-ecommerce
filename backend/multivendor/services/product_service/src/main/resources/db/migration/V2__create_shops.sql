@@ -1,0 +1,25 @@
+CREATE TABLE public.shops (
+    id uuid PRIMARY KEY,
+    seller_id uuid NOT NULL,
+    name varchar(200) NOT NULL,
+    slug varchar(220) NOT NULL,
+    logo_url text,
+    banner_url text,
+    description text,
+    address text,
+    bank_details varchar(200),
+    rating_avg numeric(3,2) NOT NULL DEFAULT 0,
+    rating_count bigint NOT NULL DEFAULT 0,
+    product_count bigint NOT NULL DEFAULT 0,
+    status varchar(20) NOT NULL,
+    created_at timestamptz(6) NOT NULL,
+    updated_at timestamptz(6) NOT NULL,
+    CONSTRAINT uk_shops_slug UNIQUE (slug),
+    CONSTRAINT uk_shops_seller UNIQUE (seller_id),
+    CONSTRAINT ck_shops_status CHECK (status IN ('ACTIVE', 'SUSPENDED', 'CLOSED', 'BANNED')),
+    CONSTRAINT ck_shops_rating CHECK (rating_avg BETWEEN 0 AND 5 AND rating_count >= 0),
+    CONSTRAINT ck_shops_product_count CHECK (product_count >= 0),
+    CONSTRAINT ck_shops_name_slug CHECK (length(btrim(name)) > 0 AND length(btrim(slug)) > 0),
+    CONSTRAINT ck_shops_timestamps CHECK (updated_at >= created_at)
+);
+COMMENT ON COLUMN public.shops.seller_id IS 'Auth UUID only; no foreign key across microservice databases.';

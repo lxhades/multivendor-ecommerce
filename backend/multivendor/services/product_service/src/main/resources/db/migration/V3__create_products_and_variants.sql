@@ -1,0 +1,51 @@
+CREATE TABLE public.products (
+    id uuid PRIMARY KEY,
+    shop_id uuid NOT NULL REFERENCES public.shops(id),
+    category_id uuid NOT NULL REFERENCES public.categories(id),
+    name varchar(255) NOT NULL,
+    slug varchar(255) NOT NULL,
+    description varchar(255),
+    media_json text,
+    status varchar(255) NOT NULL,
+    approval_status varchar(255) NOT NULL,
+    min_price numeric(38,2) NOT NULL DEFAULT 0,
+    sold_count bigint NOT NULL DEFAULT 0,
+    rating_avg numeric(38,2) NOT NULL DEFAULT 0,
+    rating_count bigint NOT NULL DEFAULT 0,
+    created_at timestamptz(6) NOT NULL,
+    updated_at timestamptz(6) NOT NULL,
+    deleted_at timestamptz(6),
+    CONSTRAINT ck_products_status CHECK (status IN ('ACTIVE', 'INACTIVE')),
+    CONSTRAINT ck_products_approval CHECK (approval_status IN ('PENDING', 'APPROVED', 'REJECTED')),
+    CONSTRAINT ck_products_price_count CHECK (min_price >= 0 AND sold_count >= 0 AND rating_count >= 0),
+    CONSTRAINT ck_products_rating CHECK (rating_avg BETWEEN 0 AND 5),
+    CONSTRAINT ck_products_media_array CHECK (media_json IS NULL OR jsonb_typeof(media_json::jsonb) = 'array'),
+    CONSTRAINT ck_products_name_slug CHECK (length(btrim(name)) > 0 AND length(btrim(slug)) > 0),
+    CONSTRAINT ck_products_timestamps CHECK (updated_at >= created_at AND (deleted_at IS NULL OR deleted_at >= created_at))
+);
+CREATE TABLE public.product_variants (
+    id uuid PRIMARY KEY,
+    product_id uuid NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+    sku varchar(255) NOT NULL,
+    price numeric(38,2) NOT NULL,
+    attributes_json varchar(255),
+    image_url text,
+    active boolean NOT NULL DEFAULT true,
+    sold_count bigint NOT NULL DEFAULT 0,
+    created_at timestamptz(6) NOT NULL,
+    updated_at timestamptz(6) NOT NULL,
+    deleted_at timestamptz(6),
+    CONSTRAINT ck_variants_price_count CHECK (price >= 0 AND sold_count >= 0),
+    CONSTRAINT ck_variants_sku CHECK (length(btrim(sku)) > 0),
+    CONSTRAINT ck_variants_attributes_object CHECK (attributes_json IS NULL OR jsonb_typeof(attributes_json::jsonb) = 'object'),
+    CONSTRAINT ck_variants_timestamps CHECK (updated_at >= created_at AND (deleted_at IS NULL OR deleted_at >= created_at))
+);
+CREATE TABLE public.product_approval_histories (
+    id uuid PRIMARY KEY,
+    product_id uuid NOT NULL REFERENCES public.products(id) ON DELETE CASCADE,
+    actor_id uuid NOT NULL,
+    decision varchar(255) NOT NULL,
+    reason varchar(255),
+    created_at timestamptz(6) NOT NULL,
+    CONSTRAINT ck_product_approval_decision CHECK (decision IN ('PENDING', 'APPROVED', 'REJECTED'))
+);

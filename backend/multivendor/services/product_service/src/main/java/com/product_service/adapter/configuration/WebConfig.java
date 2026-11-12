@@ -27,13 +27,9 @@ public class WebConfig implements WebMvcConfigurer {
 
         String finalPath = uploadPathUri + "media/";
 
-        // 👇 IN RA MÀN HÌNH ĐỂ KIỂM TRA ĐƯỜNG DẪN
-        System.out.println("=== KIỂM TRA ĐƯỜNG DẪN MEDIA ===");
-        System.out.println("URL Prefix: /media/**");
-        System.out.println("Thư mục vật lý sẽ tìm: " + finalPath);
-        System.out.println("=================================");
+
 
         registry.addResourceHandler("/media/**")
-                .addResourceLocations(finalPath);
+                .addResourceLocations(finalPath, "classpath:/static/media/");
     }
 }

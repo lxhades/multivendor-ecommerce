@@ -34,7 +34,10 @@ public class AuthController {
     private final RegisterSellerUseCase registerSellerUseCase;
     private final RegisterAdminUseCase  registerAdminUseCase;
 
-
+    @GetMapping("/hello")
+    public String hello(){
+        return "hello";
+    }
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegisterUserResult>> register(
             @Valid @RequestBody RegisterRequest request) {
