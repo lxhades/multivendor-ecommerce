@@ -31,7 +31,6 @@ public class CreateReviewUseCase {
 
     @Transactional
     public ReviewResult execute(UUID buyerId, String buyerName, CreateReviewCommand command) {
-        // All purchase checks are done in this service's own orders/order_items tables.
         if (buyerId == null || !orders.hasDeliveredProduct(command.orderId(), buyerId, command.productId())) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN, PURCHASE_REQUIRED);
         }
@@ -52,7 +51,6 @@ public class CreateReviewUseCase {
         try {
             return ReviewResult.from(reviews.saveAndFlush(review));
         } catch (DataIntegrityViolationException e) {
-            // A pre-check alone cannot prevent two simultaneous requests from creating a review.
             for (Throwable cause = e; cause != null; cause = cause.getCause()) {
                 if (cause instanceof ConstraintViolationException violation
                         && violation.getConstraintName() != null
