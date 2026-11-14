@@ -1,0 +1,62 @@
+# Standalone infrastructure for IDE development.
+# docker compose -f docker-compose.infrastructure.yml up -d --build --wait --wait-timeout 300
+# Reuse definitions to keep Kafka/DB healthchecks and volumes aligned with the full stack.
+services:
+  postgres-auth:
+    extends:
+      file: docker-compose.yml
+      service: postgres-auth
+
+  postgres-product:
+    extends:
+      file: docker-compose.yml
+      service: postgres-product
+
+  postgres-inventory:
+    extends:
+      file: docker-compose.yml
+      service: postgres-inventory
+
+  postgres-order:
+    extends:
+      file: docker-compose.yml
+      service: postgres-order
+
+  postgres-shipping:
+    extends:
+      file: docker-compose.yml
+      service: postgres-shipping
+
+  redis:
+    extends:
+      file: docker-compose.yml
+      service: redis
+
+  kafka:
+    extends:
+      file: docker-compose.yml
+      service: kafka
+
+  kong:
+    extends:
+      file: docker-compose.yml
+      service: kong
+
+  kafka-ui:
+    extends:
+      file: docker-compose.yml
+      service: kafka-ui
+    profiles: [tools]
+
+volumes:
+  postgres_auth_data:
+  postgres_product_data:
+  postgres_inventory_data:
+  postgres_order_data:
+  postgres_shipping_data:
+  redis_data:
+  kafka_data:
+
+networks:
+  backend:
+    driver: bridge

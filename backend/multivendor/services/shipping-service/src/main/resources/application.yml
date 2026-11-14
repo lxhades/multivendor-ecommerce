@@ -46,3 +46,20 @@ shipping:
     status-topic: shipping.status.v1
   outbox:
     poll-ms: 1000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      show-components: never
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState,db
+        liveness:
+          include: livenessState

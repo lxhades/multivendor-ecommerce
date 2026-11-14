@@ -25,6 +25,7 @@ public class InventorySecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/actuator/health", "/actuator/health/liveness", "/actuator/health/readiness").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/inventories/variant/*").permitAll()
                         .requestMatchers("/api/inventories/seller", "/api/inventories/seller/**").hasRole("SELLER")
                         .requestMatchers("/api/inventories/admin", "/api/inventories/admin/**",

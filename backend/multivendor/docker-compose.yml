@@ -1,10 +1,184 @@
+x-backend-app: &backend-app
+  restart: unless-stopped
+  networks:
+    - backend
+  extra_hosts:
+    - "host.docker.internal:host-gateway"
+
+x-backend-environment: &backend-environment
+  DB_USERNAME: postgres
+  DB_PASSWORD: postgres
+  KAFKA_BOOTSTRAP_SERVERS: kafka:29092
+  JWT_JWK_SET_URI: http://host.docker.internal:8081/oauth2/jwks
+  PRODUCT_SERVICE_URL: http://host.docker.internal:8082
+  SHIPPING_SERVICE_URL: http://host.docker.internal:8086
+  PRODUCT_SERVICE_INTERNAL_TOKEN: ${PRODUCT_SERVICE_INTERNAL_TOKEN:-test123}
+  SPRING_DEVTOOLS_RESTART_ENABLED: "false"
+
 services:
+  auth-service:
+    <<: *backend-app
+    profiles: [apps, auth]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_MODULE: auth_service
+    ports:
+      - "8081:8081"
+    environment:
+      <<: *backend-environment
+      SERVER_PORT: 8081
+      DB_URL: jdbc:postgresql://postgres-auth:5432/auth_db
+      REDIS_HOST: redis
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-changeme}
+      MAIL_USERNAME: ${MAIL_USERNAME:-}
+      MAIL_PASSWORD: ${MAIL_PASSWORD:-}
+      GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID:-}
+      GOOGLE_CLIENT_SECRET: ${GOOGLE_CLIENT_SECRET:-}
+    depends_on:
+      postgres-auth:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "--max-time", "4", "http://127.0.0.1:8081/actuator/health/readiness"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+
+  product-service:
+    <<: *backend-app
+    profiles: [apps, product]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_MODULE: product_service
+    ports:
+      - "8082:8082"
+    environment:
+      <<: *backend-environment
+      SERVER_PORT: 8082
+      DB_URL: jdbc:postgresql://postgres-product:5432/product_db
+      CATALOG_MEDIA_BASE_URL: ${CATALOG_MEDIA_BASE_URL:-http://localhost:8000}
+      APP_MEDIA_STORAGE_PATH: /app/uploads
+      APP_MEDIA_PUBLIC_BASE_URL: ${APP_MEDIA_PUBLIC_BASE_URL:-http://localhost:8000}
+    volumes:
+      - type: bind
+        source: ${MEDIA_HOST_PATH:-./uploads}
+        target: /app/uploads
+    depends_on:
+      postgres-product:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "--max-time", "4", "http://127.0.0.1:8082/actuator/health/readiness"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+
+  order-service:
+    <<: *backend-app
+    profiles: [apps, order]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_MODULE: order_service
+    ports:
+      - "8084:8084"
+    environment:
+      <<: *backend-environment
+      SERVER_PORT: 8084
+      DB_URL: jdbc:postgresql://postgres-order:5432/order_db
+      CATALOG_MEDIA_BASE_URL: ${CATALOG_MEDIA_BASE_URL:-http://localhost:8000}
+    depends_on:
+      postgres-order:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "--max-time", "4", "http://127.0.0.1:8084/actuator/health/readiness"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+
+  inventory-service:
+    <<: *backend-app
+    profiles: [apps, inventory]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_MODULE: inventory-service
+    ports:
+      - "8085:8085"
+    environment:
+      <<: *backend-environment
+      SERVER_PORT: 8085
+      DB_URL: jdbc:postgresql://postgres-inventory:5432/inventory_db
+    depends_on:
+      postgres-inventory:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "--max-time", "4", "http://127.0.0.1:8085/actuator/health/readiness"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+
+  shipping-service:
+    <<: *backend-app
+    profiles: [apps, shipping]
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        SERVICE_MODULE: shipping-service
+    ports:
+      - "8086:8086"
+    environment:
+      <<: *backend-environment
+      SERVER_PORT: 8086
+      DB_URL: jdbc:postgresql://postgres-shipping:5432/shipping_db
+    depends_on:
+      postgres-shipping:
+        condition: service_healthy
+      kafka:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "--show-error", "--max-time", "4", "http://127.0.0.1:8086/actuator/health/readiness"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 90s
+
   kafka:
-    image: apache/kafka:3.7.0
+    restart: unless-stopped
+    volumes:
+      - kafka_data:/tmp/kraft-combined-logs
+    healthcheck:
+      test: ["CMD-SHELL", "test -f /tmp/kafka-topics-ready && /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:29092 --list >/dev/null"]
+      interval: 15s
+      timeout: 10s
+      retries: 10
+      start_period: 30s
+    build:
+      context: ./docker/kafka
+    stop_grace_period: 60s
     container_name: kafka
     ports:
       - "9092:9092"
     environment:
+      CLUSTER_ID: MkU3OEVBNTcwNTJENDM2Qk
+      KAFKA_LOG_DIRS: /tmp/kraft-combined-logs
       KAFKA_NODE_ID: 1
       KAFKA_PROCESS_ROLES: broker,controller
 
@@ -27,6 +201,7 @@ services:
 
   kafka-ui:
     image: provectuslabs/kafka-ui:latest
+    restart: unless-stopped
     container_name: kafka-ui
     ports:
       - "9091:8080"
@@ -34,13 +209,16 @@ services:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka:29092
     depends_on:
-      - kafka
+      kafka:
+        condition: service_healthy
     networks:
       - backend
 
   # Kong
   kong:
     image: kong:3.9
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     container_name: ecommerce-kong
     restart: unless-stopped
     environment:
@@ -61,11 +239,13 @@ services:
       test: [ "CMD", "kong", "health" ]
       interval: 15s
       timeout: 5s
-      retries: 5
+      retries: 12
+      start_period: 30s
 
   # Auth DB
   postgres-auth:
     image: postgres:16
+    restart: unless-stopped
     container_name: postgres-auth
     environment:
       POSTGRES_DB: auth_db
@@ -78,14 +258,16 @@ services:
     networks:
       - backend
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d auth_db" ]
+      test: [ "CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d auth_db" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 12
+      start_period: 30s
 
   # Product DB
   postgres-product:
     image: postgres:16
+    restart: unless-stopped
     container_name: postgres-product
     environment:
       POSTGRES_DB: product_db
@@ -98,14 +280,16 @@ services:
     networks:
       - backend
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d product_db" ]
+      test: [ "CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d product_db" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 12
+      start_period: 30s
 
   # INVENTORY DB
   postgres-inventory:
     image: postgres:16
+    restart: unless-stopped
     container_name: postgres-inventory
     environment:
       POSTGRES_DB: inventory_db
@@ -118,14 +302,16 @@ services:
     networks:
       - backend
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d inventory_db" ]
+      test: [ "CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d inventory_db" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 12
+      start_period: 30s
 
   # ORDER DB
   postgres-order:
     image: postgres:16
+    restart: unless-stopped
     container_name: postgres-order
     environment:
       POSTGRES_DB: order_db
@@ -138,14 +324,16 @@ services:
     networks:
       - backend
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d order_db" ]
+      test: [ "CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d order_db" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 12
+      start_period: 30s
 
   # SHIPPING DB
   postgres-shipping:
     image: postgres:16
+    restart: unless-stopped
     container_name: postgres-shipping
     environment:
       POSTGRES_DB: shipping_db
@@ -158,13 +346,16 @@ services:
     networks:
       - backend
     healthcheck:
-      test: [ "CMD-SHELL", "pg_isready -U postgres -d shipping_db" ]
+      test: [ "CMD-SHELL", "pg_isready -h 127.0.0.1 -U postgres -d shipping_db" ]
       interval: 10s
       timeout: 5s
-      retries: 5
+      retries: 12
+      start_period: 30s
   # Redis
   redis:
     image: redis:7-alpine
+    environment:
+      REDISCLI_AUTH: ${REDIS_PASSWORD:-changeme}
     container_name: redis
     restart: unless-stopped
     command: >
@@ -180,7 +371,7 @@ services:
     networks:
       - backend
     healthcheck:
-      test: [ "CMD", "redis-cli", "-a", "${REDIS_PASSWORD:-changeme}", "ping" ]
+      test: [ "CMD-SHELL", "redis-cli --no-auth-warning ping | grep -qx PONG" ]
       interval: 10s
       timeout: 3s
       retries: 5
@@ -193,6 +384,7 @@ volumes:
   postgres_shipping_data:
 
   redis_data:
+  kafka_data:
 
 networks:
   backend:

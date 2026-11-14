@@ -73,3 +73,21 @@ inventory:
     delivered-topic: order.delivered.v1
   outbox:
       poll-delay-ms: 3000
+
+# Do not include external mail providers in the startup readiness gate.
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: never
+      show-components: never
+      probes:
+        enabled: true
+      group:
+        readiness:
+          include: readinessState,db
+        liveness:
+          include: livenessState

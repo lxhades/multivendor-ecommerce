@@ -1,0 +1,5396 @@
+{
+  "info": {
+    "name": "Multivendor API – Local",
+    "description": "Các thư mục service là danh mục request chạy riêng. Chạy từng kịch bản trong thư mục Tổng hợp bằng Collection Runner trên môi trường dev/test. Xem tài liệu API để chuẩn bị dữ liệu và delay.\nCập nhật 14/11/2026: API Admin phân trang đơn và tổng hợp doanh thu server. Các request mới chưa được chạy nghiệm thu.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "description": "Chạy từng request với dữ liệu phù hợp. Các request ghi và xóa cần fixture riêng.",
+      "item": [
+        {
+          "name": "Đăng ký Buyer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/auth/register",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{newBuyerEmail}}\",\n  \"password\": \"{{buyerPassword}}\",\n  \"phone\": \"0912345678\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Đăng ký Buyer"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"newBuyerId\", d.userId);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đăng nhập Buyer",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{buyerEmail}}\",\n  \"password\": \"{{buyerPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Đăng nhập Buyer"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"buyerId\", d.userId);",
+                  "save(\"buyerAccessToken\", d.accessToken);",
+                  "save(\"buyerRefreshToken\", d.refreshToken);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đăng nhập Seller",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{sellerEmail}}\",\n  \"password\": \"{{sellerPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Đăng nhập Seller"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"sellerId\", d.userId);",
+                  "save(\"sellerAccessToken\", d.accessToken);",
+                  "save(\"sellerRefreshToken\", d.refreshToken);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đăng nhập Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/auth/login",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Đăng nhập Admin"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"adminId\", d.userId);",
+                  "save(\"adminAccessToken\", d.accessToken);",
+                  "save(\"adminRefreshToken\", d.refreshToken);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Xem tài khoản",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/auth/me",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Xem tài khoản"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Quên mật khẩu (gửi email)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/auth/forgotpassword",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{buyerEmail}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chỉ chạy riêng trên dữ liệu test. Yêu cầu này có thể thay đổi dữ liệu hoặc gửi email."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đổi mật khẩu",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/auth/changepassword",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"oldPassword\": \"{{buyerPassword}}\",\n  \"newPassword\": \"{{newPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chỉ chạy riêng trên dữ liệu test. Yêu cầu này có thể thay đổi dữ liệu hoặc gửi email."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đổi access và refresh token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/auth/refresh",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{buyerRefreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Đổi access và refresh token"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"buyerAccessToken\", d.accessToken); save(\"buyerRefreshToken\", d.refreshToken);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Thu hồi refresh token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/auth/logout",
+            "auth": {
+              "type": "noauth"
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"refreshToken\": \"{{buyerRefreshToken}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Thu hồi refresh token"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đăng ký làm Seller",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/auth/me/register-seller",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Đăng ký làm Seller"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Danh sách địa chỉ của mình",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/auth/users/{{buyerId}}/addresses",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Danh sách địa chỉ của mình"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Thêm địa chỉ",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/auth/users/{{buyerId}}/addresses",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverName\": \"Người nhận test\",\n  \"phone\": \"0912345678\",\n  \"location\": \"TP. Hồ Chí Minh\",\n  \"detail\": \"12 Đường Test\",\n  \"isDefault\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Thêm địa chỉ"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"addressId\", d.addressId);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sửa địa chỉ",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/auth/users/{{buyerId}}/addresses/{{addressId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"receiverName\": \"Người nhận test\",\n  \"phone\": \"0912345678\",\n  \"location\": \"TP. Hồ Chí Minh\",\n  \"detail\": \"12 Đường Test\",\n  \"isDefault\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Sửa địa chỉ"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Xóa địa chỉ",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/auth/users/{{buyerId}}/addresses/{{addressId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Chỉ chạy riêng trên dữ liệu test. Yêu cầu này có thể thay đổi dữ liệu hoặc gửi email."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Danh sách người dùng",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/api/users/admin?page=0&size=20",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Danh sách người dùng"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chi tiết người dùng",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/api/users/admin/{{buyerId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Chi tiết người dùng"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Xóa tài khoản test",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/api/users/admin/{{deleteUserId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Chỉ chạy riêng trên dữ liệu test. Yêu cầu này có thể thay đổi dữ liệu hoặc gửi email."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Khóa công khai JWT",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{authBaseUrl}}/oauth2/jwks",
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Khóa công khai JWT"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Product",
+      "description": "Chạy từng request với dữ liệu phù hợp. Các request ghi và xóa cần fixture riêng.",
+      "item": [
+        {
+          "name": "Danh sách shop",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/shops?page=0&size=20",
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Danh sách shop"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chi tiết shop",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/shops/{{shopId}}",
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Chi tiết shop"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Danh sách danh mục",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/categories",
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Danh sách danh mục"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chi tiết danh mục",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/categories/{{categoryId}}",
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Chi tiết danh mục"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Danh mục con",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/categories/{{categoryId}}/children",
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Danh mục con"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Danh sách sản phẩm",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products?shopId={{shopId}}&includeChildren=false",
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Danh sách sản phẩm"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chi tiết sản phẩm và biến thể",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products/{{productId}}",
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Chi tiết sản phẩm và biến thể"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Xác minh biến thể nội bộ",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/internal/products/variants/verify",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"variantIds\": [\n    \"{{variantId}}\"\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Xác minh biến thể nội bộ"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tạo shop",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/shops/seller",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Shop Postman\",\n  \"slug\": \"{{shopSlug}}\",\n  \"description\": \"Dữ liệu test\",\n  \"address\": \"TP. Hồ Chí Minh\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Tạo shop"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"shopId\", d.id);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Shop của Seller",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/shops/seller/my-shop",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Shop của Seller"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"shopId\", d.id);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Cập nhật shop",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/shops/seller/{{shopId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Shop Postman\",\n  \"slug\": \"{{shopSlug}}\",\n  \"description\": \"Dữ liệu test\",\n  \"address\": \"TP. Hồ Chí Minh\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Cập nhật shop"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đóng shop",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/shops/seller/{{shopId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Chỉ chạy riêng trên dữ liệu test. Yêu cầu này có thể thay đổi dữ liệu hoặc gửi email."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Mở lại shop",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/shops/seller/{{shopId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Mở lại shop"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin liệt kê shop",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/shops/admin?page=0&size=20",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Admin liệt kê shop"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem shop",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/shops/admin/{{shopId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Admin xem shop"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin đổi trạng thái shop",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/shops/admin/{{shopId}}/status?shopStatus=ACTIVE",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Admin đổi trạng thái shop"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin đóng shop",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/shops/admin/{{shopId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Chỉ chạy riêng trên dữ liệu test. Yêu cầu này có thể thay đổi dữ liệu hoặc gửi email."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tạo danh mục",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/categories/admin",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Danh mục test\",\n  \"slug\": \"{{categorySlug}}\",\n  \"displayOrder\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Tạo danh mục"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"categoryId\", d.id);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sửa danh mục",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/categories/admin/{{categoryId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Danh mục test\",\n  \"slug\": \"{{categorySlug}}\",\n  \"displayOrder\": 0\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Sửa danh mục"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đổi trạng thái danh mục",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/categories/admin/{{categoryId}}/status",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Đổi trạng thái danh mục"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Xóa danh mục",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/categories/admin/{{categoryId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Chỉ chạy riêng trên dữ liệu test. Yêu cầu này có thể thay đổi dữ liệu hoặc gửi email."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Seller liệt kê sản phẩm",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products/seller/shops/{{shopId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Seller liệt kê sản phẩm"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tạo sản phẩm",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products/seller/shops/{{shopId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{categoryId}}\",\n  \"name\": \"Sản phẩm Postman\",\n  \"slug\": \"{{productSlug}}\",\n  \"description\": \"Dữ liệu test\",\n  \"mediaJson\": \"[]\",\n  \"variants\": [\n    {\n      \"sku\": \"{{sku}}\",\n      \"price\": 125000,\n      \"attributesJson\": \"{\\\"color\\\":\\\"Blue\\\"}\",\n      \"active\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Tạo sản phẩm"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"productId\", d.id); save(\"variantId\", d.variants?.[0]?.id);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Seller xem sản phẩm",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products/seller/shops/{{shopId}}/{{productId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Seller xem sản phẩm"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sửa sản phẩm",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products/seller/shops/{{shopId}}/{{productId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"categoryId\": \"{{categoryId}}\",\n  \"name\": \"Sản phẩm Postman\",\n  \"slug\": \"{{productSlug}}\",\n  \"description\": \"Dữ liệu test\",\n  \"mediaJson\": \"[]\",\n  \"variants\": [\n    {\n      \"sku\": \"{{sku}}\",\n      \"price\": 125000,\n      \"attributesJson\": \"{\\\"color\\\":\\\"Blue\\\"}\",\n      \"active\": true\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Sửa sản phẩm"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đổi trạng thái sản phẩm",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products/seller/shops/{{shopId}}/{{productId}}/status",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Đổi trạng thái sản phẩm"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Xóa sản phẩm",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products/seller/shops/{{shopId}}/{{productId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Chỉ chạy riêng trên dữ liệu test. Yêu cầu này có thể thay đổi dữ liệu hoặc gửi email."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Thêm biến thể",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products/seller/shops/{{shopId}}/{{productId}}/variants",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"{{sku}}\",\n  \"price\": 125000,\n  \"attributesJson\": \"{\\\"color\\\":\\\"Blue\\\"}\",\n  \"active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Thêm biến thể"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sửa biến thể",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products/seller/shops/{{shopId}}/{{productId}}/variants/{{variantId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sku\": \"{{sku}}\",\n  \"price\": 125000,\n  \"attributesJson\": \"{\\\"color\\\":\\\"Blue\\\"}\",\n  \"active\": true\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Sửa biến thể"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Xóa biến thể",
+          "request": {
+            "method": "DELETE",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products/seller/shops/{{shopId}}/{{productId}}/variants/{{variantId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Chỉ chạy riêng trên dữ liệu test. Yêu cầu này có thể thay đổi dữ liệu hoặc gửi email."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Sản phẩm chờ duyệt",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products/admin/pending",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Sản phẩm chờ duyệt"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem sản phẩm",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products/admin/{{productId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Admin xem sản phẩm"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Duyệt sản phẩm",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products/admin/{{productId}}/approve",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Kiểm thử Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Duyệt sản phẩm"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Từ chối sản phẩm",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{productBaseUrl}}/api/products/admin/{{productId}}/reject",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"reason\": \"Kiểm thử Postman\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Từ chối sản phẩm"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Inventory",
+      "description": "Chạy từng request với dữ liệu phù hợp. Các request ghi và xóa cần fixture riêng.",
+      "item": [
+        {
+          "name": "Số lượng còn bán",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/inventories/variant/{{variantId}}",
+            "auth": {
+              "type": "noauth"
+            },
+            "description": "Số lượng còn bán"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Seller xem kho theo shop",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/inventories/seller?shopId={{shopId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Seller xem kho theo shop"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Seller xem chi tiết kho",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/inventories/seller/{{inventoryId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Seller xem chi tiết kho"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Seller xem kho theo biến thể",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/inventories/seller/variants/{{variantId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Seller xem kho theo biến thể"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"inventoryId\", d.id);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Seller điều chỉnh tồn",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/inventories/seller/variants/{{variantId}}/stock",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"newQuantity\": 100\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Seller điều chỉnh tồn"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem kho theo shop",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/inventories/admin?shopId={{shopId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Admin xem kho theo shop"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem chi tiết kho",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/inventories/admin/{{inventoryId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Admin xem chi tiết kho"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem kho theo biến thể",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/inventories/admin/variants/{{variantId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Admin xem kho theo biến thể"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"inventoryId\", d.id);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Khởi tạo kho thủ công",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/inventories/admin",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"{{productId}}\",\n  \"variantId\": \"{{variantId}}\",\n  \"shopId\": \"{{shopId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Khởi tạo kho thủ công"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tăng tồn",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/inventories/admin/increase-stock",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"variantId\": \"{{variantId}}\",\n  \"quantity\": 5\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Tăng tồn"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tạo giữ chỗ thủ công",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/reservations/admin",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{manualOrderId}}\",\n  \"variantId\": \"{{variantId}}\",\n  \"quantity\": 1\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chỉ chạy riêng trên dữ liệu test. Yêu cầu này có thể thay đổi dữ liệu hoặc gửi email."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"reservationId\", d.id);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Danh sách giữ chỗ theo đơn",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/reservations/admin?orderId={{orderId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Danh sách giữ chỗ theo đơn"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chi tiết giữ chỗ",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/reservations/admin/{{reservationId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Chi tiết giữ chỗ"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Chốt giữ chỗ thủ công",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/reservations/admin/{{reservationId}}/confirm",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Chỉ chạy riêng trên dữ liệu test. Yêu cầu này có thể thay đổi dữ liệu hoặc gửi email."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Nhả giữ chỗ thủ công",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{inventoryBaseUrl}}/api/reservations/admin/{{reservationId}}/release",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Chỉ chạy riêng trên dữ liệu test. Yêu cầu này có thể thay đổi dữ liệu hoặc gửi email."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Order",
+      "description": "Chạy từng request với dữ liệu phù hợp. Các request ghi và xóa cần fixture riêng.",
+      "item": [
+        {
+          "name": "Tạo checkout COD",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Idempotency-Key",
+                "value": "{{checkoutKey}}"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/checkouts",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"paymentMethod\": \"COD\",\n  \"shippingAddress\": \"12 Đường Test, TP. Hồ Chí Minh\",\n  \"items\": [\n    {\n      \"variantId\": \"{{variantId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Tạo checkout COD"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"checkoutId\", d.checkout?.id); save(\"orderId\", d.orders?.[0]?.id);",
+                  " ",
+                  "}"
+                ]
+              }
+            },
+            {
+              "listen": "prerequest",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "if (!pm.environment.get(\"checkoutKey\")) pm.environment.set(\"checkoutKey\", pm.variables.replaceIn(\"{{$guid}}\"));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buyer xem checkout",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/checkouts/{{checkoutId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Buyer xem checkout"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem checkout",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/checkouts/{{checkoutId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Admin xem checkout"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Đơn của Buyer",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Đơn của Buyer"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lọc đơn theo Buyer hiện tại",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders?buyerId={{buyerId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Lọc đơn theo Buyer hiện tại"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buyer xem đơn trong checkout",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders?checkoutId={{checkoutId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Buyer xem đơn trong checkout"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buyer xem chi tiết đơn",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/{{orderId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Buyer xem chi tiết đơn"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buyer hủy đơn COD",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/{{orderId}}/cancel",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{buyerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Buyer hủy đơn COD"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Seller xem trang đơn đã giao",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/seller/shops/{{shopId}}?page=0&size=20&status=DELIVERED",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Seller xem trang đơn đã giao"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Seller xem đơn theo shop",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/seller?shopId={{shopId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Seller xem đơn theo shop"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Seller xem đơn theo checkout",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/seller?checkoutId={{checkoutId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Seller xem đơn theo checkout"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Seller xem chi tiết đơn",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/seller/{{orderId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Seller xem chi tiết đơn"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Seller hủy đơn COD",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/seller/{{orderId}}/cancel",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Seller hủy đơn COD"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Seller gửi đơn cho Shipping",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/seller/{{orderId}}/ship",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{sellerAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Seller gửi đơn cho Shipping"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem đơn theo shop",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/admin?shopId={{shopId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Admin xem đơn theo shop"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem đơn theo checkout",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/admin?checkoutId={{checkoutId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Admin xem đơn theo checkout"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem đơn theo Buyer",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/admin?buyerId={{buyerId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Admin xem đơn theo Buyer"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin xem chi tiết đơn",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/admin/{{orderId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Admin xem chi tiết đơn"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin hủy đơn COD",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/admin/{{orderId}}/cancel",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Admin hủy đơn COD"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin gửi đơn cho Shipping",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/admin/{{orderId}}/ship",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Admin gửi đơn cho Shipping"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Admin danh sách đơn phân trang server",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/admin/page?page=0&size=20&direction=DESC",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Không có filter trả toàn hệ thống. Tùy chọn: orderId/checkoutId/shopId/buyerId/status/paymentStatus/paymentMethod/from/to/dateBasis=CREATED_AT|UPDATED_AT/q<=150. data.items là OrderResult trực tiếp; metadata page/size/totalElements/totalPages."
+          }
+        },
+        {
+          "name": "Admin doanh thu toàn phạm vi lọc",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{orderBaseUrl}}/api/orders/admin/reports/revenue?from={{reportFrom}}&to={{reportTo}}&page=0&size=10",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Chỉ DELIVERED theo updatedAt, inclusive giờ Việt Nam. shopId tùy chọn. summary toàn phạm vi lọc, items shop phân trang; chưa phải công nợ/chuyển tiền."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Shipping",
+      "description": "Chạy từng request với dữ liệu phù hợp. Các request ghi và xóa cần fixture riêng.",
+      "item": [
+        {
+          "name": "Tạo vận đơn thủ công",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{shippingBaseUrl}}/api/shipments/admin",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"orderId\": \"{{manualOrderId}}\",\n  \"shippingAddress\": \"12 Đường Test, TP. Hồ Chí Minh\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Chỉ chạy riêng trên dữ liệu test. Yêu cầu này có thể thay đổi dữ liệu hoặc gửi email."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " ",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tra vận đơn theo đơn",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{shippingBaseUrl}}/api/shipments/admin?orderId={{orderId}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Tra vận đơn theo đơn"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"trackingCode\", d.trackingCode);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Tra vận đơn theo mã",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": "{{shippingBaseUrl}}/api/shipments/admin/{{trackingCode}}",
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{adminAccessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "description": "Tra vận đơn theo mã"
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                  "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                  "if (ok) {",
+                  " let json = {};",
+                  " if (pm.response.text()) json = pm.response.json();",
+                  " const d = json.data ?? json;",
+                  " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                  " save(\"trackingCode\", d.trackingCode);",
+                  " ",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Tổng hợp",
+      "item": [
+        {
+          "name": "Happy Path · COD giao thành công",
+          "item": [
+            {
+              "name": "01 · Đăng nhập Buyer",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{authBaseUrl}}/auth/login",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{buyerEmail}}\",\n  \"password\": \"{{buyerPassword}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "description": "Đăng nhập Buyer"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " save(\"buyerId\", d.userId);",
+                      "save(\"buyerAccessToken\", d.accessToken);",
+                      "save(\"buyerRefreshToken\", d.refreshToken);",
+                      " ",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "02 · Đăng nhập Seller",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{authBaseUrl}}/auth/login",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{sellerEmail}}\",\n  \"password\": \"{{sellerPassword}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "description": "Đăng nhập Seller"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " save(\"sellerId\", d.userId);",
+                      "save(\"sellerAccessToken\", d.accessToken);",
+                      "save(\"sellerRefreshToken\", d.refreshToken);",
+                      " ",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "03 · Đăng nhập Admin",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{authBaseUrl}}/auth/login",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{adminEmail}}\",\n  \"password\": \"{{adminPassword}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "description": "Đăng nhập Admin"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " save(\"adminId\", d.userId);",
+                      "save(\"adminAccessToken\", d.accessToken);",
+                      "save(\"adminRefreshToken\", d.refreshToken);",
+                      " ",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "04 · Chụp tồn trước checkout",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{inventoryBaseUrl}}/api/inventories/seller/variants/{{variantId}}",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{sellerAccessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "description": "Seller xem kho theo biến thể"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " save(\"inventoryId\", d.id);",
+                      " save(\"beforeOnHand\", d.onHandQuantity); save(\"beforeReserved\", d.reservedQuantity);",
+                      "pm.test(\"Đủ tồn để mua 1 món\", () => pm.expect(d.availableQuantity).to.be.at.least(1));",
+                      "if (!(d.availableQuantity >= 1)) pm.execution.setNextRequest(null);",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "05 · Tạo checkout COD mới",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "{{checkoutKey}}"
+                  }
+                ],
+                "url": "{{orderBaseUrl}}/api/checkouts",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{buyerAccessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"paymentMethod\": \"COD\",\n  \"shippingAddress\": \"12 Đường Test, TP. Hồ Chí Minh\",\n  \"items\": [\n    {\n      \"variantId\": \"{{variantId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "description": "Tạo checkout COD"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code === 201;",
+                      "pm.test(\"201\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " save(\"checkoutId\", d.checkout?.id); save(\"orderId\", d.orders?.[0]?.id);",
+                      " pm.test(\"Checkout có đúng một đơn của shop test\", () => { pm.expect(d.checkout?.id).to.be.a(\"string\"); pm.expect(d.orders).to.have.lengthOf(1); pm.expect(d.orders[0].shopId).to.eql(pm.environment.get(\"shopId\")); });",
+                      "if (!d.checkout?.id || d.orders?.length !== 1 || d.orders[0].shopId !== pm.environment.get(\"shopId\")) pm.execution.setNextRequest(null);",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.environment.set(\"checkoutKey\", pm.variables.replaceIn(\"{{$guid}}\"));",
+                      "[\"checkoutId\",\"orderId\",\"trackingCode\",\"pollConfirm\",\"pollDelivery\",\"pollCancelConfirm\",\"pollInventory\",\"pollRelease\",\"pollShipment\"].forEach(k => pm.environment.unset(k));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "06 · Chờ giữ hàng và CONFIRMED",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{orderBaseUrl}}/api/orders/{{orderId}}",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{buyerAccessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "description": "Buyer xem chi tiết đơn"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " ",
+                      " const status = d.orderStatus;",
+                      " const attempts = Number(pm.environment.get(\"pollConfirm\") || 0) + 1;",
+                      " if (status === \"CONFIRMED\") {",
+                      "  pm.environment.unset(\"pollConfirm\");",
+                      "  pm.test(\"Đạt CONFIRMED\", () => pm.expect(status).to.eql(\"CONFIRMED\"));",
+                      " } else if (attempts < 20 && [\"PENDING\"].includes(status)) {",
+                      "  pm.environment.set(\"pollConfirm\", String(attempts));",
+                      "  pm.execution.setNextRequest(pm.info.requestName);",
+                      " } else {",
+                      "  pm.test(\"Đạt CONFIRMED trong 20 lần thử\", () => pm.expect(status).to.eql(\"CONFIRMED\"));",
+                      "  pm.execution.setNextRequest(null);",
+                      " }",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "07 · Seller giao đơn",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{orderBaseUrl}}/api/orders/seller/{{orderId}}/ship",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{sellerAccessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "description": "Seller gửi đơn cho Shipping"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " ",
+                      " pm.test(\"Đã chuyển SHIPPED\", () => pm.expect(d.orderStatus).to.eql(\"SHIPPED\"));",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "08 · Chờ Order DELIVERED",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{orderBaseUrl}}/api/orders/{{orderId}}",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{buyerAccessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "description": "Buyer xem chi tiết đơn"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " ",
+                      " const status = d.orderStatus;",
+                      " const attempts = Number(pm.environment.get(\"pollDelivery\") || 0) + 1;",
+                      " if (status === \"DELIVERED\") {",
+                      "  pm.environment.unset(\"pollDelivery\");",
+                      "  pm.test(\"Đạt DELIVERED\", () => pm.expect(status).to.eql(\"DELIVERED\"));",
+                      " } else if (attempts < 20 && [\"SHIPPED\"].includes(status)) {",
+                      "  pm.environment.set(\"pollDelivery\", String(attempts));",
+                      "  pm.execution.setNextRequest(pm.info.requestName);",
+                      " } else {",
+                      "  pm.test(\"Đạt DELIVERED trong 20 lần thử\", () => pm.expect(status).to.eql(\"DELIVERED\"));",
+                      "  pm.execution.setNextRequest(null);",
+                      " }",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "09 · Chờ Inventory chốt tồn",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{inventoryBaseUrl}}/api/inventories/seller/variants/{{variantId}}",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{sellerAccessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "description": "Seller xem kho theo biến thể"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " save(\"inventoryId\", d.id);",
+                      " const stock = Number(pm.environment.get(\"beforeOnHand\"));",
+                      "const reserved = Number(pm.environment.get(\"beforeReserved\"));",
+                      "if (d.onHandQuantity === stock - 1 && d.reservedQuantity === reserved) {",
+                      " pm.environment.unset(\"pollInventory\");",
+                      " pm.test(\"Đã chốt đúng một sản phẩm\", () => pm.expect(d.availableQuantity).to.eql(stock - reserved - 1));",
+                      "} else {",
+                      " const n = Number(pm.environment.get(\"pollInventory\") || 0) + 1;",
+                      " pm.environment.set(\"pollInventory\", String(n));",
+                      " if (n < 20) pm.execution.setNextRequest(pm.info.requestName);",
+                      " else { pm.test(\"Inventory đã chốt hàng\", () => pm.expect([d.onHandQuantity, d.reservedQuantity]).to.eql([stock - 1, reserved])); pm.execution.setNextRequest(null); }",
+                      "}",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "10 · Kiểm tra vận đơn",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{shippingBaseUrl}}/api/shipments/admin?orderId={{orderId}}",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{adminAccessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "description": "Tra vận đơn theo đơn"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " save(\"trackingCode\", d.trackingCode);",
+                      " pm.test(\"Đúng đơn và đã giao\", () => { pm.expect(d.orderId).to.eql(pm.environment.get(\"orderId\")); pm.expect(d.status).to.eql(\"DELIVERED\"); });",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "COD · Hủy đơn và nhả giữ chỗ",
+          "item": [
+            {
+              "name": "01 · Đăng nhập Buyer",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{authBaseUrl}}/auth/login",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{buyerEmail}}\",\n  \"password\": \"{{buyerPassword}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "description": "Đăng nhập Buyer"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " save(\"buyerId\", d.userId);",
+                      "save(\"buyerAccessToken\", d.accessToken);",
+                      "save(\"buyerRefreshToken\", d.refreshToken);",
+                      " ",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "02 · Đăng nhập Seller",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{authBaseUrl}}/auth/login",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"{{sellerEmail}}\",\n  \"password\": \"{{sellerPassword}}\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "description": "Đăng nhập Seller"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " save(\"sellerId\", d.userId);",
+                      "save(\"sellerAccessToken\", d.accessToken);",
+                      "save(\"sellerRefreshToken\", d.refreshToken);",
+                      " ",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "04 · Chụp tồn trước checkout",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{inventoryBaseUrl}}/api/inventories/seller/variants/{{variantId}}",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{sellerAccessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "description": "Seller xem kho theo biến thể"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " save(\"inventoryId\", d.id);",
+                      " save(\"beforeOnHand\", d.onHandQuantity); save(\"beforeReserved\", d.reservedQuantity);",
+                      "pm.test(\"Đủ tồn để mua 1 món\", () => pm.expect(d.availableQuantity).to.be.at.least(1));",
+                      "if (!(d.availableQuantity >= 1)) pm.execution.setNextRequest(null);",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "05 · Tạo checkout COD mới",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "{{checkoutKey}}"
+                  }
+                ],
+                "url": "{{orderBaseUrl}}/api/checkouts",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{buyerAccessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"paymentMethod\": \"COD\",\n  \"shippingAddress\": \"12 Đường Test, TP. Hồ Chí Minh\",\n  \"items\": [\n    {\n      \"variantId\": \"{{variantId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "description": "Tạo checkout COD"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code === 201;",
+                      "pm.test(\"201\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " save(\"checkoutId\", d.checkout?.id); save(\"orderId\", d.orders?.[0]?.id);",
+                      " pm.test(\"Checkout có đúng một đơn của shop test\", () => { pm.expect(d.checkout?.id).to.be.a(\"string\"); pm.expect(d.orders).to.have.lengthOf(1); pm.expect(d.orders[0].shopId).to.eql(pm.environment.get(\"shopId\")); });",
+                      "if (!d.checkout?.id || d.orders?.length !== 1 || d.orders[0].shopId !== pm.environment.get(\"shopId\")) pm.execution.setNextRequest(null);",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "pm.environment.set(\"checkoutKey\", pm.variables.replaceIn(\"{{$guid}}\"));",
+                      "[\"checkoutId\",\"orderId\",\"trackingCode\",\"pollConfirm\",\"pollDelivery\",\"pollCancelConfirm\",\"pollInventory\",\"pollRelease\",\"pollShipment\"].forEach(k => pm.environment.unset(k));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "06 · Chờ CONFIRMED trước khi hủy",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{orderBaseUrl}}/api/orders/{{orderId}}",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{buyerAccessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "description": "Buyer xem chi tiết đơn"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " ",
+                      " const status = d.orderStatus;",
+                      " const attempts = Number(pm.environment.get(\"pollCancelConfirm\") || 0) + 1;",
+                      " if (status === \"CONFIRMED\") {",
+                      "  pm.environment.unset(\"pollCancelConfirm\");",
+                      "  pm.test(\"Đạt CONFIRMED\", () => pm.expect(status).to.eql(\"CONFIRMED\"));",
+                      " } else if (attempts < 20 && [\"PENDING\"].includes(status)) {",
+                      "  pm.environment.set(\"pollCancelConfirm\", String(attempts));",
+                      "  pm.execution.setNextRequest(pm.info.requestName);",
+                      " } else {",
+                      "  pm.test(\"Đạt CONFIRMED trong 20 lần thử\", () => pm.expect(status).to.eql(\"CONFIRMED\"));",
+                      "  pm.execution.setNextRequest(null);",
+                      " }",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "07 · Buyer hủy đơn",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{orderBaseUrl}}/api/orders/{{orderId}}/cancel",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{buyerAccessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "description": "Buyer hủy đơn COD"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " ",
+                      " pm.test(\"Đã hủy đơn\", () => pm.expect(d.orderStatus).to.eql(\"CANCELLED\"));",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "08 · Chờ nhả giữ chỗ",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{inventoryBaseUrl}}/api/inventories/seller/variants/{{variantId}}",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{sellerAccessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "description": "Seller xem kho theo biến thể"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code >= 200 && pm.response.code < 300;",
+                      "pm.test(\"HTTP 2xx\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " save(\"inventoryId\", d.id);",
+                      " const expected = Number(pm.environment.get(\"beforeReserved\")); const onHand = Number(pm.environment.get(\"beforeOnHand\"));",
+                      "if (d.reservedQuantity === expected && d.onHandQuantity === onHand) { pm.environment.unset(\"pollRelease\"); pm.test(\"Nhả hàng, tồn thực tế giữ nguyên\", () => pm.expect(d.availableQuantity).to.eql(onHand - expected)); }",
+                      "else { const n = Number(pm.environment.get(\"pollRelease\") || 0) + 1; pm.environment.set(\"pollRelease\", String(n)); if (n < 20) pm.execution.setNextRequest(pm.info.requestName); else { pm.test(\"Inventory đã nhả hàng\", () => pm.expect([d.onHandQuantity,d.reservedQuantity]).to.eql([onHand,expected])); pm.execution.setNextRequest(null); } }",
+                      "} else { pm.execution.setNextRequest(null); }"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Phân quyền · 401 và 403",
+          "description": "Đăng nhập Buyer trước để có buyerAccessToken hợp lệ.",
+          "item": [
+            {
+              "name": "Checkout thiếu JWT",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Idempotency-Key",
+                    "value": "{{checkoutKey}}"
+                  }
+                ],
+                "url": "{{orderBaseUrl}}/api/checkouts",
+                "auth": {
+                  "type": "noauth"
+                },
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"paymentMethod\": \"COD\",\n  \"shippingAddress\": \"12 Đường Test, TP. Hồ Chí Minh\",\n  \"items\": [\n    {\n      \"variantId\": \"{{variantId}}\",\n      \"quantity\": 1\n    }\n  ]\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "description": "Checkout thiếu JWT"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code === 401;",
+                      "pm.test(\"401\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " save(\"checkoutId\", d.checkout?.id); save(\"orderId\", d.orders?.[0]?.id);",
+                      " ",
+                      "}"
+                    ]
+                  }
+                },
+                {
+                  "listen": "prerequest",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "if (!pm.environment.get(\"checkoutKey\")) pm.environment.set(\"checkoutKey\", pm.variables.replaceIn(\"{{$guid}}\"));"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Buyer không có quyền Admin",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{inventoryBaseUrl}}/api/inventories/admin?shopId={{shopId}}",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{buyerAccessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "description": "Buyer không có quyền Admin"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code === 403;",
+                      "pm.test(\"403\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " ",
+                      " ",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Buyer không có quyền Seller",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": "{{orderBaseUrl}}/api/orders/seller/shops/{{shopId}}",
+                "auth": {
+                  "type": "bearer",
+                  "bearer": [
+                    {
+                      "key": "token",
+                      "value": "{{buyerAccessToken}}",
+                      "type": "string"
+                    }
+                  ]
+                },
+                "description": "Buyer không có quyền Seller"
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "type": "text/javascript",
+                    "exec": [
+                      "const ok = pm.response.code === 403;",
+                      "pm.test(\"403\", () => pm.expect(ok, \"HTTP \" + pm.response.code).to.be.true);",
+                      "if (ok) {",
+                      " let json = {};",
+                      " if (pm.response.text()) json = pm.response.json();",
+                      " const d = json.data ?? json;",
+                      " const save = (key, value) => { if (value !== undefined && value !== null) pm.environment.set(key, String(value)); };",
+                      " ",
+                      " ",
+                      "}"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
