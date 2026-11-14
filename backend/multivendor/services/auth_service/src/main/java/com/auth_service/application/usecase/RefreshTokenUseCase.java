@@ -8,6 +8,7 @@ import com.auth_service.application.port.out.RefreshTokenRepository;
 import com.auth_service.application.port.out.TokenProvider;
 import com.auth_service.application.port.out.UserRepository;
 import com.auth_service.domain.model.aggregate.User;
+import com.auth_service.domain.model.enumtype.UserStatus;
 import com.auth_service.domain.model.entity.RefreshToken;
 import com.auth_service.infrastructure.security.RefreshTokenGenerator;
 import org.springframework.beans.factory.annotation.Value;
@@ -62,6 +63,10 @@ public class RefreshTokenUseCase {
         User user = userRepository
                 .findById(oldRefreshToken.getUserId())
                 .orElseThrow(() -> new DomainException(ErrorCode.USER_NOT_FOUND));
+
+        if (user.getStatus() != UserStatus.ACTIVE) {
+            throw new DomainException(ErrorCode.ACCOUNT_LOCKED);
+        }
 
         refreshTokenRepository.deleteByToken(
                 oldRefreshToken.getToken()

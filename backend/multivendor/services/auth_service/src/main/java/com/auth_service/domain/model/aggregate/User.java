@@ -67,6 +67,12 @@ public class User {
         return user;
     }
 
+    public void updateContact(Email email, Phone phone) {
+        this.email = Objects.requireNonNull(email, "Email không được để trống");
+        this.phone = Objects.requireNonNull(phone, "Số điện thoại không được để trống");
+        this.updatedAt = Instant.now();
+    }
+
     public void changePassword(PasswordHash newPasswordHash) {
         this.passwordHash = Objects.requireNonNull(newPasswordHash, "Mã băm mật khẩu không được để trống");
         this.updatedAt = Instant.now();

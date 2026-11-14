@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Locale;
+import java.util.Comparator;
 
 @Service
 public class ListUsersUseCase {
@@ -21,12 +23,13 @@ public class ListUsersUseCase {
     @Transactional(readOnly = true)
     public AdminUserListResult execute(SearchUsersQuery query) {
         List<User> all = userRepository.findAll();
-        String keyword = query.keyword() == null ? "" : query.keyword().trim().toLowerCase();
+        String keyword = query.keyword() == null ? "" : query.keyword().trim().toLowerCase(Locale.ROOT);
 
         List<User> filtered = all.stream()
                 .filter(user -> keyword.isBlank()
-                        || user.getEmail().getValue().toLowerCase().contains(keyword)
+                        || user.getEmail().getValue().toLowerCase(Locale.ROOT).contains(keyword)
                         || user.getPhone().value().contains(keyword))
+                .sorted(Comparator.comparing(User::getCreatedAt).reversed().thenComparing(user -> user.getUserId().toString()))
                 .toList();
 
         int from = Math.min(query.page() * query.size(), filtered.size());
