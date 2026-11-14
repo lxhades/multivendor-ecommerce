@@ -1,0 +1,15 @@
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { useState } from "react";
+import { isMediaUrl } from "../product/productHelpers.js";
+import { adminShopStatuses } from "./adminShopModel.js";
+
+export default function AdminShopsTable({ shops, onOpen }) {
+  return <div className="overflow-x-auto rounded-2xl border border-border bg-card"><table className="w-full min-w-[980px] text-left text-sm"><caption className="sr-only">Danh sách cửa hàng quản trị</caption><thead className="bg-background text-xs text-muted-foreground"><tr>{["Logo", "Cửa hàng / ID", "Người bán", "Sản phẩm", "Đánh giá", "Trạng thái", "Thao tác"].map((label) => <th key={label} scope="col" className="px-4 py-4">{label}</th>)}</tr></thead>
+    <tbody className="divide-y divide-border">{shops.map((shop) => <tr key={shop.id} className="align-top hover:bg-background/50"><td className="px-4 py-4"><ShopLogo key={shop.logoUrl || shop.id} shop={shop} /></td><td className="max-w-60 px-4 py-4"><p className="break-words font-semibold">{shop.name}</p><p className="mt-1 break-words text-xs text-muted-foreground">{shop.slug}</p><p className="mt-2 break-all text-xs text-muted-foreground">{shop.id}</p></td><td className="max-w-40 break-all px-4 py-4 text-xs text-muted-foreground">{shop.sellerId}</td><td className="px-4 py-4">{shop.productCount.toLocaleString("vi-VN")}</td><td className="px-4 py-4 text-xs">{shop.ratingCount ? `${shop.ratingAvg ?? 0}/5 (${shop.ratingCount})` : "Chưa có"}</td><td className="px-4 py-4"><Badge variant="outline" className={`whitespace-nowrap rounded-full px-2 py-1 text-xs font-semibold ${shop.status === "ACTIVE" ? "bg-green-50 text-green-700" : shop.status === "BANNED" ? "bg-red-50 text-red-700" : "bg-accent text-accent-foreground"}`}>{adminShopStatuses[shop.status]}</Badge></td><td className="px-4 py-4"><div className="flex flex-wrap gap-2"><Button variant="outline" type="button" onClick={() => onOpen(shop.id)} className="min-h-11 rounded-lg border px-3 text-xs font-semibold">Chi tiết</Button><Button variant="outline" type="button" onClick={() => onOpen(shop.id, shop.status === "ACTIVE" ? "SUSPENDED" : "ACTIVE")} className="min-h-11 rounded-lg border border-primary/25 px-3 text-xs font-semibold text-primary">{shop.status === "ACTIVE" ? "Tạm ngưng" : "Mở lại"}</Button>{shop.status !== "BANNED" && <Button variant="outline" type="button" onClick={() => onOpen(shop.id, "BANNED")} className="min-h-11 rounded-lg border border-red-200 px-3 text-xs font-semibold text-red-700">Cấm</Button>}</div></td></tr>)}</tbody>
+  </table></div>;
+}
+function ShopLogo({ shop }) {
+  const [failed, setFailed] = useState(false);
+  return <div className="grid size-14 place-items-center overflow-hidden rounded-full border border-border/60 bg-accent">{isMediaUrl(shop.logoUrl) && !failed ? <img src={shop.logoUrl} alt={`Logo ${shop.name}`} loading="lazy" onError={() => setFailed(true)} className="size-full object-cover" /> : <span className="font-bold text-primary">{shop.name.charAt(0)}</span>}</div>;
+}

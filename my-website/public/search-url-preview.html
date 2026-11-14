@@ -1,0 +1,213 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Thử URL danh mục theo slug</title>
+  <style>
+    *{box-sizing:border-box}body{margin:0;background:#f8fafc;color:#0f172a;font:15px/1.6 system-ui,sans-serif}main{max-width:1100px;margin:auto;padding:24px}h1{font-size:26px}h2{font-size:18px;margin-top:0}.card{padding:20px;background:white;border:1px solid #e2e8f0;border-radius:16px;margin:18px 0}.note{background:#fff7ed;color:#9a3412;padding:14px;border-radius:12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}label{display:grid;gap:6px;font-weight:600}input,select,button{font:inherit;min-height:44px;border:1px solid #cbd5e1;border-radius:8px;padding:8px 12px;max-width:100%}input,select{width:100%;background:white}button{cursor:pointer;background:#ea580c;color:white;border-color:#ea580c;font-weight:600}button:disabled{opacity:.5;cursor:wait}.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}.secondary{background:white;color:#9a3412;border-color:#fed7aa}.check{display:flex;align-items:center;gap:10px;margin-top:12px}.check input{width:18px;min-height:18px}.muted{font-size:13px;color:#64748b}.error{color:#b91c1c}code{display:block;overflow-wrap:anywhere;background:#f1f5f9;padding:12px;border-radius:8px}.products{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}.product{display:grid;align-content:start;border:1px solid #e2e8f0;border-radius:12px;overflow:hidden}.product img{width:100%;height:140px;object-fit:contain;background:#f8fafc}.product p{padding:0 12px;overflow-wrap:anywhere}.product a{padding:10px 12px;color:#c2410c}.ok{color:#15803d}a{color:#c2410c}button:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid #ea580c;outline-offset:2px}
+  </style>
+</head>
+<body>
+<main>
+  <h1>Thử URL danh mục theo slug</h1>
+  <p class="note">Trang thử độc lập. Chưa thay đổi router hoặc liên kết chính. Đường dẫn mới được đặt sau dấu <strong>#</strong> trên trang này để thử tải lại và quay lui. URL /search/danh-muc/... thật chưa được triển khai.</p>
+  <section class="card">
+    <h2>1. Chọn danh mục và bộ lọc</h2>
+    <form id="filters">
+      <div class="grid">
+        <label>Danh mục<select id="category" required disabled><option>Đang tải danh mục…</option></select></label>
+        <label>Từ khóa<input name="q" maxlength="120" placeholder="Tên sản phẩm hoặc SKU" /></label>
+        <label>Giá từ (VND)<input name="minPrice" type="number" min="0" step="1" /></label>
+        <label>Giá đến (VND)<input name="maxPrice" type="number" min="0" step="1" /></label>
+        <label>Sắp xếp<select name="sort"><option value="NEWEST">Mới nhất</option><option value="RELEVANCE">Liên quan</option><option value="PRICE_ASC">Giá tăng</option><option value="PRICE_DESC">Giá giảm</option></select></label>
+        <label>Trang<input name="page" type="number" min="1" max="200" value="1" required /></label>
+      </div>
+      <label class="check"><input name="includeChildren" type="checkbox" checked />Gồm danh mục con (mặc định, ẩn khỏi URL)</label>
+      <div class="actions"><button id="try" type="submit" disabled>Thử URL mới và tìm sản phẩm</button><button id="reload" type="button" class="secondary">Tải lại danh mục</button><button id="checks" type="button" class="secondary" disabled>Kiểm tra quy tắc URL</button></div>
+    </form>
+    <p id="categoryStatus" role="status" class="muted"></p>
+  </section>
+  <section class="card">
+    <h2>2. Thử chuyển URL cũ</h2>
+    <label>URL cũ<input id="oldUrl" value="http://localhost:3000/search?categoryId=30000000-0000-4000-8000-000000000003&amp;includeChildren=true" /></label>
+    <div class="actions"><button id="convert" type="button" class="secondary" disabled>Chuyển sang slug và thử</button></div>
+  </section>
+  <section class="card">
+    <h2>3. Kết quả chuyển đổi</h2>
+    <p class="muted">URL dự kiến khi triển khai chính thức</p><code id="candidate">Chưa chọn danh mục.</code>
+    <p class="muted">API thật vẫn nhận categoryId</p><code id="apiUrl">Chưa gọi API.</code>
+    <p id="status" role="status"></p><ul id="checkResults"></ul>
+    <div id="products" class="products"></div>
+    <div class="actions"><button id="previous" type="button" class="secondary" hidden>Trang trước</button><button id="next" type="button" class="secondary" hidden>Trang sau</button></div>
+  </section>
+  <a href="/search">Về trang tìm kiếm hiện tại</a>
+</main>
+<script type="module">
+  const apiBase = "http://localhost:8000";
+  const $ = (id) => document.getElementById(id);
+  const form = $("filters");
+  const allowed = ["q", "minPrice", "maxPrice", "sort", "page", "size", "shopId", "includeChildren"];
+  const sorts = ["RELEVANCE", "NEWEST", "PRICE_ASC", "PRICE_DESC"];
+  const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+  let categories = [];
+  let categoryRequest;
+  let searchRequest;
+  let currentRoute;
+  const money = new Intl.NumberFormat("vi-VN", { style: "currency", currency: "VND" });
+  function fail(message) { throw new Error(message); }
+  function message(error) { $("status").textContent = error.message; $("status").className = "error"; }
+  async function readApi(url, signal) {
+    const response = await fetch(url, { signal });
+    const body = await response.json().catch(() => null);
+    if (!response.ok) fail(body?.message || `API trả HTTP ${response.status}.`);
+    if (!body || !Object.hasOwn(body, "data")) fail("API không trả envelope data hợp lệ.");
+    return body.data;
+  }
+  function categoryBy(field, value, source = categories) {
+    const matches = source.filter((item) => item[field] === value);
+    if (matches.length !== 1) fail(matches.length ? "Slug/ID danh mục bị trùng, không thể xác định duy nhất." : "Không tìm thấy danh mục tương ứng.");
+    const item = matches[0];
+    if (typeof item.slug !== "string" || !/^[a-z0-9]+(?:-[a-z0-9]+)*$/.test(item.slug)) fail("Danh mục chưa có slug hợp lệ; không tự tạo slug từ tên.");
+    return item;
+  }
+  function cleanQuery(source) {
+    const params = new URLSearchParams();
+    for (const name of allowed) {
+      if (source.getAll(name).length > 1) fail(`Tham số ${name} bị lặp.`);
+      const value = source.get(name)?.trim();
+      if (value) params.set(name, value);
+    }
+    if ((params.get("q") || "").length > 120) fail("Từ khóa tối đa 120 ký tự.");
+    for (const name of ["minPrice", "maxPrice", "page", "size"]) {
+      if (!params.has(name)) continue;
+      const text = params.get(name), number = Number(text);
+      if (!/^\d+$/.test(text) || !Number.isSafeInteger(number) || number < (name === "page" || name === "size" ? 1 : 0)) fail(`Tham số ${name} không hợp lệ.`);
+    }
+    if (Number(params.get("page") || 1) > 200 || Number(params.get("size") || 12) > 48) fail("API hỗ trợ page 1–200 và size 1–48.");
+    if (params.has("minPrice") && params.has("maxPrice") && Number(params.get("minPrice")) > Number(params.get("maxPrice"))) fail("Giá tối thiểu vượt giá tối đa.");
+    if (params.has("sort") && !sorts.includes(params.get("sort"))) fail("Sort không được hỗ trợ.");
+    if (params.has("shopId") && !uuid.test(params.get("shopId"))) fail("shopId không hợp lệ.");
+    if (params.has("includeChildren") && !["true", "false"].includes(params.get("includeChildren"))) fail("includeChildren không hợp lệ.");
+    if (params.get("includeChildren") === "true") params.delete("includeChildren");
+    return params;
+  }
+  function buildRoute(category, query) {
+    categoryBy("slug", category.slug);
+    const params = cleanQuery(query);
+    return `/search/danh-muc/${encodeURIComponent(category.slug)}${params.size ? `?${params}` : ""}`;
+  }
+  function resolveRoute(route) {
+    const url = new URL(route, location.origin);
+    const match = url.pathname.match(/^\/search\/danh-muc\/([^/]+)\/?$/);
+    if (!match) fail("Đường dẫn thử phải có dạng /search/danh-muc/slug.");
+    const category = categoryBy("slug", decodeURIComponent(match[1]));
+    if (url.searchParams.has("categoryId")) fail("URL slug không nhận thêm categoryId để tránh mâu thuẫn.");
+    const query = cleanQuery(url.searchParams);
+    const api = new URLSearchParams(query);
+    api.set("categoryId", category.id);
+    api.set("includeChildren", query.get("includeChildren") !== "false" ? "true" : "false");
+    api.set("page", query.get("page") || "1"); api.set("size", query.get("size") || "12");
+    return { category, query, api, route: buildRoute(category, query) };
+  }
+  function convertOld(value) {
+    const url = new URL(value, location.origin);
+    if (url.pathname !== "/search" || url.searchParams.getAll("categoryId").length !== 1) fail("URL cũ phải là /search?categoryId=... với một categoryId.");
+    return buildRoute(categoryBy("id", url.searchParams.get("categoryId")), url.searchParams);
+  }
+  function navigate(route) {
+    if (location.hash.slice(1) === route) void runRoute();
+    else location.hash = route;
+  }
+  async function loadCategories() {
+    categoryRequest?.abort(); searchRequest?.abort();
+    categoryRequest = new AbortController();
+    const request = categoryRequest;
+    for (const id of ["try", "convert", "checks", "category"]) $(id).disabled = true;
+    $("categoryStatus").textContent = "Đang đọc danh mục thật từ /categories…";
+    try {
+      const items = await readApi(`${apiBase}/categories`, request.signal);
+      if (!Array.isArray(items) || items.some((item) => !item?.id || typeof item.name !== "string")) fail("Dữ liệu danh mục không hợp lệ.");
+      if (request.signal.aborted) return;
+      categories = items.filter((item) => item.status === "ACTIVE");
+      $("category").replaceChildren();
+      for (const category of categories) {
+        const option = document.createElement("option"); option.value = category.id; option.textContent = `${category.name} (${category.slug || "thiếu slug"})`; $("category").append(option);
+      }
+      if (!categories.length) fail("Chưa có danh mục ACTIVE để thử.");
+      const exampleId = "30000000-0000-4000-8000-000000000003";
+      if (categories.some((item) => item.id === exampleId)) $("category").value = exampleId;
+      for (const id of ["try", "convert", "checks", "category"]) $(id).disabled = false;
+      $("categoryStatus").textContent = `Đã đọc ${categories.length} danh mục. Dùng slug API trả về, không đoán slug theo tên.`;
+      if (location.hash) await runRoute();
+    } catch (error) { if (!request.signal.aborted) { $("categoryStatus").textContent = error.message + " Kiểm tra backend/Kong trên localhost:8000 và CORS."; $("categoryStatus").className = "error"; } }
+  }
+  async function runRoute() {
+    if (!categories.length) return;
+    searchRequest?.abort(); searchRequest = new AbortController();
+    const request = searchRequest;
+    currentRoute = null; $("products").replaceChildren(); $("previous").hidden = true; $("next").hidden = true;
+    $("status").className = "";
+    try {
+      const resolved = resolveRoute(location.hash.slice(1));
+      currentRoute = resolved;
+      $("candidate").textContent = location.origin + resolved.route;
+      $("apiUrl").textContent = `${apiBase}/api/products/search?${resolved.api}`;
+      $("category").value = resolved.category.id;
+      for (const name of ["q", "minPrice", "maxPrice"]) form.elements[name].value = resolved.query.get(name) || "";
+      form.elements.sort.value = resolved.query.get("sort") || (resolved.query.get("q") ? "RELEVANCE" : "NEWEST");
+      form.elements.page.value = resolved.api.get("page"); form.elements.includeChildren.checked = resolved.api.get("includeChildren") === "true";
+      $("status").textContent = "Đang gọi API tìm kiếm bằng categoryId được giải từ slug…";
+      const data = await readApi($("apiUrl").textContent, request.signal);
+      if (request.signal.aborted) return;
+      if (!Array.isArray(data?.items) || !Number.isSafeInteger(data.totalElements) || !Number.isSafeInteger(data.totalPages) || data.page !== Number(resolved.api.get("page"))) fail("Response tìm kiếm không đúng contract.");
+      $("status").textContent = `${resolved.category.name}: ${data.totalElements} kết quả; trang ${data.page}/${Math.max(1, data.totalPages)}; hiển thị ${data.items.length} sản phẩm.`;
+      if (!data.items.length) $("status").textContent += " Không có sản phẩm trong trang/bộ lọc này.";
+      for (const product of data.items) {
+        const card = document.createElement("article"); card.className = "product";
+        let urls = []; try { urls = JSON.parse(product.mediaJson || "[]"); } catch { /* Missing media does not block URL testing. */ }
+        const image = Array.isArray(urls) && urls.find((url) => typeof url === "string" && /^https?:\/\//i.test(url) && !/\.(mp4|webm|ogg)(?:[?#]|$)/i.test(url));
+        if (image) { const img = document.createElement("img"); img.src = image; img.alt = product.name || "Sản phẩm"; img.loading = "lazy"; card.append(img); }
+        for (const text of [product.name || "Sản phẩm", typeof product.minPrice === "number" ? money.format(product.minPrice) : "Chưa có giá", product.categoryName || ""]) { const p = document.createElement("p"); p.textContent = text; card.append(p); }
+        const link = document.createElement("a"); link.href = `/products/${encodeURIComponent(product.id)}`; link.textContent = "Xem sản phẩm (trang hiện tại)"; card.append(link); $("products").append(card);
+      }
+      $("previous").hidden = data.page <= 1; $("next").hidden = data.page >= Math.min(200, data.totalPages);
+    } catch (error) { if (!request.signal.aborted) message(error); }
+  }
+  form.addEventListener("submit", (event) => {
+    event.preventDefault();
+    try {
+      const query = new URLSearchParams(); const values = new FormData(form);
+      for (const name of ["q", "minPrice", "maxPrice", "sort", "page"]) if (values.get(name)) query.set(name, String(values.get(name)));
+      if (!form.elements.includeChildren.checked) query.set("includeChildren", "false");
+      navigate(buildRoute(categoryBy("id", $("category").value), query));
+    } catch (error) { message(error); }
+  });
+  $("convert").addEventListener("click", () => { try { navigate(convertOld($("oldUrl").value)); } catch (error) { message(error); } });
+  $("reload").addEventListener("click", () => void loadCategories());
+  for (const [id, offset] of [["previous", -1], ["next", 1]]) $(id).addEventListener("click", () => {
+    if (!currentRoute) return;
+    const query = new URLSearchParams(currentRoute.query); query.set("page", String(Number(currentRoute.api.get("page")) + offset)); navigate(buildRoute(currentRoute.category, query));
+  });
+  $("checks").addEventListener("click", () => {
+    $("checkResults").replaceChildren();
+    let category;
+    try { category = categoryBy("id", $("category").value); } catch (error) { message(error); return; }
+    const checks = [
+      ["Slug giải về đúng UUID để gọi API", () => resolveRoute(buildRoute(category, new URLSearchParams())).category.id === category.id],
+      ["includeChildren=true được ẩn nhưng API vẫn nhận true", () => { const value = resolveRoute(buildRoute(category, new URLSearchParams("includeChildren=true"))); return !value.query.has("includeChildren") && value.api.get("includeChildren") === "true"; }],
+      ["includeChildren=false được giữ nguyên", () => resolveRoute(buildRoute(category, new URLSearchParams("includeChildren=false"))).api.get("includeChildren") === "false"],
+      ["Chuyển URL cũ giữ từ khóa tiếng Việt, giá và trang", () => { const query = new URLSearchParams({ categoryId: category.id, q: "Áo xanh & trắng", minPrice: "100000", page: "2" }); const value = resolveRoute(convertOld(`/search?${query}`)); return value.query.get("q") === "Áo xanh & trắng" && value.query.get("minPrice") === "100000" && value.api.get("page") === "2"; }],
+      ["Không nhận slug không tồn tại", () => { try { categoryBy("slug", "slug-khong-ton-tai", []); return false; } catch { return true; } }],
+      ["Không tự chọn khi slug bị trùng", () => { try { categoryBy("slug", category.slug, [category, { ...category, id: "another-id" }]); return false; } catch { return true; } }],
+      ["Chặn khoảng giá đảo ngược", () => { try { cleanQuery(new URLSearchParams("minPrice=200&maxPrice=100")); return false; } catch { return true; } }],
+      ["Chặn trang vượt giới hạn API", () => { try { cleanQuery(new URLSearchParams("page=201")); return false; } catch { return true; } }],
+    ];
+    for (const [label, check] of checks) { const item = document.createElement("li"); let ok = false; try { ok = check(); } catch { /* Report the failed rule below. */ } item.textContent = `${ok ? "ĐẠT" : "LỖI"}: ${label}`; item.className = ok ? "ok" : "error"; $("checkResults").append(item); }
+  });
+  window.addEventListener("hashchange", () => void runRoute());
+  window.addEventListener("pagehide", () => { categoryRequest?.abort(); searchRequest?.abort(); });
+  void loadCategories();
+</script>
+</body>
+</html>
