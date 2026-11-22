@@ -12,6 +12,7 @@ public class AuthServiceApplication {
 
         TimeZone.setDefault(TimeZone.getTimeZone("Asia/Ho_Chi_Minh"));
         SpringApplication.run(AuthServiceApplication.class, args);
+        //test
     }
 
 }
