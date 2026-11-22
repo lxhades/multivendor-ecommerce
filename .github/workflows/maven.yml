@@ -23,7 +23,7 @@ jobs:
             root:
               - 'backend/multivendor/pom.xml'
             auth:
-              - 'backend/multivendor/services/auth_service/**'
+              - 'backend/multivendor/services/auth-service/**'
             product:
               - 'backend/multivendor/services/product_service/**'
             inventory:
