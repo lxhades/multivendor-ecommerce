@@ -28,7 +28,9 @@ jobs:
             product:
               - 'backend/multivendor/services/product_service/**'
             inventory:
-              - 'backend/multivendor/services/inventory_service/**'
+              - 'backend/multivendor/services/inventory-service/**'
+            order:
+              - 'backend/multivendor/services/order_service/**'
 
       # 2. Setup JDK 17 (Chạy nếu có bất kỳ sự thay đổi nào)
       - name: Setup JDK 17
@@ -73,14 +75,14 @@ jobs:
       - name: Build Inventory Service
         if: steps.filter.outputs.root == 'true' || steps.filter.outputs.inventory == 'true'
         working-directory: ./backend/multivendor
-        run: mvn -B -ntp clean package -Dmaven.test.skip=true -pl :inventory_service -am
+        run: mvn -B -ntp clean package -Dmaven.test.skip=true -pl :inventory-service -am
 
       - name: Upload Inventory JAR
         if: steps.filter.outputs.root == 'true' || steps.filter.outputs.inventory == 'true'
         uses: actions/upload-artifact@v4
         with:
           name: inventory-service-jar
-          path: 'backend/multivendor/services/inventory_service/target/*.jar'
+          path: 'backend/multivendor/services/inventory-service/target/*.jar'
           if-no-files-found: error
       # BUILD ORDER SERVICE
       
