@@ -24,7 +24,7 @@ jobs:
             root:
               - 'backend/multivendor/pom.xml'
             auth:
-              - 'backend/multivendor/services/auth-service/**'
+              - 'backend/multivendor/services/auth_service/**'
             product:
               - 'backend/multivendor/services/product_service/**'
             inventory:
@@ -44,7 +44,7 @@ jobs:
       - name: Build Auth Service
         if: steps.filter.outputs.root == 'true' || steps.filter.outputs.auth == 'true'
         working-directory: ./backend/multivendor
-        run: mvn -B -ntp clean package -Dmaven.test.skip=true -pl :auth_service -am
+        run: mvn -B -ntp clean package -Dmaven.test.skip=true -pl :auth-service -am
 
       - name: Upload Auth JAR
         if: steps.filter.outputs.root == 'true' || steps.filter.outputs.auth == 'true'
