@@ -8,7 +8,17 @@ export function mediaUrls(mediaJson) {
 }
 
 export function isMediaUrl(value) {
-  return typeof value === "string" && /^https?:\/\//i.test(value);
+  if (typeof value !== "string" || !value.trim()) {
+    return false;
+  }
+
+  // URL tuyệt đối: ảnh từ domain bên ngoài hoặc dữ liệu cũ.
+  if (/^https?:\/\//i.test(value)) {
+    return true;
+  }
+
+  // URL tương đối do backend trả về.
+  return /^\/media\/.+/i.test(value);
 }
 
 export function isVideo(url) {

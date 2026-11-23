@@ -1,0 +1,33 @@
+services:
+  nginx:
+    image: nginx:alpine
+    container_name: multivendor-demo-nginx
+    restart: unless-stopped
+
+    ports:
+      - "127.0.0.1:8088:80"
+
+    volumes:
+      - ../../my-website/dist:/usr/share/nginx/html:ro
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
+
+    networks:
+      - backend
+
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: multivendor-cloudflared
+    restart: unless-stopped
+
+    command: tunnel --no-autoupdate --url http://nginx:80
+
+    depends_on:
+      - nginx
+
+    networks:
+      - backend
+
+networks:
+  backend:
+    external: true
+    name: multivendor_backend

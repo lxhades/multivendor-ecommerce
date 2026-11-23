@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { isVideo, mediaUrls, money } from "../product/productHelpers.js";
+import { isVideo, mediaUrls, money,isMediaUrl } from "../product/productHelpers.js";
 import { orderDate } from "../order/orderHelpers.js";
 
 export default function AdminPendingProductsTable({ products, shops, onOpen }) {
@@ -11,6 +11,8 @@ export default function AdminPendingProductsTable({ products, shops, onOpen }) {
 }
 function ProductImage({ product }) {
   const [failed, setFailed] = useState(false);
-  const url = mediaUrls(product.mediaJson).find((item) => !isVideo(item)) || product.variants.find((item) => item.imageUrl)?.imageUrl;
+  const url =
+      mediaUrls(product.mediaJson).find((item) => !isVideo(item)) ||
+      product.variants.find((item) => isMediaUrl(item.imageUrl))?.imageUrl;
   return <div className="grid size-16 place-items-center overflow-hidden rounded-lg bg-muted">{url && !failed ? <img src={url} alt={product.name} loading="lazy" onError={() => setFailed(true)} className="size-full object-contain" /> : <span className="text-xs text-muted-foreground">Chưa có ảnh</span>}</div>;
 }

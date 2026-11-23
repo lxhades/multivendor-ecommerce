@@ -2,7 +2,9 @@ import axios from 'axios';
 import { getSession, waitForSessionRefresh } from "./auth/authSession.js";
 
 const axiosClient = axios.create({
-  baseURL: 'http://localhost:8000', 
+  baseURL: import.meta.env.DEV
+  ? 'http://localhost:8000'
+  : '', 
   headers: {
     'Content-Type': 'application/json',
   },
